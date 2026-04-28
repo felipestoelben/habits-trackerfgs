@@ -2,65 +2,319 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Hábitos</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Habits</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0 }
-  body { font-family: system-ui, -apple-system, sans-serif; background: #f0f0f5; min-height: 100vh; padding: 24px 16px 40px }
-  h1 { text-align: center; font-size: 24px; font-weight: 700; color: #1c1c1e; margin-bottom: 4px }
-  .date { text-align: center; color: #888; font-size: 14px; margin-bottom: 16px; text-transform: capitalize }
-  .progress-bar-wrap { background: #e0e0e8; border-radius: 8px; height: 8px; margin-bottom: 6px }
-  .progress-bar { background: #d4006e; height: 8px; border-radius: 8px; transition: width .3s }
-  .progress-label { text-align: center; font-size: 13px; color: #888; margin-bottom: 20px }
-  .progress-label b { color: #d4006e }
-  .habit {
-    display: flex; align-items: center; gap: 14px;
-    background: #fff; border-radius: 14px; padding: 15px 16px;
-    margin-bottom: 8px; cursor: pointer; transition: opacity .15s;
-    -webkit-tap-highlight-color: transparent; user-select: none;
+  :root {
+    --bg: #f2f2f7;
+    --surface: #ffffff;
+    --surface2: #f0f0f5;
+    --text: #1c1c1e;
+    --text2: #8e8e93;
+    --sep: #e5e5ea;
+    --accent: #d4006e;
   }
-  .habit:active { opacity: .65 }
-  .habit.done { background: #fdf5f9 }
-  .check {
-    width: 30px; height: 30px; border-radius: 50%;
-    border: 2px solid #ddd; flex-shrink: 0;
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #000000;
+      --surface: #1c1c1e;
+      --surface2: #2c2c2e;
+      --text: #ffffff;
+      --text2: #8e8e93;
+      --sep: #38383a;
+      --accent: #ff2d78;
+    }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 40px);
+  }
+
+  .app { max-width: 430px; margin: 0 auto }
+
+  /* ── Header ── */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 20px 10px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 20;
+  }
+  .icon-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 16px;
+    cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    font-size: 15px; transition: all .2s;
+    box-shadow: 0 1px 6px rgba(0,0,0,.12);
+    transition: transform .12s, opacity .12s;
+    user-select: none;
   }
-  .habit.done .check { background: #d4006e; border-color: #d4006e; color: #fff }
-  .label { font-size: 16px; flex: 1; color: #1c1c1e }
-  .habit.done .label { color: #b0b0b8; text-decoration: line-through }
+  .icon-btn:active { transform: scale(.88); opacity: .7 }
+  .header h1 { font-size: 20px; font-weight: 700; letter-spacing: -.3px }
+
+  /* ── Date strip ── */
+  .date-strip {
+    display: flex;
+    align-items: flex-end;
+    padding: 4px 16px 10px;
+    gap: 0;
+  }
+  .ds-spacer { flex: 1 }
+  .ds-cols {
+    display: flex;
+    width: 175px;
+    flex-shrink: 0;
+  }
+  .ds-col {
+    flex: 1;
+    text-align: center;
+    line-height: 1.2;
+  }
+  .ds-col .dn {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text2);
+  }
+  .ds-col .dw {
+    font-size: 10px;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: .3px;
+  }
+  .ds-col.today .dn,
+  .ds-col.today .dw { color: var(--accent) }
+
+  /* ── Progress ── */
+  .progress-wrap {
+    padding: 0 16px 14px;
+  }
+  .progress-track {
+    background: var(--sep);
+    border-radius: 99px;
+    height: 5px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 99px;
+    transition: width .4s ease;
+  }
+  .progress-label {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text2);
+    margin-top: 5px;
+  }
+  .progress-label b { color: var(--accent) }
+
+  /* ── Habit list ── */
+  .habit-list {
+    margin: 0 16px;
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--surface);
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+  }
+  .habit-row + .habit-row {
+    border-top: 1px solid var(--sep);
+  }
+
+  /* ── Habit row ── */
+  .habit-row {
+    display: flex;
+    align-items: center;
+    padding: 11px 12px;
+    cursor: pointer;
+    user-select: none;
+    gap: 10px;
+    transition: background .1s;
+    background: transparent;
+  }
+  .habit-row:active { background: var(--surface2) }
+
+  .check-circle {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--sep);
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+    transition: background .2s, border-color .2s;
+  }
+
+  .habit-name {
+    flex: 1;
+    font-size: 15px;
+    font-weight: 500;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color .2s;
+  }
+  .habit-row.done .habit-name {
+    color: var(--text2) !important;
+    text-decoration: line-through;
+    text-decoration-color: var(--text2);
+  }
+
+  /* ── Day indicators ── */
+  .day-inds {
+    display: flex;
+    width: 175px;
+    flex-shrink: 0;
+  }
+  .day-ind {
+    flex: 1;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .ind {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    transition: background .2s;
+  }
+  .ind.done { color: #fff }
+  .ind.missed { color: var(--sep); font-size: 17px; font-weight: 300; line-height: 1 }
+  .ind.pending { border: 2px solid var(--sep) }
 </style>
 </head>
 <body>
-<h1>🎯 Hábitos</h1>
-<p class="date" id="date"></p>
-<div class="progress-bar-wrap"><div class="progress-bar" id="bar" style="width:0%"></div></div>
-<p class="progress-label"><b id="count">0</b> / 12 concluídos hoje</p>
-<div id="list"></div>
+<div class="app">
+  <div class="header">
+    <button class="icon-btn" id="btn-settings">⚙️</button>
+    <h1>Habits</h1>
+    <button class="icon-btn" id="btn-add">＋</button>
+  </div>
+
+  <div class="date-strip">
+    <div class="ds-spacer"></div>
+    <div class="ds-cols" id="ds-cols"></div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-track">
+      <div class="progress-fill" id="bar" style="width:0%"></div>
+    </div>
+    <p class="progress-label"><b id="cnt">0</b> / <span id="tot">0</span> concluídos hoje</p>
+  </div>
+
+  <div class="habit-list" id="list"></div>
+</div>
+
 <script>
 const HABITS = [
-  ['⏰','Acordar até 04:20'],['💧','500ml de água em jejum'],['☀️','Exposição à luz de manhã'],
-  ['💊','Minoxidil + Biotina + Dutasterida'],['📖','Devocional'],['📚','Leitura 30 minutos'],
-  ['💪','Treino de força'],['🥤','Creatina'],['🏃','Cardio 30 minutos'],
-  ['🥗','Dieta'],['💧','4 litros de água'],['😴','Dormir até 21:30'],
+  {id:'h1',  emoji:'⏰', name:'Acordar às 04:20',        color:'#FF6B6B'},
+  {id:'h2',  emoji:'💧', name:'500ml água em jejum',      color:'#4ECDC4'},
+  {id:'h3',  emoji:'☀️', name:'Luz solar de manhã',       color:'#F9C74F'},
+  {id:'h4',  emoji:'💊', name:'Minoxidil + Biotina + Dut',color:'#90BE6D'},
+  {id:'h5',  emoji:'📖', name:'Devocional',               color:'#C77DFF'},
+  {id:'h6',  emoji:'📚', name:'Leitura 30 min',           color:'#F3722C'},
+  {id:'h7',  emoji:'💪', name:'Treino de força',          color:'#F94144'},
+  {id:'h8',  emoji:'🥤', name:'Creatina',                 color:'#43AA8B'},
+  {id:'h9',  emoji:'🏃', name:'Cardio 30 min',            color:'#277DA1'},
+  {id:'h10', emoji:'🥗', name:'Dieta',                    color:'#80B918'},
+  {id:'h11', emoji:'💧', name:'4 litros de água',         color:'#0096C7'},
+  {id:'h12', emoji:'😴', name:'Dormir às 21:30',          color:'#9B72CF'},
 ];
-const todayKey = () => 'habits_' + new Date().toISOString().slice(0,10);
-let state = JSON.parse(localStorage.getItem(todayKey())) || Array(12).fill(false);
-function save() { localStorage.setItem(todayKey(), JSON.stringify(state)); }
-function render() {
-  const done = state.filter(Boolean).length;
-  document.getElementById('count').textContent = done;
-  document.getElementById('bar').style.width = (done/12*100)+'%';
-  document.getElementById('list').innerHTML = HABITS.map(([e,n],i)=>`
-    <div class="habit${state[i]?' done':''}" onclick="toggle(${i})">
-      <div class="check">${state[i]?'✓':''}</div>
-      <span class="label">${e} ${n}</span>
-    </div>`).join('');
+
+const WDAYS = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+
+function today() {
+  return new Date().toISOString().slice(0, 10);
 }
-function toggle(i) { state[i]=!state[i]; save(); render(); }
-document.getElementById('date').textContent =
-  new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+function last5() {
+  return Array.from({length: 5}, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - (4 - i));
+    return d.toISOString().slice(0, 10);
+  });
+}
+
+function getComp() {
+  return JSON.parse(localStorage.getItem('comp') || '{}');
+}
+
+function saveComp(c) {
+  localStorage.setItem('comp', JSON.stringify(c));
+}
+
+function toggle(id) {
+  const c = getComp();
+  const d = today();
+  c[d] = c[d] || [];
+  const i = c[d].indexOf(id);
+  i >= 0 ? c[d].splice(i, 1) : c[d].push(id);
+  saveComp(c);
+  render();
+}
+
+function render() {
+  const comp = getComp();
+  const t = today();
+  const days = last5();
+
+  // Day headers
+  document.getElementById('ds-cols').innerHTML = days.map(d => {
+    const dt = new Date(d + 'T12:00:00');
+    const isT = d === t;
+    return `<div class="ds-col${isT ? ' today' : ''}">
+      <div class="dn">${dt.getDate()}</div>
+      <div class="dw">${WDAYS[dt.getDay()]}</div>
+    </div>`;
+  }).join('');
+
+  // Progress
+  const todayDone = (comp[t] || []).length;
+  document.getElementById('cnt').textContent = todayDone;
+  document.getElementById('tot').textContent = HABITS.length;
+  document.getElementById('bar').style.width = (todayDone / HABITS.length * 100) + '%';
+
+  // Habits
+  document.getElementById('list').innerHTML = HABITS.map(h => {
+    const done = (comp[t] || []).includes(h.id);
+    const inds = days.map(d => {
+      if (d > t) return `<div class="day-ind"><div class="ind"></div></div>`;
+      const isDone = (comp[d] || []).includes(h.id);
+      if (isDone)
+        return `<div class="day-ind"><div class="ind done" style="background:${h.color}">✓</div></div>`;
+      if (d === t)
+        return `<div class="day-ind"><div class="ind pending"></div></div>`;
+      return `<div class="day-ind"><div class="ind missed">×</div></div>`;
+    }).join('');
+
+    const nameStyle = done ? '' : `color:${h.color}`;
+    const checkStyle = done
+      ? `background:${h.color};border-color:${h.color}`
+      : `border-color:${h.color}`;
+
+    return `<div class="habit-row${done ? ' done' : ''}" onclick="toggle('${h.id}')">
+      <div class="check-circle" style="${checkStyle}">${done ? '✓' : ''}</div>
+      <div class="habit-name" style="${nameStyle}">${h.emoji} ${h.name}</div>
+      <div class="day-inds">${inds}</div>
+    </div>`;
+  }).join('');
+}
+
 render();
 </script>
 </body>
