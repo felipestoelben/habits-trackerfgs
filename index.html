@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hábitos</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0 }
+  body { font-family: system-ui, -apple-system, sans-serif; background: #f0f0f5; min-height: 100vh; padding: 24px 16px 40px }
+  h1 { text-align: center; font-size: 24px; font-weight: 700; color: #1c1c1e; margin-bottom: 4px }
+  .date { text-align: center; color: #888; font-size: 14px; margin-bottom: 16px; text-transform: capitalize }
+  .progress-bar-wrap { background: #e0e0e8; border-radius: 8px; height: 8px; margin-bottom: 6px }
+  .progress-bar { background: #d4006e; height: 8px; border-radius: 8px; transition: width .3s }
+  .progress-label { text-align: center; font-size: 13px; color: #888; margin-bottom: 20px }
+  .progress-label b { color: #d4006e }
+  .habit {
+    display: flex; align-items: center; gap: 14px;
+    background: #fff; border-radius: 14px; padding: 15px 16px;
+    margin-bottom: 8px; cursor: pointer; transition: opacity .15s;
+    -webkit-tap-highlight-color: transparent; user-select: none;
+  }
+  .habit:active { opacity: .65 }
+  .habit.done { background: #fdf5f9 }
+  .check {
+    width: 30px; height: 30px; border-radius: 50%;
+    border: 2px solid #ddd; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; transition: all .2s;
+  }
+  .habit.done .check { background: #d4006e; border-color: #d4006e; color: #fff }
+  .label { font-size: 16px; flex: 1; color: #1c1c1e }
+  .habit.done .label { color: #b0b0b8; text-decoration: line-through }
+</style>
+</head>
+<body>
+<h1>🎯 Hábitos</h1>
+<p class="date" id="date"></p>
+<div class="progress-bar-wrap"><div class="progress-bar" id="bar" style="width:0%"></div></div>
+<p class="progress-label"><b id="count">0</b> / 12 concluídos hoje</p>
+<div id="list"></div>
+<script>
+const HABITS = [
+  ['⏰','Acordar até 04:20'],['💧','500ml de água em jejum'],['☀️','Exposição à luz de manhã'],
+  ['💊','Minoxidil + Biotina + Dutasterida'],['📖','Devocional'],['📚','Leitura 30 minutos'],
+  ['💪','Treino de força'],['🥤','Creatina'],['🏃','Cardio 30 minutos'],
+  ['🥗','Dieta'],['💧','4 litros de água'],['😴','Dormir até 21:30'],
+];
+const todayKey = () => 'habits_' + new Date().toISOString().slice(0,10);
+let state = JSON.parse(localStorage.getItem(todayKey())) || Array(12).fill(false);
+function save() { localStorage.setItem(todayKey(), JSON.stringify(state)); }
+function render() {
+  const done = state.filter(Boolean).length;
+  document.getElementById('count').textContent = done;
+  document.getElementById('bar').style.width = (done/12*100)+'%';
+  document.getElementById('list').innerHTML = HABITS.map(([e,n],i)=>`
+    <div class="habit${state[i]?' done':''}" onclick="toggle(${i})">
+      <div class="check">${state[i]?'✓':''}</div>
+      <span class="label">${e} ${n}</span>
+    </div>`).join('');
+}
+function toggle(i) { state[i]=!state[i]; save(); render(); }
+document.getElementById('date').textContent =
+  new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+render();
+</script>
+</body>
+</html>
