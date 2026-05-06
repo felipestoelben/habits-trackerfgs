@@ -110,10 +110,10 @@
   /* ── Date strip ── */
   .date-strip { display: flex; align-items: flex-end; padding: 4px 16px 10px }
   .ds-spacer { flex: 1 }
-  .ds-cols { display: flex; width: 175px; flex-shrink: 0 }
+  .ds-cols { display: flex; width: 150px; flex-shrink: 0 }
   .ds-col { flex: 1; text-align: center; line-height: 1.2 }
-  .ds-col .dn { font-size: 13px; font-weight: 600; color: var(--text2) }
-  .ds-col .dw { font-size: 10px; color: var(--text2); text-transform: uppercase; letter-spacing: .3px }
+  .ds-col .dn { font-size: 12px; font-weight: 600; color: var(--text2) }
+  .ds-col .dw { font-size: 9px; color: var(--text2); text-transform: uppercase; letter-spacing: .2px }
   .ds-col.today .dn, .ds-col.today .dw { color: var(--text) }
 
   /* ── Progress ── */
@@ -131,13 +131,14 @@
     background: var(--surface); box-shadow: 0 1px 4px rgba(0,0,0,.06);
   }
   .habit-row + .habit-row { border-top: 1px solid var(--sep) }
-  .habit-row { display: flex; align-items: center; padding: 10px 12px; gap: 10px; background: transparent }
+  .habit-row { display: flex; align-items: center; padding: 9px 12px; gap: 8px; background: transparent }
 
-  /* SVG ring tap area — 44×44 minimum touch target */
+  /* SVG ring tap area — 44×44 touch target, visual menor via SVG interno */
   .ring-tap {
     flex-shrink: 0; width: 44px; height: 44px;
     display: flex; align-items: center; justify-content: center;
     cursor: pointer; user-select: none; border-radius: 50%;
+    margin: 0 -4px; /* compensa o padding extra sem cortar o toque */
     transition: opacity .12s;
   }
   .ring-tap:active { opacity: .55 }
@@ -152,11 +153,11 @@
   .streak-hot { color: #FF6B35 }
   .streak-cold { color: var(--text2) }
 
-  .day-inds { display: flex; width: 175px; flex-shrink: 0; cursor: pointer }
+  .day-inds { display: flex; width: 150px; flex-shrink: 0; cursor: pointer }
   .day-ind { flex: 1; display: flex; align-items: center; justify-content: center }
-  .ind { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700 }
+  .ind { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700 }
   .ind.done { color: #fff }
-  .ind.missed { color: var(--sep); font-size: 17px; font-weight: 300; line-height: 1 }
+  .ind.missed { color: var(--sep); font-size: 15px; font-weight: 300; line-height: 1 }
   .ind.pending { border: 2px solid var(--sep) }
 
   /* ── Detail screen ── */
@@ -613,18 +614,18 @@ function monthPct(id, comp) {
 
 // ── SVG ──────────────────────────────────────────────
 function miniRing(id, comp, color) {
-  const S=34,r=14,cx=17,cy=17;
+  const S=30,r=12,cx=15,cy=15;
   const circ=+(2*Math.PI*r).toFixed(2);
   const pct=monthPct(id,comp);
   const off=+(circ*(1-pct)).toFixed(2);
   const isDone=(comp[today()]||[]).includes(id);
-  const arc=pct>0?`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="2.5"
+  const arc=pct>0?`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="2"
     stroke-dasharray="${circ}" stroke-dashoffset="${off}" stroke-linecap="round" transform="rotate(-90 ${cx} ${cy})"/>`:'';
   const center=isDone
-    ?`<text x="${cx}" y="${cy+5}" text-anchor="middle" font-size="12" font-weight="700" fill="${color}">✓</text>`
+    ?`<text x="${cx}" y="${cy+4}" text-anchor="middle" font-size="10" font-weight="700" fill="${color}">✓</text>`
     :'';
   return `<svg width="${S}" height="${S}" viewBox="0 0 ${S} ${S}">
-    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--sep)" stroke-width="2.5"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--sep)" stroke-width="2"/>
     ${arc}${center}</svg>`;
 }
 
