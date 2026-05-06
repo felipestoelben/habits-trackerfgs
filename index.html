@@ -493,43 +493,56 @@ function getHabits() { return JSON.parse(localStorage.getItem('habits') || 'null
 function saveHabits(h) { localStorage.setItem('habits', JSON.stringify(h)) }
 function getComp()     { return JSON.parse(localStorage.getItem('comp') || '{}') }
 function saveComp(c)   { localStorage.setItem('comp', JSON.stringify(c)) }
-function today()       { return new Date().toISOString().slice(0, 10) }
 function uid()         { return 'h' + Date.now().toString(36) }
+
+// Usa data LOCAL (não UTC) — evita bug de fuso horário (ex: Brasil UTC-3)
+function dateKey(d) {
+  if (!d) d = new Date();
+  return d.getFullYear() + '-' +
+    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getDate()).padStart(2, '0');
+}
+function today() { return dateKey() }
 
 function last5() {
   return Array.from({length:5}, (_,i) => {
-    const d = new Date(); d.setDate(d.getDate()-(4-i));
-    return d.toISOString().slice(0,10);
+    const d = new Date(); d.setDate(d.getDate() - (4 - i));
+    return dateKey(d);
   });
 }
 
 // ── Calcs ────────────────────────────────────────────
 function calcStreak(id, comp) {
-  const t = today(), d = new Date(t+'T12:00:00');
-  if (!(comp[t]||[]).includes(id)) d.setDate(d.getDate()-1);
-  let n=0;
-  while(n<3650){ const k=d.toISOString().slice(0,10); if((comp[k]||[]).includes(id)){n++;d.setDate(d.getDate()-1);}else break; }
+  const t = today(), d = new Date();
+  if (!(comp[t]||[]).includes(id)) d.setDate(d.getDate() - 1);
+  let n = 0;
+  while (n < 3650) {
+    const k = dateKey(d);
+    if ((comp[k]||[]).includes(id)) { n++; d.setDate(d.getDate() - 1); } else break;
+  }
   return n;
 }
 
 function calcScore(id, comp) {
-  const t=today(), now=new Date(t+'T12:00:00');
+  const t=today(), now=new Date();
   const allDates=Object.keys(comp).filter(d=>d<=t).sort();
   let totalDays=1, totalDone=0;
   if(allDates.length){
-    const start=new Date(allDates[0]+'T12:00:00');
+    const start=new Date(allDates[0]);
     totalDays=Math.max(1,Math.round((now-start)/86400000)+1);
     for(const [day,ids] of Object.entries(comp)) if(day<=t&&ids.includes(id)) totalDone++;
   }
-  const dom=now.getDate(); let mDone=0;
+  const dom=now.getDate(), yr=now.getFullYear(), mo=now.getMonth();
+  let mDone=0;
   for(let i=1;i<=dom;i++){
-    const k=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+    const k=`${yr}-${String(mo+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
     if((comp[k]||[]).includes(id)) mDone++;
   }
-  const ys=new Date(now.getFullYear(),0,1), doy=Math.round((now-ys)/86400000)+1;
+  const doy=Math.round((now-new Date(yr,0,1))/86400000)+1;
   let yDone=0;
   for(let i=0;i<doy;i++){
-    const k=new Date(ys.getTime()+i*86400000).toISOString().slice(0,10);
+    const d2=new Date(yr,0,1+i);
+    const k=dateKey(d2);
     if(k<=t&&(comp[k]||[]).includes(id)) yDone++;
   }
   return {
@@ -584,7 +597,7 @@ function chartHTML(id, comp, color, view) {
   if(view==='month'){
     for(let i=0;i<30;i++){
       const d=new Date();d.setDate(d.getDate()-(29-i));
-      pts.push({f:i/29,v:(comp[d.toISOString().slice(0,10)]||[]).includes(id)?100:0});
+      pts.push({f:i/29,v:(comp[dateKey(d)]||[]).includes(id)?100:0});
     }
   } else {
     for(let i=0;i<12;i++){
