@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Habits</title>
+<!-- Aplica tema antes do render para evitar flash branco/preto -->
+<script>
+  (function(){
+    const s = localStorage.getItem('theme');
+    const dark = s ? s==='dark' : window.matchMedia('(prefers-color-scheme:dark)').matches;
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  })();
+</script>
 <style>
   :root {
     --bg: #f2f2f7;
@@ -14,8 +22,9 @@
     --sep: #e5e5ea;
     --green: #34c759;
   }
+  /* Sistema: escuro por preferência do OS (quando usuário não escolheu manualmente) */
   @media (prefers-color-scheme: dark) {
-    :root {
+    :root:not([data-theme="light"]) {
       --bg: #000;
       --surface: #1c1c1e;
       --surface2: #2c2c2e;
@@ -24,6 +33,25 @@
       --sep: #38383a;
       --green: #30d158;
     }
+  }
+  /* Escolha manual do usuário */
+  [data-theme="dark"] {
+    --bg: #000;
+    --surface: #1c1c1e;
+    --surface2: #2c2c2e;
+    --text: #fff;
+    --text2: #8e8e93;
+    --sep: #38383a;
+    --green: #30d158;
+  }
+  [data-theme="light"] {
+    --bg: #f2f2f7;
+    --surface: #ffffff;
+    --surface2: #f0f0f5;
+    --text: #1c1c1e;
+    --text2: #8e8e93;
+    --sep: #e5e5ea;
+    --green: #34c759;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; touch-action: manipulation }
   html { overscroll-behavior: none }
@@ -321,7 +349,7 @@
   <!-- ══ MAIN ══ -->
   <div id="screen-main">
     <div class="main-header">
-      <button class="icon-btn">⚙️</button>
+      <button class="icon-btn" id="theme-btn" onclick="toggleTheme()"></button>
       <h1>Habits</h1>
       <button class="icon-btn" onclick="openAdd()">＋</button>
     </div>
@@ -487,6 +515,28 @@ let editColor       = COLORS[0];
 let detailYear, detailMonth;
 let detailChartView = 'month';
 let colorPickerOpen = false;
+
+// ── Tema ─────────────────────────────────────────────
+function isDarkNow() {
+  const saved = localStorage.getItem('theme');
+  if (saved) return saved === 'dark';
+  return window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
+function applyTheme(dark) {
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  const btn = document.getElementById('theme-btn');
+  if (btn) btn.textContent = dark ? '☀️' : '🌙';
+}
+
+function toggleTheme() {
+  const dark = !isDarkNow();
+  localStorage.setItem('theme', dark ? 'dark' : 'light');
+  applyTheme(dark);
+}
+
+// Aplica o tema antes de qualquer render para evitar flash
+applyTheme(isDarkNow());
 
 // ── Storage ─────────────────────────────────────────
 function getHabits() { return JSON.parse(localStorage.getItem('habits') || 'null') || DEFAULT_HABITS }
