@@ -2,65 +2,700 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Hábitos</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Habits</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0 }
-  body { font-family: system-ui, -apple-system, sans-serif; background: #f0f0f5; min-height: 100vh; padding: 24px 16px 40px }
-  h1 { text-align: center; font-size: 24px; font-weight: 700; color: #1c1c1e; margin-bottom: 4px }
-  .date { text-align: center; color: #888; font-size: 14px; margin-bottom: 16px; text-transform: capitalize }
-  .progress-bar-wrap { background: #e0e0e8; border-radius: 8px; height: 8px; margin-bottom: 6px }
-  .progress-bar { background: #d4006e; height: 8px; border-radius: 8px; transition: width .3s }
-  .progress-label { text-align: center; font-size: 13px; color: #888; margin-bottom: 20px }
-  .progress-label b { color: #d4006e }
-  .habit {
-    display: flex; align-items: center; gap: 14px;
-    background: #fff; border-radius: 14px; padding: 15px 16px;
-    margin-bottom: 8px; cursor: pointer; transition: opacity .15s;
-    -webkit-tap-highlight-color: transparent; user-select: none;
+  :root {
+    --bg: #f2f2f7;
+    --surface: #ffffff;
+    --surface2: #f0f0f5;
+    --text: #1c1c1e;
+    --text2: #8e8e93;
+    --sep: #e5e5ea;
+    --accent: #d4006e;
   }
-  .habit:active { opacity: .65 }
-  .habit.done { background: #fdf5f9 }
-  .check {
-    width: 30px; height: 30px; border-radius: 50%;
-    border: 2px solid #ddd; flex-shrink: 0;
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #000000;
+      --surface: #1c1c1e;
+      --surface2: #2c2c2e;
+      --text: #ffffff;
+      --text2: #8e8e93;
+      --sep: #38383a;
+      --accent: #ff2d78;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+  @media (min-width: 500px) {
+    body { background: #e0e0e8; padding: 40px 0 60px }
+    @media (prefers-color-scheme: dark) { body { background: #111 } }
+    .app-shell { border-radius: 40px; box-shadow: 0 24px 80px rgba(0,0,0,.22) }
+  }
+
+  /* ── App shell ── */
+  .app-shell {
+    max-width: 430px; margin: 0 auto;
+    position: relative; overflow: hidden;
+    min-height: 100vh; background: var(--bg);
+  }
+
+  /* ── Overlay screens ── */
+  .overlay {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    overflow-y: auto;
+    background: var(--bg);
+    transform: translateX(100%);
+    transition: transform .32s cubic-bezier(.4,0,.2,1);
+    padding-bottom: 60px;
+  }
+  .overlay.open { transform: translateX(0) }
+  #screen-detail { z-index: 50 }
+  #screen-edit   { z-index: 100 }
+
+  /* ── Shared header ── */
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 20px 10px;
+    position: sticky; top: 0; background: var(--bg); z-index: 20;
+  }
+  .icon-btn {
+    width: 36px; height: 36px; border-radius: 50%;
+    border: none; background: var(--surface); color: var(--text);
+    font-size: 16px; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    font-size: 15px; transition: all .2s;
+    box-shadow: 0 1px 6px rgba(0,0,0,.12);
+    transition: transform .12s, opacity .12s; user-select: none;
   }
-  .habit.done .check { background: #d4006e; border-color: #d4006e; color: #fff }
-  .label { font-size: 16px; flex: 1; color: #1c1c1e }
-  .habit.done .label { color: #b0b0b8; text-decoration: line-through }
+  .icon-btn:active { transform: scale(.88); opacity: .7 }
+  .header h1 { font-size: 20px; font-weight: 700; letter-spacing: -.3px }
+
+  /* ── Date strip ── */
+  .date-strip { display: flex; align-items: flex-end; padding: 4px 16px 10px }
+  .ds-spacer { flex: 1 }
+  .ds-cols { display: flex; width: 175px; flex-shrink: 0 }
+  .ds-col { flex: 1; text-align: center; line-height: 1.2 }
+  .ds-col .dn { font-size: 13px; font-weight: 600; color: var(--text2) }
+  .ds-col .dw { font-size: 10px; color: var(--text2); text-transform: uppercase; letter-spacing: .3px }
+  .ds-col.today .dn, .ds-col.today .dw { color: var(--accent) }
+
+  /* ── Progress ── */
+  .progress-wrap { padding: 0 16px 14px }
+  .progress-track { background: var(--sep); border-radius: 99px; height: 5px; overflow: hidden }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 99px; transition: width .4s ease }
+  .progress-label { text-align: center; font-size: 12px; color: var(--text2); margin-top: 5px }
+  .progress-label b { color: var(--accent) }
+
+  /* ── Habit list ── */
+  .habit-list { margin: 0 16px; border-radius: 14px; overflow: hidden; background: var(--surface); box-shadow: 0 1px 4px rgba(0,0,0,.06) }
+  .habit-row + .habit-row { border-top: 1px solid var(--sep) }
+  .habit-row { display: flex; align-items: center; padding: 10px 12px; gap: 10px; background: transparent }
+  .habit-row:active .habit-info, .habit-row:active .day-inds { opacity: .6 }
+
+  .check-circle {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 2px solid var(--sep); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: white;
+    transition: background .2s, border-color .2s;
+    cursor: pointer; user-select: none;
+  }
+  .check-circle:active { transform: scale(.85) }
+
+  .habit-info { flex: 1; min-width: 0; cursor: pointer; user-select: none }
+  .habit-name { font-size: 15px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color .2s }
+  .habit-row.done .habit-name { color: var(--text2) !important; text-decoration: line-through; text-decoration-color: var(--text2) }
+  .habit-streak { font-size: 11px; font-weight: 600; margin-top: 2px }
+  .streak-hot { color: #FF6B35 }
+  .streak-cold { color: var(--text2) }
+
+  .day-inds { display: flex; width: 175px; flex-shrink: 0; cursor: pointer }
+  .day-ind { flex: 1; display: flex; align-items: center; justify-content: center }
+  .ind { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700 }
+  .ind.done { color: #fff }
+  .ind.missed { color: var(--sep); font-size: 17px; font-weight: 300; line-height: 1 }
+  .ind.pending { border: 2px solid var(--sep) }
+
+  /* ── Detail screen ── */
+  .detail-hdr {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 16px; position: sticky; top: 0; z-index: 10;
+  }
+  .detail-back {
+    width: 34px; height: 34px; border-radius: 50%;
+    border: none; background: rgba(255,255,255,.25);
+    color: #fff; font-size: 20px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: opacity .15s;
+  }
+  .detail-back:active { opacity: .6 }
+  .detail-hdr h2 { font-size: 17px; font-weight: 700; color: #fff; flex: 1; text-align: center; margin: 0 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+  .detail-edit-btn {
+    padding: 6px 14px; border-radius: 99px;
+    border: none; background: rgba(255,255,255,.9);
+    font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity .15s;
+  }
+  .detail-edit-btn:active { opacity: .7 }
+
+  .detail-body { padding: 0 16px }
+  .detail-card { background: var(--surface); border-radius: 16px; margin-bottom: 12px; overflow: hidden }
+  .detail-card-title { font-size: 12px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: .6px; padding: 14px 16px 0 }
+
+  .overview-row { display: flex; align-items: center; padding: 16px; gap: 12px }
+  .overview-stats { display: flex; flex: 1 }
+  .stat-col { flex: 1; text-align: center }
+  .stat-val { font-size: 20px; font-weight: 700 }
+  .stat-lbl { font-size: 11px; color: var(--text2); margin-top: 2px }
+
+  .cal-nav { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px 8px }
+  .cal-nav-btn { width: 28px; height: 28px; border-radius: 50%; border: none; background: var(--surface2); color: var(--text); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center }
+  .cal-nav-btn:active { opacity: .6 }
+  .cal-month-label { font-size: 15px; font-weight: 600 }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); padding: 0 8px 12px; gap: 2px }
+  .cal-hdr { text-align: center; font-size: 11px; font-weight: 600; color: var(--text2); padding: 4px 0 6px }
+  .cal-cell { display: flex; align-items: center; justify-content: center; padding: 2px 0 }
+  .cal-day { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--text) }
+  .cal-day.done { color: #fff }
+  .cal-day.today { font-weight: 700 }
+  .cal-day.future { color: var(--text2); opacity: .4 }
+
+  .chart-toggle { display: flex; gap: 6px; padding: 12px 16px 8px }
+  .toggle-btn { padding: 5px 16px; border-radius: 99px; border: none; font-size: 13px; font-weight: 600; cursor: pointer; background: var(--surface2); color: var(--text2) }
+  .toggle-btn.active { background: var(--text); color: var(--bg) }
+  .chart-wrap { padding: 0 12px 12px }
+
+  .detail-delete { display: block; width: 100%; padding: 16px; border: none; background: var(--surface); border-radius: 16px; color: #ff3b30; font-size: 16px; font-weight: 600; cursor: pointer; margin-bottom: 12px }
+  .detail-delete:active { opacity: .6 }
+
+  /* ── Edit / Add screen ── */
+  .edit-hdr {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 16px 12px;
+    border-bottom: 1px solid var(--sep);
+    position: sticky; top: 0; background: var(--bg); z-index: 10;
+  }
+  .edit-hdr-btn { background: none; border: none; font-size: 15px; font-weight: 400; color: var(--accent); cursor: pointer; padding: 4px 0 }
+  .edit-hdr-btn.save { font-weight: 700 }
+  .edit-hdr-btn:active { opacity: .6 }
+  .edit-hdr h2 { font-size: 17px; font-weight: 700 }
+
+  .edit-preview {
+    margin: 16px 16px 8px;
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 12px 16px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .preview-circle {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+    transition: background .2s;
+  }
+  .preview-name { font-size: 16px; font-weight: 600; flex: 1; color: var(--text) }
+
+  .edit-section { margin: 16px 16px 0 }
+  .edit-section-title { font-size: 12px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 8px; padding: 0 4px }
+  .edit-card { background: var(--surface); border-radius: 14px; overflow: hidden }
+
+  .name-input {
+    width: 100%; padding: 14px 16px;
+    border: none; background: transparent;
+    font-size: 16px; color: var(--text);
+    font-family: inherit; outline: none;
+  }
+  .name-input::placeholder { color: var(--text2) }
+
+  .emoji-grid { display: grid; grid-template-columns: repeat(8, 1fr); padding: 10px 8px; gap: 4px }
+  .emoji-btn {
+    aspect-ratio: 1; border-radius: 10px; border: none;
+    background: transparent; font-size: 22px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s; padding: 0;
+  }
+  .emoji-btn:active { background: var(--surface2) }
+  .emoji-btn.selected { background: var(--sep) }
+
+  .color-grid { display: grid; grid-template-columns: repeat(6, 1fr); padding: 12px; gap: 10px }
+  .color-btn {
+    aspect-ratio: 1; border-radius: 50%; border: none;
+    cursor: pointer; transition: transform .15s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .color-btn:active { transform: scale(.88) }
+  .color-btn .check-mark { font-size: 14px; color: white; font-weight: 700; opacity: 0 }
+  .color-btn.selected .check-mark { opacity: 1 }
 </style>
 </head>
 <body>
-<h1>🎯 Hábitos</h1>
-<p class="date" id="date"></p>
-<div class="progress-bar-wrap"><div class="progress-bar" id="bar" style="width:0%"></div></div>
-<p class="progress-label"><b id="count">0</b> / 12 concluídos hoje</p>
-<div id="list"></div>
+<div class="app-shell">
+
+  <!-- ══════════════ MAIN SCREEN ══════════════ -->
+  <div id="screen-main">
+    <div class="header">
+      <button class="icon-btn">⚙️</button>
+      <h1>Habits</h1>
+      <button class="icon-btn" onclick="openAdd()">＋</button>
+    </div>
+    <div class="date-strip">
+      <div class="ds-spacer"></div>
+      <div class="ds-cols" id="ds-cols"></div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-track"><div class="progress-fill" id="bar" style="width:0%"></div></div>
+      <p class="progress-label"><b id="cnt">0</b> / <span id="tot">0</span> concluídos hoje</p>
+    </div>
+    <div class="habit-list" id="list"></div>
+  </div>
+
+  <!-- ══════════════ DETAIL SCREEN ══════════════ -->
+  <div class="overlay" id="screen-detail">
+    <div class="detail-hdr" id="detail-hdr">
+      <button class="detail-back" onclick="closeDetail()">‹</button>
+      <h2 id="detail-title"></h2>
+      <button class="detail-edit-btn" onclick="openEdit(currentHabitId)">Edit</button>
+    </div>
+    <div class="detail-body">
+      <div class="detail-card">
+        <div class="detail-card-title">Visão Geral</div>
+        <div class="overview-row">
+          <div id="detail-ring"></div>
+          <div class="overview-stats">
+            <div class="stat-col"><div class="stat-val" id="stat-score">0%</div><div class="stat-lbl">Score</div></div>
+            <div class="stat-col"><div class="stat-val" id="stat-month">0%</div><div class="stat-lbl">Mês</div></div>
+            <div class="stat-col"><div class="stat-val" id="stat-year">0%</div><div class="stat-lbl">Ano</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="detail-card">
+        <div class="detail-card-title">Histórico</div>
+        <div id="detail-cal"></div>
+      </div>
+      <div class="detail-card">
+        <div class="detail-card-title">Força do Hábito</div>
+        <div class="chart-toggle">
+          <button class="toggle-btn active" id="btn-month" onclick="setChartView('month')">Mês</button>
+          <button class="toggle-btn"        id="btn-year"  onclick="setChartView('year')">Ano</button>
+        </div>
+        <div class="chart-wrap" id="detail-chart"></div>
+      </div>
+      <button class="detail-delete" onclick="confirmDelete()">Deletar hábito</button>
+    </div>
+  </div>
+
+  <!-- ══════════════ EDIT / ADD SCREEN ══════════════ -->
+  <div class="overlay" id="screen-edit">
+    <div class="edit-hdr">
+      <button class="edit-hdr-btn" onclick="closeEdit()">Cancelar</button>
+      <h2 id="edit-title">Novo Hábito</h2>
+      <button class="edit-hdr-btn save" onclick="saveHabit()">Salvar</button>
+    </div>
+
+    <!-- Preview -->
+    <div class="edit-preview">
+      <div class="preview-circle" id="prev-circle">⏰</div>
+      <div class="preview-name"  id="prev-name">Nome do hábito</div>
+    </div>
+
+    <!-- Name -->
+    <div class="edit-section">
+      <div class="edit-section-title">Nome</div>
+      <div class="edit-card">
+        <input class="name-input" id="edit-name" type="text" maxlength="40"
+               placeholder="Ex: Beber água" oninput="updatePreview()">
+      </div>
+    </div>
+
+    <!-- Emoji -->
+    <div class="edit-section">
+      <div class="edit-section-title">Emoji</div>
+      <div class="edit-card">
+        <div class="emoji-grid" id="emoji-grid"></div>
+      </div>
+    </div>
+
+    <!-- Color -->
+    <div class="edit-section">
+      <div class="edit-section-title">Cor</div>
+      <div class="edit-card">
+        <div class="color-grid" id="color-grid"></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- app-shell -->
+
 <script>
-const HABITS = [
-  ['⏰','Acordar até 04:20'],['💧','500ml de água em jejum'],['☀️','Exposição à luz de manhã'],
-  ['💊','Minoxidil + Biotina + Dutasterida'],['📖','Devocional'],['📚','Leitura 30 minutos'],
-  ['💪','Treino de força'],['🥤','Creatina'],['🏃','Cardio 30 minutos'],
-  ['🥗','Dieta'],['💧','4 litros de água'],['😴','Dormir até 21:30'],
+// ── Constants ─────────────────────────────────────────
+const DEFAULT_HABITS = [
+  {id:'h1',  emoji:'⏰', name:'Acordar às 04:20',         color:'#FF6B6B'},
+  {id:'h2',  emoji:'💧', name:'500ml água em jejum',       color:'#4ECDC4'},
+  {id:'h3',  emoji:'☀️', name:'Luz solar de manhã',        color:'#F9C74F'},
+  {id:'h4',  emoji:'💊', name:'Minoxidil + Biotina + Dut', color:'#90BE6D'},
+  {id:'h5',  emoji:'📖', name:'Devocional',                color:'#C77DFF'},
+  {id:'h6',  emoji:'📚', name:'Leitura 30 min',            color:'#F3722C'},
+  {id:'h7',  emoji:'💪', name:'Treino de força',           color:'#F94144'},
+  {id:'h8',  emoji:'🥤', name:'Creatina',                  color:'#43AA8B'},
+  {id:'h9',  emoji:'🏃', name:'Cardio 30 min',             color:'#277DA1'},
+  {id:'h10', emoji:'🥗', name:'Dieta',                     color:'#80B918'},
+  {id:'h11', emoji:'💧', name:'4 litros de água',          color:'#0096C7'},
+  {id:'h12', emoji:'😴', name:'Dormir às 21:30',           color:'#9B72CF'},
 ];
-const todayKey = () => 'habits_' + new Date().toISOString().slice(0,10);
-let state = JSON.parse(localStorage.getItem(todayKey())) || Array(12).fill(false);
-function save() { localStorage.setItem(todayKey(), JSON.stringify(state)); }
-function render() {
-  const done = state.filter(Boolean).length;
-  document.getElementById('count').textContent = done;
-  document.getElementById('bar').style.width = (done/12*100)+'%';
-  document.getElementById('list').innerHTML = HABITS.map(([e,n],i)=>`
-    <div class="habit${state[i]?' done':''}" onclick="toggle(${i})">
-      <div class="check">${state[i]?'✓':''}</div>
-      <span class="label">${e} ${n}</span>
-    </div>`).join('');
+
+const EMOJIS = [
+  '⏰','🌅','☀️','🌙','💧','🔥','⚡','🌱',
+  '💪','🏃','🚴','🧘','🏊','⚽','🏋️','🤸',
+  '🥗','🍎','🥤','☕','💊','🩺','🧴','🪥',
+  '📖','📚','✏️','💻','🎨','🎵','🎯','🏆',
+  '💰','📝','🧠','❤️','😴','🛌','🚿','✅',
+];
+
+const COLORS = [
+  '#FF6B6B','#F3722C','#F9C74F','#90BE6D',
+  '#43AA8B','#4ECDC4','#277DA1','#5E60CE',
+  '#C77DFF','#F94144','#0096C7','#9B72CF',
+];
+
+const WDAYS     = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const WDAYS_MON = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
+const MONTHS    = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const MONTHS_S  = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+// ── State ─────────────────────────────────────────────
+let currentHabitId  = null;
+let editingHabitId  = null;   // null = new habit
+let editEmoji       = EMOJIS[0];
+let editColor       = COLORS[0];
+let detailYear, detailMonth;
+let detailChartView = 'month';
+
+// ── Storage ───────────────────────────────────────────
+function getHabits() {
+  return JSON.parse(localStorage.getItem('habits') || 'null') || DEFAULT_HABITS;
 }
-function toggle(i) { state[i]=!state[i]; save(); render(); }
-document.getElementById('date').textContent =
-  new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+function saveHabits(h) { localStorage.setItem('habits', JSON.stringify(h)) }
+function getComp()     { return JSON.parse(localStorage.getItem('comp') || '{}') }
+function saveComp(c)   { localStorage.setItem('comp', JSON.stringify(c)) }
+function today()       { return new Date().toISOString().slice(0, 10) }
+
+function last5() {
+  return Array.from({length: 5}, (_, i) => {
+    const d = new Date(); d.setDate(d.getDate() - (4 - i));
+    return d.toISOString().slice(0, 10);
+  });
+}
+
+function uid() { return 'h' + Date.now().toString(36) }
+
+// ── Calculations ──────────────────────────────────────
+function calcStreak(id, comp) {
+  const t = today();
+  const d = new Date(t + 'T12:00:00');
+  if (!(comp[t] || []).includes(id)) d.setDate(d.getDate() - 1);
+  let n = 0;
+  while (n < 3650) {
+    const key = d.toISOString().slice(0, 10);
+    if ((comp[key] || []).includes(id)) { n++; d.setDate(d.getDate() - 1); } else break;
+  }
+  return n;
+}
+
+function calcScore(id, comp) {
+  const t = today();
+  const now = new Date(t + 'T12:00:00');
+  const allDates = Object.keys(comp).filter(d => d <= t).sort();
+  let totalDays = 1, totalDone = 0;
+  if (allDates.length) {
+    const start = new Date(allDates[0] + 'T12:00:00');
+    totalDays = Math.max(1, Math.round((now - start) / 86400000) + 1);
+    for (const [day, ids] of Object.entries(comp))
+      if (day <= t && ids.includes(id)) totalDone++;
+  }
+  const dom = now.getDate();
+  let mDone = 0;
+  for (let i = 1; i <= dom; i++) {
+    const k = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+    if ((comp[k] || []).includes(id)) mDone++;
+  }
+  const yearStart = new Date(now.getFullYear(), 0, 1);
+  const doy = Math.round((now - yearStart) / 86400000) + 1;
+  let yDone = 0;
+  for (let i = 0; i < doy; i++) {
+    const k = new Date(yearStart.getTime() + i * 86400000).toISOString().slice(0, 10);
+    if (k <= t && (comp[k] || []).includes(id)) yDone++;
+  }
+  return {
+    score: Math.round(totalDone / totalDays * 100),
+    month: Math.round(mDone / dom * 100),
+    year:  Math.round(yDone / doy * 100),
+  };
+}
+
+// ── SVG ───────────────────────────────────────────────
+function ringHTML(pct, color) {
+  const S=72, r=28, c=36, circ=+(2*Math.PI*r).toFixed(2);
+  const off = +(circ*(1-pct/100)).toFixed(2);
+  return `<svg width="${S}" height="${S}" viewBox="0 0 ${S} ${S}">
+    <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="var(--sep)" stroke-width="5"/>
+    <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${color}" stroke-width="5"
+      stroke-dasharray="${circ}" stroke-dashoffset="${off}"
+      stroke-linecap="round" transform="rotate(-90 ${c} ${c})"/>
+    <text x="${c}" y="${c+5}" text-anchor="middle" font-size="13" font-weight="700" fill="${color}">${pct}%</text>
+  </svg>`;
+}
+
+function chartHTML(id, comp, color, view) {
+  const W=320,H=110,pL=28,pR=8,pT=8,pB=22,cW=W-pL-pR,cH=H-pT-pB;
+  const x=f=>pL+f*cW, y=v=>pT+(1-v/100)*cH;
+  let pts=[];
+  if (view==='month') {
+    for (let i=0;i<30;i++) {
+      const d=new Date(); d.setDate(d.getDate()-(29-i));
+      const k=d.toISOString().slice(0,10);
+      pts.push({f:i/29, v:(comp[k]||[]).includes(id)?100:0});
+    }
+  } else {
+    for (let i=0;i<12;i++) {
+      const d=new Date(); d.setMonth(d.getMonth()-(11-i));
+      const yr=d.getFullYear(), mo=d.getMonth();
+      const dim=new Date(yr,mo+1,0).getDate(), last=i===11?new Date().getDate():dim;
+      let done=0;
+      for (let day=1;day<=last;day++) {
+        const k=`${yr}-${String(mo+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+        if ((comp[k]||[]).includes(id)) done++;
+      }
+      pts.push({f:i/11, v:Math.round(done/last*100)});
+    }
+  }
+  const poly=pts.map(p=>`${x(p.f).toFixed(1)},${y(p.v).toFixed(1)}`).join(' ');
+  const area=`${x(0).toFixed(1)},${(pT+cH).toFixed(1)} ${poly} ${x(1).toFixed(1)},${(pT+cH).toFixed(1)}`;
+  const grid=[0,50,100].map(v=>`<line x1="${pL}" y1="${y(v).toFixed(1)}" x2="${pL+cW}" y2="${y(v).toFixed(1)}" stroke="var(--sep)" stroke-width="0.5"/>
+    <text x="${pL-3}" y="${(y(v)+4).toFixed(1)}" text-anchor="end" font-size="8" fill="var(--text2)">${v}</text>`).join('');
+  const ticks=view==='month'
+    ?[0,7,14,21,29].map(i=>{const d=new Date();d.setDate(d.getDate()-(29-i));return `<text x="${x(i/29).toFixed(1)}" y="${H-4}" text-anchor="middle" font-size="8" fill="var(--text2)">${d.getDate()}/${d.getMonth()+1}</text>`;}).join('')
+    :[0,3,6,9,11].map(i=>{const d=new Date();d.setMonth(d.getMonth()-(11-i));return `<text x="${x(i/11).toFixed(1)}" y="${H-4}" text-anchor="middle" font-size="8" fill="var(--text2)">${MONTHS_S[d.getMonth()]}</text>`;}).join('');
+  const dots=pts.map(p=>`<circle cx="${x(p.f).toFixed(1)}" cy="${y(p.v).toFixed(1)}" r="2.5" fill="${color}"/>`).join('');
+  return `<svg width="100%" viewBox="0 0 ${W} ${H}" style="display:block">
+    ${grid}<polygon points="${area}" fill="${color}20"/>
+    <polyline points="${poly}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    ${dots}${ticks}</svg>`;
+}
+
+function calendarHTML(id, comp, color, yr, mo) {
+  const t=today();
+  const firstDow=(new Date(yr,mo,1).getDay()+6)%7;
+  const dim=new Date(yr,mo+1,0).getDate();
+  let cells='';
+  for (let i=0;i<firstDow;i++) cells+=`<div class="cal-cell"></div>`;
+  for (let d=1;d<=dim;d++) {
+    const k=`${yr}-${String(mo+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const done=(comp[k]||[]).includes(id), isT=k===t, isFut=k>t;
+    let cls='cal-day',sty='';
+    if (done)   { cls+=' done';   sty=`background:${color}` }
+    else if(isT){ cls+=' today';  sty=`border:2.5px solid ${color};color:${color}` }
+    else if(isFut){ cls+=' future' }
+    cells+=`<div class="cal-cell"><div class="${cls}" style="${sty}">${d}</div></div>`;
+  }
+  return `<div class="cal-nav">
+    <button class="cal-nav-btn" onclick="navMonth(-1)">‹</button>
+    <span class="cal-month-label">${MONTHS[mo]} ${yr}</span>
+    <button class="cal-nav-btn" onclick="navMonth(1)">›</button>
+  </div>
+  <div class="cal-grid">
+    ${WDAYS_MON.map(d=>`<div class="cal-hdr">${d}</div>`).join('')}
+    ${cells}
+  </div>`;
+}
+
+// ── Detail ────────────────────────────────────────────
+function openDetail(id) {
+  currentHabitId = id;
+  const now = new Date();
+  detailYear = now.getFullYear(); detailMonth = now.getMonth();
+  detailChartView = 'month';
+  renderDetail();
+  document.getElementById('screen-detail').classList.add('open');
+  document.getElementById('screen-detail').scrollTop = 0;
+}
+
+function closeDetail() {
+  document.getElementById('screen-detail').classList.remove('open');
+  currentHabitId = null;
+}
+
+function navMonth(dir) {
+  detailMonth += dir;
+  if (detailMonth < 0)  { detailMonth = 11; detailYear-- }
+  if (detailMonth > 11) { detailMonth = 0;  detailYear++ }
+  renderDetail();
+}
+
+function setChartView(v) {
+  detailChartView = v;
+  document.getElementById('btn-month').classList.toggle('active', v==='month');
+  document.getElementById('btn-year').classList.toggle('active',  v==='year');
+  const h = getHabits().find(h=>h.id===currentHabitId);
+  document.getElementById('detail-chart').innerHTML = chartHTML(h.id, getComp(), h.color, v);
+}
+
+function renderDetail() {
+  const h = getHabits().find(h=>h.id===currentHabitId); if (!h) return;
+  const comp = getComp();
+  const {score, month, year} = calcScore(h.id, comp);
+  document.getElementById('detail-hdr').style.background   = h.color;
+  document.getElementById('detail-title').textContent      = `${h.emoji} ${h.name}`;
+  document.getElementById('detail-ring').innerHTML         = ringHTML(score, '#fff');
+  document.getElementById('stat-score').textContent        = `${score}%`;
+  document.getElementById('stat-month').textContent        = `${month}%`;
+  document.getElementById('stat-year').textContent         = `${year}%`;
+  document.getElementById('stat-score').style.color        = h.color;
+  document.getElementById('stat-month').style.color        = h.color;
+  document.getElementById('stat-year').style.color         = h.color;
+  document.getElementById('detail-cal').innerHTML          = calendarHTML(h.id, comp, h.color, detailYear, detailMonth);
+  document.getElementById('detail-chart').innerHTML        = chartHTML(h.id, comp, h.color, detailChartView);
+  document.getElementById('btn-month').classList.toggle('active', detailChartView==='month');
+  document.getElementById('btn-year').classList.toggle('active',  detailChartView==='year');
+}
+
+function confirmDelete() {
+  const h = getHabits().find(h=>h.id===currentHabitId); if (!h) return;
+  if (!confirm(`Deletar "${h.name}"? Esta ação não pode ser desfeita.`)) return;
+  const habits = getHabits().filter(h=>h.id!==currentHabitId);
+  saveHabits(habits);
+  closeDetail();
+  render();
+}
+
+// ── Edit / Add ────────────────────────────────────────
+function buildEditPickers() {
+  document.getElementById('emoji-grid').innerHTML = EMOJIS.map(e =>
+    `<button class="emoji-btn${e===editEmoji?' selected':''}" onclick="selectEmoji('${e}')">${e}</button>`
+  ).join('');
+  document.getElementById('color-grid').innerHTML = COLORS.map(c =>
+    `<button class="color-btn${c===editColor?' selected':''}" style="background:${c}" onclick="selectColor('${c}')">
+       <span class="check-mark">✓</span></button>`
+  ).join('');
+}
+
+function updatePreview() {
+  const name = document.getElementById('edit-name').value.trim() || 'Nome do hábito';
+  document.getElementById('prev-circle').textContent = editEmoji;
+  document.getElementById('prev-circle').style.background = editColor + '22';
+  document.getElementById('prev-name').textContent = name;
+}
+
+function selectEmoji(e) {
+  editEmoji = e;
+  document.querySelectorAll('.emoji-btn').forEach(b => b.classList.toggle('selected', b.textContent === e));
+  updatePreview();
+}
+
+function selectColor(c) {
+  editColor = c;
+  document.querySelectorAll('.color-btn').forEach(b => b.classList.toggle('selected', b.style.background === c || b.style.backgroundColor === c));
+  updatePreview();
+}
+
+function openAdd() {
+  editingHabitId = null;
+  editEmoji = EMOJIS[0]; editColor = COLORS[0];
+  document.getElementById('edit-title').textContent = 'Novo Hábito';
+  document.getElementById('edit-name').value = '';
+  buildEditPickers(); updatePreview();
+  document.getElementById('screen-edit').classList.add('open');
+  document.getElementById('screen-edit').scrollTop = 0;
+  setTimeout(() => document.getElementById('edit-name').focus(), 350);
+}
+
+function openEdit(id) {
+  const h = getHabits().find(h=>h.id===id); if (!h) return;
+  editingHabitId = id;
+  editEmoji = h.emoji; editColor = h.color;
+  document.getElementById('edit-title').textContent = 'Editar Hábito';
+  document.getElementById('edit-name').value = h.name;
+  buildEditPickers(); updatePreview();
+  document.getElementById('screen-edit').classList.add('open');
+  document.getElementById('screen-edit').scrollTop = 0;
+}
+
+function closeEdit() {
+  document.getElementById('screen-edit').classList.remove('open');
+}
+
+function saveHabit() {
+  const name = document.getElementById('edit-name').value.trim();
+  if (!name) { document.getElementById('edit-name').focus(); return; }
+  const habits = getHabits();
+  if (editingHabitId) {
+    const h = habits.find(h=>h.id===editingHabitId);
+    if (h) { h.name = name; h.emoji = editEmoji; h.color = editColor; }
+  } else {
+    habits.push({id: uid(), emoji: editEmoji, name, color: editColor});
+  }
+  saveHabits(habits);
+  closeEdit();
+  if (editingHabitId) renderDetail(); // refresh detail if editing existing
+  render();
+}
+
+// ── Toggle ────────────────────────────────────────────
+function toggle(id, e) {
+  e.stopPropagation();
+  const c = getComp(), d = today();
+  c[d] = c[d] || [];
+  const i = c[d].indexOf(id);
+  i >= 0 ? c[d].splice(i,1) : c[d].push(id);
+  saveComp(c); render();
+  if (currentHabitId === id) renderDetail();
+}
+
+// ── Main render ───────────────────────────────────────
+function render() {
+  const habits = getHabits(), comp = getComp(), t = today(), days = last5();
+
+  document.getElementById('ds-cols').innerHTML = days.map(d => {
+    const dt = new Date(d+'T12:00:00'), isT = d===t;
+    return `<div class="ds-col${isT?' today':''}"><div class="dn">${dt.getDate()}</div><div class="dw">${WDAYS[dt.getDay()]}</div></div>`;
+  }).join('');
+
+  const done = (comp[t]||[]).length;
+  document.getElementById('cnt').textContent = done;
+  document.getElementById('tot').textContent = habits.length;
+  document.getElementById('bar').style.width = habits.length ? (done/habits.length*100)+'%' : '0%';
+
+  document.getElementById('list').innerHTML = habits.length
+    ? habits.map(h => {
+        const isDone = (comp[t]||[]).includes(h.id);
+        const streak = calcStreak(h.id, comp);
+        const streakHtml = streak > 0
+          ? `<div class="habit-streak ${streak>=3?'streak-hot':'streak-cold'}">🔥 ${streak} ${streak===1?'dia':'dias'}</div>` : '';
+        const inds = days.map(d => {
+          if (d>t) return `<div class="day-ind"><div class="ind"></div></div>`;
+          const ok = (comp[d]||[]).includes(h.id);
+          if (ok)     return `<div class="day-ind"><div class="ind done" style="background:${h.color}">✓</div></div>`;
+          if (d===t)  return `<div class="day-ind"><div class="ind pending"></div></div>`;
+          return `<div class="day-ind"><div class="ind missed">×</div></div>`;
+        }).join('');
+        return `<div class="habit-row${isDone?' done':''}">
+          <div class="check-circle" style="${isDone?`background:${h.color};border-color:${h.color}`:`border-color:${h.color}`}" onclick="toggle('${h.id}',event)">${isDone?'✓':''}</div>
+          <div class="habit-info" onclick="openDetail('${h.id}')">
+            <div class="habit-name" style="${isDone?'':` color:${h.color}`}">${h.emoji} ${h.name}</div>
+            ${streakHtml}
+          </div>
+          <div class="day-inds" onclick="openDetail('${h.id}')">${inds}</div>
+        </div>`;
+      }).join('')
+    : `<div style="padding:32px;text-align:center;color:var(--text2);font-size:15px">
+        Nenhum hábito ainda.<br>Toque em <b>＋</b> para adicionar.
+      </div>`;
+}
+
 render();
 </script>
 </body>
