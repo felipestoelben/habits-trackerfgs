@@ -25,10 +25,15 @@
       --green: #30d158;
     }
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; touch-action: manipulation }
+  html { overscroll-behavior: none }
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
-    background: var(--bg); color: var(--text); min-height: 100vh;
+    background: var(--bg); color: var(--text);
+    min-height: 100dvh;
+    /* bottom padding for home indicator */
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    overscroll-behavior: none;
   }
   @media (min-width: 500px) {
     body { background: #e0e0e8; padding: 40px 0 60px }
@@ -38,15 +43,18 @@
   .app-shell {
     max-width: 430px; margin: 0 auto;
     position: relative; overflow: hidden;
-    min-height: 100vh; background: var(--bg);
+    min-height: 100dvh; background: var(--bg);
   }
   .overlay {
     position: absolute; top: 0; left: 0;
-    width: 100%; height: 100%; overflow-y: auto;
+    width: 100%; height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
     background: var(--bg);
     transform: translateX(100%);
     transition: transform .32s cubic-bezier(.4,0,.2,1);
-    padding-bottom: 60px;
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 60px);
   }
   .overlay.open { transform: translateX(0) }
   #screen-detail { z-index: 50 }
@@ -55,11 +63,13 @@
   /* ── Main header ── */
   .main-header {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 20px 20px 10px;
+    /* top padding respects notch / Dynamic Island */
+    padding: calc(env(safe-area-inset-top, 0px) + 16px) 20px 10px;
     position: sticky; top: 0; background: var(--bg); z-index: 20;
   }
   .icon-btn {
-    width: 36px; height: 36px; border-radius: 50%;
+    /* 44×44 minimum touch target */
+    width: 44px; height: 44px; border-radius: 50%;
     border: none; background: var(--surface); color: var(--text);
     font-size: 17px; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
@@ -85,6 +95,9 @@
   .progress-label { text-align: center; font-size: 12px; color: var(--text2); margin-top: 5px }
 
   /* ── Habit list ── */
+  #screen-main {
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 32px);
+  }
   .habit-list {
     margin: 0 16px; border-radius: 14px; overflow: hidden;
     background: var(--surface); box-shadow: 0 1px 4px rgba(0,0,0,.06);
@@ -92,9 +105,9 @@
   .habit-row + .habit-row { border-top: 1px solid var(--sep) }
   .habit-row { display: flex; align-items: center; padding: 10px 12px; gap: 10px; background: transparent }
 
-  /* SVG ring tap area */
+  /* SVG ring tap area — 44×44 minimum touch target */
   .ring-tap {
-    flex-shrink: 0; width: 34px; height: 34px;
+    flex-shrink: 0; width: 44px; height: 44px;
     display: flex; align-items: center; justify-content: center;
     cursor: pointer; user-select: none; border-radius: 50%;
     transition: opacity .12s;
@@ -121,13 +134,13 @@
   /* ── Detail screen ── */
   .detail-hdr {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 16px 16px;
+    padding: calc(env(safe-area-inset-top, 0px) + 14px) 16px 14px;
     background: var(--surface);
     border-bottom: 1px solid var(--sep);
     position: sticky; top: 0; z-index: 10;
   }
   .detail-back {
-    width: 34px; height: 34px; border-radius: 50%;
+    width: 44px; height: 44px; border-radius: 50%;
     border: none; background: var(--surface2);
     color: var(--text); font-size: 20px; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
@@ -214,7 +227,8 @@
   /* ── Edit / Add screen ── */
   .edit-hdr {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 16px; border-bottom: 1px solid var(--sep);
+    padding: calc(env(safe-area-inset-top, 0px) + 14px) 16px 14px;
+    border-bottom: 1px solid var(--sep);
     position: sticky; top: 0; background: var(--bg); z-index: 10;
   }
   .edit-cancel { background: none; border: none; font-size: 16px; color: var(--text2); cursor: pointer; padding: 4px 0 }
@@ -261,11 +275,11 @@
   .reg-label { font-size: 16px }
   .reg-value { font-size: 15px; color: var(--text2) }
 
-  /* iOS toggle */
-  .ios-toggle { position: relative; width: 51px; height: 31px; flex-shrink: 0 }
+  /* iOS toggle — wrapper expands hit area to 44px */
+  .ios-toggle { position: relative; width: 51px; height: 44px; flex-shrink: 0; display: flex; align-items: center }
   .ios-toggle input { opacity: 0; width: 0; height: 0 }
   .ios-track {
-    position: absolute; inset: 0;
+    position: relative; width: 51px; height: 31px; flex-shrink: 0;
     background: var(--sep); border-radius: 99px;
     cursor: pointer; transition: background .2s;
   }
