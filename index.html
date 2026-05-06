@@ -352,7 +352,10 @@
     <div class="main-header">
       <button class="icon-btn" id="theme-btn" onclick="toggleTheme()"></button>
       <h1>Habits</h1>
-      <button class="icon-btn" onclick="openAdd()">＋</button>
+      <div style="display:flex;gap:8px">
+        <button class="icon-btn" id="sync-btn" onclick="handleSyncBtn()" title="Sincronizar">☁️</button>
+        <button class="icon-btn" onclick="openAdd()">＋</button>
+      </div>
     </div>
     <div class="date-strip">
       <div class="ds-spacer"></div>
@@ -474,7 +477,78 @@
 
 </div>
 
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore-compat.js"></script>
+
 <script>
+// ── Firebase init ─────────────────────────────────────
+const firebaseConfig = {
+  apiKey: "AIzaSyDr6t6yt2PcPuy9cQSWdHOnfo4EgGSyFxA",
+  authDomain: "habits-tracker-9b937.firebaseapp.com",
+  projectId: "habits-tracker-9b937",
+  storageBucket: "habits-tracker-9b937.firebasestorage.app",
+  messagingSenderId: "991287243189",
+  appId: "1:991287243189:web:0018bcbe480c67711be9fc"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db   = firebase.firestore();
+let fbUser = null;
+
+auth.onAuthStateChanged(user => {
+  fbUser = user;
+  updateSyncBtn();
+  if (user) loadFromCloud();
+});
+
+function handleSyncBtn() {
+  if (fbUser) {
+    if (confirm(`Conta: ${fbUser.displayName}\n\nDeseja sair?`)) auth.signOut();
+  } else {
+    auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(console.error);
+  }
+}
+
+function updateSyncBtn() {
+  const btn = document.getElementById('sync-btn');
+  if (!btn) return;
+  if (fbUser) {
+    btn.innerHTML = fbUser.photoURL
+      ? `<img src="${fbUser.photoURL}" style="width:26px;height:26px;border-radius:50%;pointer-events:none">`
+      : '👤';
+  } else {
+    btn.textContent = '☁️';
+  }
+}
+
+async function loadFromCloud() {
+  if (!fbUser) return;
+  try {
+    const snap = await db.collection('users').doc(fbUser.uid).get();
+    if (snap.exists) {
+      const d = snap.data();
+      if (d.habits) localStorage.setItem('habits', JSON.stringify(d.habits));
+      if (d.comp)   localStorage.setItem('comp',   JSON.stringify(d.comp));
+      render();
+    } else {
+      pushToCloud();
+    }
+  } catch(e) { console.warn('Cloud load failed', e); }
+}
+
+async function pushToCloud() {
+  if (!fbUser) return;
+  try {
+    await db.collection('users').doc(fbUser.uid).set({
+      habits: getHabits(),
+      comp:   getComp(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+  } catch(e) { console.warn('Cloud push failed', e); }
+}
+
 const DEFAULT_HABITS = [
   {id:'h1',  emoji:'⏰', name:'Acordar às 04:20',         color:'#FF6B6B', question:'Você acordou às 04:20?',  remind:false},
   {id:'h2',  emoji:'💧', name:'500ml água em jejum',       color:'#4ECDC4', question:'Bebeu 500ml em jejum?',   remind:false},
@@ -541,9 +615,9 @@ applyTheme(isDarkNow());
 
 // ── Storage ─────────────────────────────────────────
 function getHabits() { return JSON.parse(localStorage.getItem('habits') || 'null') || DEFAULT_HABITS }
-function saveHabits(h) { localStorage.setItem('habits', JSON.stringify(h)) }
+function saveHabits(h) { localStorage.setItem('habits', JSON.stringify(h)); pushToCloud(); }
 function getComp()     { return JSON.parse(localStorage.getItem('comp') || '{}') }
-function saveComp(c)   { localStorage.setItem('comp', JSON.stringify(c)) }
+function saveComp(c)   { localStorage.setItem('comp', JSON.stringify(c)); pushToCloud(); }
 function uid()         { return 'h' + Date.now().toString(36) }
 
 // Usa data LOCAL (não UTC) — evita bug de fuso horário (ex: Brasil UTC-3)
