@@ -503,11 +503,24 @@ auth.onAuthStateChanged(user => {
   if (user) loadFromCloud();
 });
 
+// Captura resultado do redirect (login via mobile)
+auth.getRedirectResult().then(r => {
+  if (r && r.user) loadFromCloud();
+}).catch(console.error);
+
 function handleSyncBtn() {
   if (fbUser) {
     if (confirm(`Conta: ${fbUser.displayName}\n\nDeseja sair?`)) auth.signOut();
   } else {
-    auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(console.error);
+    const provider = new firebase.auth.GoogleAuthProvider();
+    // Tenta popup; se bloqueado (mobile), usa redirect
+    auth.signInWithPopup(provider).catch(err => {
+      if (err.code === 'auth/popup-blocked' || err.code === 'auth/cancelled-popup-request') {
+        auth.signInWithRedirect(provider);
+      } else {
+        console.error(err);
+      }
+    });
   }
 }
 
