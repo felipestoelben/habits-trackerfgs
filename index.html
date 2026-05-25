@@ -131,8 +131,13 @@ body{
 #screen-habits{padding-bottom:calc(env(safe-area-inset-bottom,0px)+82px)}
 .main-header{
   padding:calc(env(safe-area-inset-top,0px)+20px) 20px 14px;
-  position:sticky;top:0;background:var(--bg);z-index:20;
+  position:sticky;top:0;z-index:20;
+  background:rgba(242,242,247,.88);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(0,0,0,.05);
 }
+[data-theme="dark"] .main-header{background:rgba(0,0,0,.78)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .main-header{background:rgba(0,0,0,.78)}}
 .header-row{display:flex;align-items:flex-start;justify-content:space-between}
 .header-greeting{font-size:27px;font-weight:900;letter-spacing:-.6px;line-height:1.15}
 .header-date{font-size:12px;color:var(--text2);margin-top:4px;font-weight:500;letter-spacing:.1px}
@@ -140,7 +145,7 @@ body{
 
 /* Hero progress card */
 .progress-hero{
-  margin:12px 16px 0;
+  margin:14px 16px 0;
   background:linear-gradient(135deg,#6366F1 0%,#4F46E5 55%,#3730A3 100%);
   border:none;
   border-radius:var(--r-xl);padding:24px 20px;
@@ -195,7 +200,7 @@ body{
 .ds-col.today .dw{color:var(--accent)}
 
 /* Habit cards */
-.habit-list{margin:0 16px;display:flex;flex-direction:column;gap:8px}
+.habit-list{margin:0 16px;display:flex;flex-direction:column;gap:9px}
 .habit-card{
   display:flex;align-items:center;gap:12px;
   padding:14px 14px 14px 0;
@@ -383,8 +388,13 @@ body{
 #screen-diet{padding-bottom:calc(env(safe-area-inset-bottom,0px)+82px)}
 .diet-header{
   padding:calc(env(safe-area-inset-top,0px)+16px) 16px 12px;
-  position:sticky;top:0;background:var(--bg);z-index:20;
+  position:sticky;top:0;z-index:20;
+  background:rgba(242,242,247,.88);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(0,0,0,.05);
 }
+[data-theme="dark"] .diet-header{background:rgba(0,0,0,.78)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .diet-header{background:rgba(0,0,0,.78)}}
 .diet-header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .diet-header-title{font-size:22px;font-weight:900;letter-spacing:-.5px}
 .diet-date-nav{display:flex;align-items:center;gap:0;background:var(--surface);border-radius:99px;box-shadow:var(--shadow-sm);overflow:hidden}
@@ -398,7 +408,7 @@ body{
 .diet-date-label{font-size:14px;font-weight:700;padding:0 10px;min-width:70px;text-align:center}
 
 /* Calorie summary card */
-.diet-summary{margin:0 16px 0;display:flex;flex-direction:column;gap:12px}
+.diet-summary{margin:14px 16px 0;display:flex;flex-direction:column;gap:12px}
 .calorie-card{
   background:linear-gradient(135deg,#1e1b4b 0%,#312e81 55%,#4338ca 100%);
   border-radius:var(--r-xl);padding:18px 20px;
@@ -1571,17 +1581,21 @@ function searchLocalFoods(q){
 async function fetchOnlineFoods(q){
   if(lastQuery!==q)return;
   try{
-    const url=`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(q)}&search_simple=1&action=process&json=1&page_size=20&fields=product_name,nutriments,brands,product_name_pt`;
-    const res=await fetch(url,{signal:AbortSignal.timeout(8000)});
+    const ctrl=new AbortController();
+    const timer=setTimeout(()=>ctrl.abort(),12000);
+    const url=`https://world.openfoodfacts.org/api/v2/search?q=${encodeURIComponent(q)}&page_size=20&fields=product_name,product_name_pt,brands,nutriments`;
+    const res=await fetch(url,{signal:ctrl.signal});
+    clearTimeout(timer);
+    if(!res.ok)throw new Error('HTTP '+res.status);
     const data=await res.json();
     if(lastQuery!==q)return;
     const products=(data.products||[]).filter(p=>{
-      const n=p.nutriments;
-      return(p.product_name||p.product_name_pt)&&n&&(n['energy-kcal_100g']||n['energy-kcal'])>0;
+      const n=p.nutriments||{};
+      return(p.product_name||p.product_name_pt)&&n['energy-kcal_100g']>0;
     }).slice(0,15);
     const onlineFoods=products.map(p=>{
-      const n=p.nutriments;
-      const kcal=Math.round(n['energy-kcal_100g']||n['energy-kcal']||0);
+      const n=p.nutriments||{};
+      const kcal=Math.round(n['energy-kcal_100g']||0);
       const prot=+((n['proteins_100g']||0)).toFixed(1);
       const carb=+((n['carbohydrates_100g']||0)).toFixed(1);
       const fat=+((n['fat_100g']||0)).toFixed(1);
@@ -1606,7 +1620,7 @@ async function fetchOnlineFoods(q){
     const local=searchLocalFoods(q);
     document.getElementById('food-results').innerHTML=
       (local.length?`<div class="food-cat-header">Banco local</div>`+local.map(f=>foodResultHTML(f,false)).join(''):'')
-      +`<div style="padding:12px 16px;font-size:12px;color:var(--text2)">⚠️ Sem conexão — mostrando apenas resultados locais</div>`;
+      +`<div style="padding:12px 16px;font-size:12px;color:var(--text2)">🌐 Resultados online indisponíveis no momento</div>`;
   }
 }
 
