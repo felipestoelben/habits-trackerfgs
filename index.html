@@ -447,6 +447,94 @@ body{
 .food-loading-dots span:nth-child(3){animation-delay:.4s}
 @keyframes fld{0%,80%,100%{opacity:.25;transform:scale(.75)}40%{opacity:1;transform:scale(1)}}
 
+/* ── Voice ── */
+.voice-mic-btn{
+  width:36px;height:36px;border-radius:50%;border:none;
+  background:var(--accent-lt);color:var(--accent);
+  font-size:17px;cursor:pointer;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .15s,transform .12s;
+}
+.voice-mic-btn:active{transform:scale(.86)}
+.voice-mic-btn.recording{background:rgba(239,68,68,.15);color:#EF4444;animation:mic-pulse .8s ease-in-out infinite}
+@keyframes mic-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+#voice-view{
+  display:none;flex-direction:column;
+  padding:0 20px 32px;height:100%;overflow-y:auto;
+}
+#voice-view.open{display:flex}
+.voice-view-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:calc(env(safe-area-inset-top,0px)+14px) 0 20px;flex-shrink:0;
+}
+.voice-anim-wrap{
+  position:relative;width:120px;height:120px;
+  margin:0 auto 24px;display:flex;align-items:center;justify-content:center;
+}
+.voice-ring{
+  position:absolute;border-radius:50%;border:2px solid var(--accent);
+  animation:vring 2s ease-out infinite;opacity:0;
+}
+.voice-ring.r1{width:80px;height:80px;animation-delay:0s}
+.voice-ring.r2{width:100px;height:100px;animation-delay:.4s}
+.voice-ring.r3{width:120px;height:120px;animation-delay:.8s}
+@keyframes vring{0%{transform:scale(.6);opacity:.7}100%{transform:scale(1);opacity:0}}
+.voice-mic-circle{
+  width:64px;height:64px;border-radius:50%;
+  background:linear-gradient(135deg,#818CF8,#6366F1);
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;z-index:1;
+  box-shadow:0 6px 20px rgba(var(--accent-rgb),.45);
+}
+.voice-hint{font-size:17px;font-weight:700;text-align:center;letter-spacing:-.2px}
+.voice-hint-sub{font-size:13px;color:var(--text2);text-align:center;margin-top:6px;line-height:1.5}
+.voice-transcript-box{
+  background:var(--surface);border-radius:var(--r-lg);padding:14px 16px;
+  margin-top:20px;box-shadow:var(--shadow-sm);
+}
+.voice-transcript-text{font-size:15px;line-height:1.5;color:var(--text);font-style:italic}
+.voice-stop-btn{
+  margin-top:24px;padding:14px;border-radius:var(--r-lg);border:none;
+  background:rgba(239,68,68,.12);color:#EF4444;
+  font-size:15px;font-weight:700;cursor:pointer;width:100%;
+  transition:background .15s;
+}
+.voice-stop-btn:active{background:rgba(239,68,68,.2)}
+.voice-results-title{font-size:17px;font-weight:800;margin-bottom:6px;padding-top:8px}
+.voice-transcript-quote{
+  font-size:13px;color:var(--text2);font-style:italic;
+  margin-bottom:16px;line-height:1.4;
+}
+.voice-item{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 14px;background:var(--surface);border-radius:var(--r-md);
+  margin-bottom:8px;box-shadow:var(--shadow-sm);
+}
+.voice-item-emoji{font-size:26px;flex-shrink:0}
+.voice-item-info{flex:1;min-width:0}
+.voice-item-name{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.voice-item-macros{font-size:12px;color:var(--text2);margin-top:2px;font-weight:500}
+.voice-item-qty-edit{
+  font-size:13px;font-weight:700;color:var(--accent);
+  background:var(--accent-lt);padding:4px 10px;border-radius:99px;
+  border:none;cursor:pointer;flex-shrink:0;
+}
+.voice-item-remove{
+  width:26px;height:26px;border-radius:50%;border:none;
+  background:rgba(239,68,68,.1);color:#EF4444;font-size:14px;
+  cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+}
+.voice-no-match{
+  text-align:center;padding:32px 0;
+}
+.voice-retry-btn{
+  width:100%;margin-top:10px;padding:13px;border-radius:var(--r-lg);border:none;
+  background:var(--surface2);color:var(--text2);
+  font-size:14px;font-weight:700;cursor:pointer;
+  transition:background .15s;
+}
+.voice-retry-btn:active{background:var(--sep)}
+
 /* ── Quantity view (inside food overlay) ── */
 #food-qty-view{display:none;flex:1;flex-direction:column;padding:20px 16px}
 #food-qty-view.open{display:flex}
@@ -661,6 +749,7 @@ body{
       <div class="food-search-bar">
         <span class="food-search-icon">🔍</span>
         <input class="food-search-input" id="food-search-input" type="text" placeholder="Buscar alimento..." oninput="filterFoods()" autocomplete="off">
+        <button class="voice-mic-btn" id="voice-mic-btn" onclick="openVoiceView()" title="Registrar por voz">🎙️</button>
       </div>
     </div>
     <div class="food-results" id="food-results"></div>
@@ -689,6 +778,42 @@ body{
       </div>
     </div>
     <button class="qty-add-btn" id="qty-add-btn" onclick="confirmAddFood()">Adicionar à refeição</button>
+  </div>
+  <!-- ── Voice view ── -->
+  <div id="voice-view">
+    <div class="voice-view-hdr">
+      <button class="food-overlay-back" onclick="closeVoiceView()">‹</button>
+      <div style="font-size:17px;font-weight:700">Registrar por voz</div>
+      <div style="width:36px"></div>
+    </div>
+    <!-- Recording state -->
+    <div id="voice-recording-state">
+      <div class="voice-anim-wrap" id="voice-anim">
+        <div class="voice-ring r3"></div>
+        <div class="voice-ring r2"></div>
+        <div class="voice-ring r1"></div>
+        <div class="voice-mic-circle">🎙️</div>
+      </div>
+      <div class="voice-hint">Fale sua refeição completa</div>
+      <div class="voice-hint-sub">Ex: "200ml de leite, 30g de whey e 2 ovos"</div>
+      <div class="voice-transcript-box" id="voice-transcript-box" style="display:none">
+        <div class="voice-transcript-text" id="voice-transcript-text"></div>
+      </div>
+      <button class="voice-stop-btn" id="voice-stop-btn" onclick="stopVoice()">⏹ Parar</button>
+    </div>
+    <!-- Results state -->
+    <div id="voice-results-state" style="display:none">
+      <div class="voice-results-title" id="voice-results-title">Itens detectados</div>
+      <div class="voice-transcript-quote" id="voice-quote"></div>
+      <div id="voice-items-list"></div>
+      <div class="voice-no-match" id="voice-no-match" style="display:none">
+        <div style="font-size:36px">🤔</div>
+        <div style="font-size:15px;font-weight:700;margin-top:8px">Não identifiquei alimentos</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:4px">Tente falar com mais clareza ou use a busca</div>
+      </div>
+      <button class="qty-add-btn" id="voice-confirm-btn" onclick="confirmVoiceItems()" style="margin-top:16px">Adicionar à refeição</button>
+      <button class="voice-retry-btn" onclick="retryVoice()">🎙️ Gravar novamente</button>
+    </div>
   </div>
 </div>
 
@@ -1078,6 +1203,169 @@ function confirmAddFood(){
   if(!d[dietDate])d[dietDate]={meals:{cafe:[],almoco:[],jantar:[],lanche:[]}};
   (d[dietDate].meals[openForMeal]=d[dietDate].meals[openForMeal]||[]).push(entry);
   saveDiet(d);closeFoodOverlay();renderDiet();
+}
+
+// ── Voice recording ────────────────────────────────────
+let recognition=null, voiceItems=[];
+
+function openVoiceView(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){alert('Reconhecimento de voz não suportado.\nUse Chrome ou Safari.');return;}
+  document.getElementById('food-search-view').style.display='none';
+  document.getElementById('food-qty-view').classList.remove('open');
+  document.getElementById('voice-view').classList.add('open');
+  document.getElementById('voice-recording-state').style.display='';
+  document.getElementById('voice-results-state').style.display='none';
+  document.getElementById('voice-transcript-box').style.display='none';
+  document.getElementById('voice-transcript-text').textContent='';
+  document.getElementById('voice-mic-btn').classList.add('recording');
+  startVoice();
+}
+
+function closeVoiceView(){
+  stopVoice();
+  document.getElementById('voice-view').classList.remove('open');
+  document.getElementById('voice-mic-btn').classList.remove('recording');
+  showFoodSearchView();
+}
+
+function retryVoice(){
+  document.getElementById('voice-recording-state').style.display='';
+  document.getElementById('voice-results-state').style.display='none';
+  document.getElementById('voice-transcript-box').style.display='none';
+  document.getElementById('voice-transcript-text').textContent='';
+  startVoice();
+}
+
+function startVoice(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR)return;
+  if(recognition){try{recognition.abort();}catch(e){}}
+  recognition=new SR();
+  recognition.lang='pt-BR';
+  recognition.continuous=false;
+  recognition.interimResults=true;
+  recognition.onresult=e=>{
+    const txt=Array.from(e.results).map(r=>r[0].transcript).join('');
+    const box=document.getElementById('voice-transcript-box');
+    box.style.display='';
+    document.getElementById('voice-transcript-text').textContent='"'+txt+'"';
+    if(e.results[e.results.length-1].isFinal) processVoiceText(txt);
+  };
+  recognition.onerror=e=>{
+    document.getElementById('voice-mic-btn').classList.remove('recording');
+    if(e.error==='not-allowed') alert('Permissão de microfone negada. Habilite nas configurações do navegador.');
+    else if(e.error!=='aborted') processVoiceText('');
+  };
+  recognition.onend=()=>{document.getElementById('voice-mic-btn').classList.remove('recording');};
+  recognition.start();
+}
+
+function stopVoice(){
+  if(recognition){try{recognition.stop();}catch(e){}recognition=null;}
+  document.getElementById('voice-mic-btn').classList.remove('recording');
+}
+
+function processVoiceText(text){
+  stopVoice();
+  document.getElementById('voice-recording-state').style.display='none';
+  document.getElementById('voice-results-state').style.display='';
+  document.getElementById('voice-quote').textContent=text?'"'+text+'"':'';
+  voiceItems=text?parseVoiceText(text):[];
+  const hasItems=voiceItems.length>0;
+  document.getElementById('voice-no-match').style.display=hasItems?'none':'';
+  document.getElementById('voice-confirm-btn').style.display=hasItems?'':'none';
+  document.getElementById('voice-results-title').textContent=
+    hasItems?`${voiceItems.length} item${voiceItems.length>1?'s':''} detectado${voiceItems.length>1?'s':''}`:
+    'Nada detectado';
+  renderVoiceItems();
+}
+
+function parseVoiceText(text){
+  let t=text.toLowerCase()
+    .replace(/\buma?\b/g,'1').replace(/\bdois\b|\bduas\b/g,'2')
+    .replace(/\btrês\b/g,'3').replace(/\bquatro\b/g,'4')
+    .replace(/\bcinco\b/g,'5').replace(/\bseis\b/g,'6')
+    .replace(/\bsete\b/g,'7').replace(/\boito\b/g,'8')
+    .replace(/\bnove\b/g,'9').replace(/\bdez\b/g,'10')
+    .replace(/\bmeio\b|\bmetade\b/g,'0.5')
+    .replace(/\bmililitros?\b/g,'ml')
+    .replace(/\bgramas?\b|\bgr\b/g,'g')
+    .replace(/\bunidades?\b/g,'unid');
+  const segments=t.split(/,|;|\se\s|\bcom\b|\btambém\b|\balém\b/);
+  const items=[];
+  for(const seg of segments){
+    const s=seg.trim();if(!s)continue;
+    const m=s.match(/(\d+(?:[.,]\d+)?)\s*(ml|g|l\b|unid|fatia|fatias|pote|lata|colher|xícara|copo)?\s*(?:de\s+)?(.+)/i);
+    if(!m)continue;
+    let qty=parseFloat(m[1].replace(',','.'));
+    const uRaw=(m[2]||'').toLowerCase();
+    let foodText=m[3].trim().replace(/\bcom\b.*/,'').replace(/\bpor\b.*/,'').trim();
+    if(!foodText)continue;
+    let unit='g';
+    if(/ml/.test(uRaw))unit='ml';
+    else if(/^l$/.test(uRaw)){unit='ml';qty*=1000;}
+    else if(/fatia|unid/.test(uRaw))unit='unid';
+    else if(/colher/.test(uRaw)){unit='g';qty*=15;}
+    else if(/copo/.test(uRaw)){unit='ml';qty*=200;}
+    const food=matchFoodText(foodText);
+    if(food)items.push({food,qty,unit});
+  }
+  return items;
+}
+
+function matchFoodText(text){
+  const words=text.toLowerCase().split(/\s+/).filter(w=>w.length>2);
+  let best=null,bestScore=0;
+  for(const food of FOODS){
+    const name=food.name.toLowerCase();
+    const score=words.reduce((acc,w)=>acc+(name.includes(w)?2:0),0);
+    if(score>bestScore){bestScore=score;best=food;}
+  }
+  return bestScore>0?best:null;
+}
+
+function renderVoiceItems(){
+  document.getElementById('voice-items-list').innerHTML=voiceItems.map((item,i)=>{
+    const m=calcMacros(item.food,item.qty);
+    return`<div class="voice-item">
+      <div class="voice-item-emoji">${item.food.emoji}</div>
+      <div class="voice-item-info">
+        <div class="voice-item-name">${item.food.name}</div>
+        <div class="voice-item-macros">${item.qty}${item.unit} · ${m.kcal} kcal · P:${m.prot}g C:${m.carb}g G:${m.fat}g</div>
+      </div>
+      <button class="voice-item-remove" onclick="removeVoiceItem(${i})">×</button>
+    </div>`;
+  }).join('');
+}
+
+function removeVoiceItem(i){
+  voiceItems.splice(i,1);
+  if(voiceItems.length===0){
+    document.getElementById('voice-no-match').style.display='';
+    document.getElementById('voice-confirm-btn').style.display='none';
+    document.getElementById('voice-results-title').textContent='Nada detectado';
+  }
+  renderVoiceItems();
+}
+
+function confirmVoiceItems(){
+  if(!openForMeal||voiceItems.length===0)return;
+  const d=getDiet();
+  if(!d[dietDate])d[dietDate]={meals:{cafe:[],almoco:[],jantar:[],lanche:[]}};
+  for(const item of voiceItems){
+    const m=calcMacros(item.food,item.qty);
+    const entry={
+      eid:'e'+Date.now().toString(36)+Math.random().toString(36).slice(2,4),
+      fid:item.food.id,name:item.food.name,qty:item.qty,unit:item.unit,...m
+    };
+    (d[dietDate].meals[openForMeal]=d[dietDate].meals[openForMeal]||[]).push(entry);
+  }
+  saveDiet(d);
+  document.getElementById('voice-mic-btn').classList.remove('recording');
+  document.getElementById('voice-view').classList.remove('open');
+  closeFoodOverlay();
+  renderDiet();
 }
 
 // ── Sidebar + navigation ───────────────────────────────
