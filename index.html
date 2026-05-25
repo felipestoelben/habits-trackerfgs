@@ -1593,23 +1593,28 @@ async function fetchOnlineFoods(q){
   try{
     const ctrl=new AbortController();
     const timer=setTimeout(()=>ctrl.abort(),12000);
-    const url=`https://br.openfoodfacts.org/api/v2/search?q=${encodeURIComponent(q)}&lc=pt&cc=br&page_size=30&fields=product_name,product_name_pt,product_name_pt-BR,brands,nutriments`;
+    const url=`https://br.openfoodfacts.org/api/v2/search?q=${encodeURIComponent(q)}&lc=pt&cc=br&countries_tags_en=brazil&page_size=50&fields=product_name,product_name_pt,product_name_pt-BR,brands,nutriments,countries_tags`;
     const res=await fetch(url,{signal:ctrl.signal});
     clearTimeout(timer);
     if(!res.ok)throw new Error('HTTP '+res.status);
     const data=await res.json();
     if(lastQuery!==q)return;
-    const products=(data.products||[]).filter(p=>{
+    // só aceita produto com nome em português E que tenha kcal válido
+    let products=(data.products||[]).filter(p=>{
       const n=p.nutriments||{};
-      const hasName=p['product_name_pt-BR']||p.product_name_pt||p.product_name;
-      return hasName&&n['energy-kcal_100g']>0;
+      const ptName=p['product_name_pt-BR']||p.product_name_pt;
+      return ptName&&ptName.trim()&&n['energy-kcal_100g']>0;
     });
-    // prioriza produtos com nome em português
-    products.sort((a,b)=>{
-      const aPt=!!(a['product_name_pt-BR']||a.product_name_pt);
-      const bPt=!!(b['product_name_pt-BR']||b.product_name_pt);
-      return bPt-aPt;
-    });
+    // se não achou nada com nome PT, aceita qualquer nome mas filtra lixo óbvio
+    if(!products.length){
+      products=(data.products||[]).filter(p=>{
+        const n=p.nutriments||{};
+        const name=p.product_name||'';
+        // rejeita nomes claramente não-latinos (árabe, cirílico, etc.)
+        const nonLatin=/[؀-ۿЀ-ӿͰ-Ͽ]/;
+        return name&&!nonLatin.test(name)&&n['energy-kcal_100g']>0;
+      });
+    }
     const onlineFoods=products.slice(0,15).map(p=>{
       const n=p.nutriments||{};
       const kcal=Math.round(n['energy-kcal_100g']||0);
