@@ -573,6 +573,82 @@ body{
 .food-loading-dots span:nth-child(3){animation-delay:.4s}
 @keyframes fld{0%,80%,100%{opacity:.25;transform:scale(.75)}40%{opacity:1;transform:scale(1)}}
 
+/* ── Barcode scanner ── */
+.scan-btn{
+  width:36px;height:36px;border-radius:50%;border:none;
+  background:var(--accent-lt);color:var(--accent);
+  font-size:17px;cursor:pointer;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .15s,transform .12s;
+}
+.scan-btn:active{transform:scale(.86)}
+#barcode-overlay{
+  position:absolute;inset:0;z-index:200;background:#000;
+  display:none;flex-direction:column;
+}
+#barcode-overlay.open{display:flex}
+.barcode-hdr{
+  padding:calc(env(safe-area-inset-top,0px)+14px) 16px 12px;
+  display:flex;align-items:center;gap:12px;
+  background:rgba(0,0,0,.6);position:absolute;top:0;left:0;right:0;z-index:10;
+}
+.barcode-hdr-back{
+  width:36px;height:36px;border-radius:50%;border:none;
+  background:rgba(255,255,255,.15);color:#fff;font-size:18px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+.barcode-hdr-title{color:#fff;font-size:17px;font-weight:700}
+#barcode-video{width:100%;height:100%;object-fit:cover;display:block}
+.barcode-aim-wrap{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  pointer-events:none;
+}
+.barcode-aim{
+  width:260px;height:130px;border-radius:12px;
+  box-shadow:0 0 0 2000px rgba(0,0,0,.55);
+  border:2px solid rgba(255,255,255,.9);
+  position:relative;
+}
+.barcode-aim::before,.barcode-aim::after{
+  content:'';position:absolute;width:24px;height:24px;border-color:#fff;border-style:solid;
+}
+.barcode-aim::before{top:-2px;left:-2px;border-width:3px 0 0 3px;border-radius:6px 0 0 0}
+.barcode-aim::after{bottom:-2px;right:-2px;border-width:0 3px 3px 0;border-radius:0 0 6px 0}
+.barcode-laser{
+  position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);
+  height:2px;background:linear-gradient(90deg,transparent,#6366F1,transparent);
+  animation:laser 1.8s ease-in-out infinite;
+}
+@keyframes laser{0%,100%{top:15%}50%{top:85%}}
+.barcode-bottom{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:16px 20px calc(env(safe-area-inset-bottom,0px)+20px);
+  background:rgba(0,0,0,.6);backdrop-filter:blur(10px);
+}
+.barcode-hint{color:rgba(255,255,255,.85);font-size:14px;text-align:center;margin-bottom:12px}
+.barcode-status{color:var(--accent);font-size:13px;text-align:center;font-weight:600;min-height:20px;margin-bottom:10px}
+.barcode-manual-row{display:flex;gap:8px;align-items:center}
+.barcode-manual-input{
+  flex:1;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);
+  border-radius:10px;padding:10px 14px;color:#fff;font-size:15px;font-family:inherit;outline:none;
+}
+.barcode-manual-input::placeholder{color:rgba(255,255,255,.45)}
+.barcode-manual-btn{
+  background:var(--accent);color:#fff;border:none;border-radius:10px;
+  padding:10px 14px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;
+}
+.barcode-fallback-msg{
+  color:rgba(255,255,255,.7);font-size:12px;text-align:center;margin-top:8px;
+}
+/* source badge */
+.food-source-badge{
+  font-size:9px;font-weight:800;padding:2px 5px;border-radius:4px;margin-left:4px;
+  vertical-align:middle;letter-spacing:.3px;
+}
+.src-taco{background:rgba(34,197,94,.15);color:#16a34a}
+.src-off{background:rgba(99,102,241,.12);color:var(--accent)}
+.src-usda{background:rgba(245,158,11,.12);color:#d97706}
+
 /* ── Voice ── */
 .voice-mic-btn{
   width:36px;height:36px;border-radius:50%;border:none;
@@ -1037,6 +1113,7 @@ body{
       <div class="food-search-bar">
         <span class="food-search-icon">🔍</span>
         <input class="food-search-input" id="food-search-input" type="text" placeholder="Buscar alimento..." oninput="filterFoods()" autocomplete="off">
+        <button class="scan-btn" onclick="openBarcodeScanner()" title="Ler código de barras">📷</button>
         <button class="voice-mic-btn" id="voice-mic-btn" onclick="openVoiceView()" title="Registrar por voz">🎙️</button>
       </div>
     </div>
@@ -1105,6 +1182,29 @@ body{
   </div>
 </div>
 
+<!-- ══ BARCODE SCANNER ══ -->
+<div id="barcode-overlay">
+  <div class="barcode-hdr">
+    <button class="barcode-hdr-back" onclick="closeBarcodeScanner()">‹</button>
+    <div class="barcode-hdr-title">Ler código de barras</div>
+  </div>
+  <video id="barcode-video" autoplay playsinline muted></video>
+  <div class="barcode-aim-wrap">
+    <div class="barcode-aim">
+      <div class="barcode-laser"></div>
+    </div>
+  </div>
+  <div class="barcode-bottom">
+    <div class="barcode-hint">Posicione o código de barras no quadro</div>
+    <div class="barcode-status" id="barcode-status">Escaneando…</div>
+    <div class="barcode-manual-row" id="barcode-manual-row" style="display:none">
+      <input class="barcode-manual-input" id="barcode-manual-input" type="tel" placeholder="Digite o EAN/código…" inputmode="numeric">
+      <button class="barcode-manual-btn" onclick="lookupBarcodeManual()">Buscar</button>
+    </div>
+    <div class="barcode-fallback-msg" id="barcode-fallback-msg"></div>
+  </div>
+</div>
+
 <!-- ══ MEAL CONFIG SHEET ══ -->
 <div id="meal-cfg-backdrop" onclick="closeMealConfig()"></div>
 <div id="meal-cfg-sheet">
@@ -1158,71 +1258,160 @@ async function loadFromCloud(){if(!fbUser)return;try{const s=await db.collection
 async function pushToCloud(){if(!fbUser)return;try{await db.collection('users').doc(fbUser.uid).set({habits:getHabits(),comp:getComp(),diet:getDiet(),dietGoal:getGoal(),dietMeals:getDietMeals(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});}catch(e){console.warn(e);}}
 
 // ── Food DB ────────────────────────────────────────────
+// Fonte: TACO (Tabela Brasileira de Composição de Alimentos) — valores por 100g ou unidade
 const FOODS=[
-  {id:'arroz_b',name:'Arroz branco cozido',emoji:'🍚',cat:'Cereais',kcal:128,prot:2.5,carb:28,fat:0.2,unit:'g'},
-  {id:'arroz_i',name:'Arroz integral cozido',emoji:'🍚',cat:'Cereais',kcal:124,prot:2.6,carb:25.8,fat:1,unit:'g'},
-  {id:'feijao',name:'Feijão preto cozido',emoji:'🫘',cat:'Cereais',kcal:76,prot:4.8,carb:13.6,fat:0.5,unit:'g'},
-  {id:'feijao_c',name:'Feijão carioca cozido',emoji:'🫘',cat:'Cereais',kcal:77,prot:4.8,carb:13.6,fat:0.5,unit:'g'},
-  {id:'macarrao',name:'Macarrão cozido',emoji:'🍝',cat:'Cereais',kcal:131,prot:4.5,carb:26,fat:0.9,unit:'g'},
-  {id:'batata_d',name:'Batata doce cozida',emoji:'🍠',cat:'Cereais',kcal:86,prot:1.6,carb:20,fat:0.1,unit:'g'},
-  {id:'batata',name:'Batata inglesa cozida',emoji:'🥔',cat:'Cereais',kcal:77,prot:2,carb:17,fat:0.1,unit:'g'},
-  {id:'pao',name:'Pão francês',emoji:'🥖',cat:'Cereais',kcal:300,prot:8,carb:58,fat:3,unit:'g'},
-  {id:'pao_i',name:'Pão integral',emoji:'🍞',cat:'Cereais',kcal:247,prot:9,carb:45,fat:3.5,unit:'g'},
-  {id:'aveia',name:'Aveia em flocos',emoji:'🌾',cat:'Cereais',kcal:394,prot:13.9,carb:66,fat:8.5,unit:'g'},
-  {id:'tapioca',name:'Tapioca (goma)',emoji:'🫓',cat:'Cereais',kcal:336,prot:0.2,carb:83,fat:0,unit:'g'},
-  {id:'cuscuz',name:'Cuscuz de milho cozido',emoji:'🌽',cat:'Cereais',kcal:112,prot:2.3,carb:23,fat:0.5,unit:'g'},
-  {id:'mandioca',name:'Mandioca cozida',emoji:'🟡',cat:'Cereais',kcal:125,prot:0.6,carb:30,fat:0.3,unit:'g'},
-  {id:'lentilha',name:'Lentilha cozida',emoji:'🫘',cat:'Cereais',kcal:116,prot:9,carb:20,fat:0.4,unit:'g'},
-  {id:'granola',name:'Granola',emoji:'🌾',cat:'Cereais',kcal:450,prot:10,carb:64,fat:18,unit:'g'},
-  {id:'frango_p',name:'Frango grelhado (peito)',emoji:'🍗',cat:'Proteínas',kcal:165,prot:31,carb:0,fat:3.6,unit:'g'},
-  {id:'frango_c',name:'Frango grelhado (coxa)',emoji:'🍗',cat:'Proteínas',kcal:215,prot:26,carb:0,fat:12,unit:'g'},
-  {id:'carne_pat',name:'Patinho grelhado',emoji:'🥩',cat:'Proteínas',kcal:133,prot:21,carb:0,fat:5,unit:'g'},
-  {id:'alcatra',name:'Alcatra grelhada',emoji:'🥩',cat:'Proteínas',kcal:180,prot:26,carb:0,fat:8,unit:'g'},
-  {id:'atum_a',name:'Atum em água',emoji:'🐟',cat:'Proteínas',kcal:103,prot:23,carb:0,fat:0.8,unit:'g'},
-  {id:'tilapia',name:'Tilápia grelhada',emoji:'🐟',cat:'Proteínas',kcal:128,prot:26,carb:0,fat:2.7,unit:'g'},
-  {id:'salmon',name:'Salmão grelhado',emoji:'🐟',cat:'Proteínas',kcal:206,prot:20,carb:0,fat:13,unit:'g'},
-  {id:'ovo',name:'Ovo inteiro',emoji:'🥚',cat:'Proteínas',kcal:77,prot:6.3,carb:0.6,fat:5.3,unit:'unid'},
-  {id:'clara',name:'Clara de ovo',emoji:'🥚',cat:'Proteínas',kcal:17,prot:3.6,carb:0.2,fat:0.1,unit:'unid'},
-  {id:'carne_m',name:'Carne moída (patinho)',emoji:'🥩',cat:'Proteínas',kcal:170,prot:20,carb:0,fat:10,unit:'g'},
-  {id:'linguica',name:'Linguiça toscana',emoji:'🌭',cat:'Proteínas',kcal:270,prot:15,carb:3,fat:22,unit:'g'},
-  {id:'camarao',name:'Camarão grelhado',emoji:'🦐',cat:'Proteínas',kcal:99,prot:21,carb:0,fat:1.1,unit:'g'},
-  {id:'leite_i',name:'Leite integral',emoji:'🥛',cat:'Laticínios',kcal:61,prot:3.2,carb:4.8,fat:3.3,unit:'ml'},
-  {id:'leite_d',name:'Leite desnatado',emoji:'🥛',cat:'Laticínios',kcal:36,prot:3.4,carb:5,fat:0.1,unit:'ml'},
-  {id:'iogurte_g',name:'Iogurte grego integral',emoji:'🥛',cat:'Laticínios',kcal:97,prot:9,carb:3.8,fat:5,unit:'g'},
-  {id:'iogurte_d',name:'Iogurte natural desnatado',emoji:'🥛',cat:'Laticínios',kcal:44,prot:4.5,carb:6.3,fat:0.1,unit:'g'},
-  {id:'queijo_m',name:'Queijo mussarela',emoji:'🧀',cat:'Laticínios',kcal:254,prot:22,carb:0,fat:18,unit:'g'},
-  {id:'queijo_c',name:'Queijo cottage',emoji:'🧀',cat:'Laticínios',kcal:98,prot:11,carb:3.4,fat:4.3,unit:'g'},
-  {id:'requeijao',name:'Requeijão cremoso',emoji:'🧀',cat:'Laticínios',kcal:210,prot:8,carb:4,fat:18,unit:'g'},
-  {id:'whey',name:'Whey Protein',emoji:'💪',cat:'Suplementos',kcal:387,prot:77,carb:8,fat:5,unit:'g'},
-  {id:'caseina',name:'Caseína',emoji:'💪',cat:'Suplementos',kcal:360,prot:75,carb:8,fat:3,unit:'g'},
-  {id:'creatina',name:'Creatina monohidratada',emoji:'⚡',cat:'Suplementos',kcal:0,prot:0,carb:0,fat:0,unit:'g'},
-  {id:'dextrose',name:'Dextrose',emoji:'⚡',cat:'Suplementos',kcal:375,prot:0,carb:94,fat:0,unit:'g'},
-  {id:'albumina',name:'Albumina',emoji:'💪',cat:'Suplementos',kcal:360,prot:80,carb:4,fat:1,unit:'g'},
-  {id:'azeite',name:'Azeite de oliva',emoji:'🫒',cat:'Gorduras',kcal:884,prot:0,carb:0,fat:100,unit:'ml'},
-  {id:'pasta_am',name:'Pasta de amendoim',emoji:'🥜',cat:'Gorduras',kcal:598,prot:25,carb:22,fat:50,unit:'g'},
-  {id:'amendoim',name:'Amendoim torrado',emoji:'🥜',cat:'Gorduras',kcal:567,prot:26,carb:16,fat:49,unit:'g'},
-  {id:'abacate',name:'Abacate',emoji:'🥑',cat:'Gorduras',kcal:160,prot:2,carb:9,fat:15,unit:'g'},
-  {id:'castanha',name:'Castanha do Pará',emoji:'🥜',cat:'Gorduras',kcal:656,prot:14,carb:12,fat:63,unit:'g'},
-  {id:'nozes',name:'Nozes',emoji:'🥜',cat:'Gorduras',kcal:654,prot:15,carb:14,fat:65,unit:'g'},
-  {id:'banana',name:'Banana',emoji:'🍌',cat:'Frutas',kcal:89,prot:1.1,carb:23,fat:0.3,unit:'g'},
-  {id:'maca',name:'Maçã',emoji:'🍎',cat:'Frutas',kcal:52,prot:0.3,carb:14,fat:0.2,unit:'g'},
-  {id:'laranja',name:'Laranja',emoji:'🍊',cat:'Frutas',kcal:47,prot:0.9,carb:12,fat:0.1,unit:'g'},
-  {id:'manga',name:'Manga',emoji:'🥭',cat:'Frutas',kcal:60,prot:0.8,carb:15,fat:0.4,unit:'g'},
-  {id:'mamao',name:'Mamão papaia',emoji:'🍈',cat:'Frutas',kcal:43,prot:0.5,carb:11,fat:0.1,unit:'g'},
-  {id:'morango',name:'Morango',emoji:'🍓',cat:'Frutas',kcal:32,prot:0.7,carb:7.7,fat:0.3,unit:'g'},
-  {id:'uva',name:'Uva',emoji:'🍇',cat:'Frutas',kcal:69,prot:0.7,carb:18,fat:0.2,unit:'g'},
-  {id:'melancia',name:'Melancia',emoji:'🍉',cat:'Frutas',kcal:30,prot:0.6,carb:7.6,fat:0.2,unit:'g'},
-  {id:'brocolis',name:'Brócolis cozido',emoji:'🥦',cat:'Verduras',kcal:34,prot:2.8,carb:7,fat:0.4,unit:'g'},
-  {id:'espinafre',name:'Espinafre cru',emoji:'🥬',cat:'Verduras',kcal:23,prot:2.9,carb:3.6,fat:0.4,unit:'g'},
-  {id:'alface',name:'Alface',emoji:'🥬',cat:'Verduras',kcal:15,prot:1.4,carb:2.9,fat:0.2,unit:'g'},
-  {id:'tomate',name:'Tomate',emoji:'🍅',cat:'Verduras',kcal:18,prot:0.9,carb:3.9,fat:0.2,unit:'g'},
-  {id:'cenoura',name:'Cenoura crua',emoji:'🥕',cat:'Verduras',kcal:41,prot:0.9,carb:10,fat:0.2,unit:'g'},
-  {id:'abobrinha',name:'Abobrinha cozida',emoji:'🥒',cat:'Verduras',kcal:17,prot:1.2,carb:3.1,fat:0.3,unit:'g'},
-  {id:'couve',name:'Couve refogada',emoji:'🥬',cat:'Verduras',kcal:49,prot:4.3,carb:9,fat:0.9,unit:'g'},
-  {id:'mel',name:'Mel',emoji:'🍯',cat:'Extras',kcal:304,prot:0.3,carb:82,fat:0,unit:'g'},
-  {id:'acucar',name:'Açúcar refinado',emoji:'🍬',cat:'Extras',kcal:387,prot:0,carb:100,fat:0,unit:'g'},
-  {id:'cafe',name:'Café sem açúcar',emoji:'☕',cat:'Extras',kcal:2,prot:0.3,carb:0,fat:0,unit:'ml'},
-  {id:'achocolatado',name:'Achocolatado',emoji:'🍫',cat:'Extras',kcal:79,prot:3.5,carb:13.5,fat:1.3,unit:'ml'},
+  // ── Cereais & Tubérculos ──────────────────────────────────────
+  {id:'arroz_b',    name:'Arroz branco cozido',      emoji:'🍚',cat:'Cereais',kcal:128,prot:2.5,carb:28.1,fat:0.2,unit:'g',src:'taco'},
+  {id:'arroz_i',    name:'Arroz integral cozido',     emoji:'🍚',cat:'Cereais',kcal:124,prot:2.6,carb:25.8,fat:1.0,unit:'g',src:'taco'},
+  {id:'feijao',     name:'Feijão preto cozido',       emoji:'🫘',cat:'Cereais',kcal:76, prot:4.8,carb:13.6,fat:0.5,unit:'g',src:'taco'},
+  {id:'feijao_c',   name:'Feijão carioca cozido',     emoji:'🫘',cat:'Cereais',kcal:77, prot:4.8,carb:13.6,fat:0.5,unit:'g',src:'taco'},
+  {id:'feijao_m',   name:'Feijão mulatinho cozido',   emoji:'🫘',cat:'Cereais',kcal:76, prot:5.0,carb:13.2,fat:0.5,unit:'g',src:'taco'},
+  {id:'lentilha',   name:'Lentilha cozida',           emoji:'🫘',cat:'Cereais',kcal:116,prot:9.0,carb:20.4,fat:0.4,unit:'g',src:'taco'},
+  {id:'grao_bico',  name:'Grão-de-bico cozido',       emoji:'🫘',cat:'Cereais',kcal:161,prot:8.9,carb:27.4,fat:2.6,unit:'g',src:'taco'},
+  {id:'soja_c',     name:'Soja cozida',               emoji:'🫘',cat:'Cereais',kcal:141,prot:14.4,carb:11.5,fat:6.0,unit:'g',src:'taco'},
+  {id:'macarrao',   name:'Macarrão cozido',           emoji:'🍝',cat:'Cereais',kcal:131,prot:4.5,carb:26.0,fat:0.9,unit:'g',src:'taco'},
+  {id:'macarrao_i', name:'Macarrão integral cozido',  emoji:'🍝',cat:'Cereais',kcal:124,prot:5.3,carb:24.5,fat:0.8,unit:'g',src:'taco'},
+  {id:'aveia',      name:'Aveia em flocos',           emoji:'🌾',cat:'Cereais',kcal:394,prot:13.9,carb:66.6,fat:8.5,unit:'g',src:'taco'},
+  {id:'granola',    name:'Granola',                   emoji:'🌾',cat:'Cereais',kcal:450,prot:10.0,carb:64.0,fat:18.0,unit:'g',src:'taco'},
+  {id:'quinoa',     name:'Quinoa cozida',             emoji:'🌾',cat:'Cereais',kcal:120,prot:4.4,carb:21.3,fat:1.9,unit:'g',src:'taco'},
+  {id:'batata_d',   name:'Batata doce cozida',        emoji:'🍠',cat:'Cereais',kcal:86, prot:1.6,carb:20.0,fat:0.1,unit:'g',src:'taco'},
+  {id:'batata',     name:'Batata inglesa cozida',     emoji:'🥔',cat:'Cereais',kcal:77, prot:2.0,carb:17.0,fat:0.1,unit:'g',src:'taco'},
+  {id:'tapioca',    name:'Tapioca (goma)',            emoji:'🫓',cat:'Cereais',kcal:336,prot:0.2,carb:83.0,fat:0.0,unit:'g',src:'taco'},
+  {id:'cuscuz',     name:'Cuscuz de milho cozido',   emoji:'🌽',cat:'Cereais',kcal:112,prot:2.3,carb:23.0,fat:0.5,unit:'g',src:'taco'},
+  {id:'milho',      name:'Milho cozido',              emoji:'🌽',cat:'Cereais',kcal:86, prot:3.2,carb:18.7,fat:1.0,unit:'g',src:'taco'},
+  {id:'mandioca',   name:'Mandioca cozida',           emoji:'🟡',cat:'Cereais',kcal:125,prot:0.6,carb:30.0,fat:0.3,unit:'g',src:'taco'},
+  {id:'inhame',     name:'Inhame cozido',             emoji:'🟡',cat:'Cereais',kcal:104,prot:2.7,carb:23.8,fat:0.1,unit:'g',src:'taco'},
+  {id:'pao',        name:'Pão francês',               emoji:'🥖',cat:'Cereais',kcal:300,prot:8.0,carb:58.0,fat:3.0,unit:'g',src:'taco'},
+  {id:'pao_i',      name:'Pão integral',              emoji:'🍞',cat:'Cereais',kcal:247,prot:9.0,carb:45.0,fat:3.5,unit:'g',src:'taco'},
+  {id:'pao_f',      name:'Pão de forma',              emoji:'🍞',cat:'Cereais',kcal:266,prot:9.0,carb:50.0,fat:3.5,unit:'g',src:'taco'},
+  {id:'pao_q',      name:'Pão de queijo',             emoji:'🧆',cat:'Cereais',kcal:323,prot:6.5,carb:52.0,fat:10.0,unit:'g',src:'taco'},
+  {id:'biscoito_a', name:'Biscoito água e sal',       emoji:'🫙',cat:'Cereais',kcal:421,prot:9.0,carb:70.0,fat:12.0,unit:'g',src:'taco'},
+  {id:'trigo_q',    name:'Trigo para quibe',          emoji:'🌾',cat:'Cereais',kcal:342,prot:11.5,carb:72.0,fat:1.9,unit:'g',src:'taco'},
+  // ── Proteínas ────────────────────────────────────────────────
+  {id:'frango_p',   name:'Frango peito grelhado',     emoji:'🍗',cat:'Proteínas',kcal:159,prot:32.0,carb:0.0,fat:3.0,unit:'g',src:'taco'},
+  {id:'frango_c',   name:'Frango coxa grelhada',      emoji:'🍗',cat:'Proteínas',kcal:215,prot:26.0,carb:0.0,fat:12.0,unit:'g',src:'taco'},
+  {id:'frango_f',   name:'Frango filé grelhado',      emoji:'🍗',cat:'Proteínas',kcal:159,prot:32.0,carb:0.0,fat:3.0,unit:'g',src:'taco'},
+  {id:'carne_pat',  name:'Patinho grelhado',           emoji:'🥩',cat:'Proteínas',kcal:133,prot:21.0,carb:0.0,fat:5.0,unit:'g',src:'taco'},
+  {id:'alcatra',    name:'Alcatra grelhada',           emoji:'🥩',cat:'Proteínas',kcal:180,prot:26.0,carb:0.0,fat:8.0,unit:'g',src:'taco'},
+  {id:'lagarto',    name:'Lagarto cozido',             emoji:'🥩',cat:'Proteínas',kcal:148,prot:25.8,carb:0.0,fat:4.5,unit:'g',src:'taco'},
+  {id:'fraldinha',  name:'Fraldinha grelhada',         emoji:'🥩',cat:'Proteínas',kcal:195,prot:22.0,carb:0.0,fat:11.0,unit:'g',src:'taco'},
+  {id:'maminha',    name:'Maminha grelhada',           emoji:'🥩',cat:'Proteínas',kcal:158,prot:25.0,carb:0.0,fat:6.0,unit:'g',src:'taco'},
+  {id:'carne_m',    name:'Carne moída (patinho)',      emoji:'🥩',cat:'Proteínas',kcal:170,prot:20.0,carb:0.0,fat:10.0,unit:'g',src:'taco'},
+  {id:'atum_a',     name:'Atum em água',               emoji:'🐟',cat:'Proteínas',kcal:103,prot:23.0,carb:0.0,fat:0.8,unit:'g',src:'taco'},
+  {id:'atum_o',     name:'Atum em óleo',               emoji:'🐟',cat:'Proteínas',kcal:200,prot:22.0,carb:0.0,fat:12.0,unit:'g',src:'taco'},
+  {id:'sardinha',   name:'Sardinha em óleo',           emoji:'🐟',cat:'Proteínas',kcal:212,prot:23.0,carb:0.0,fat:13.0,unit:'g',src:'taco'},
+  {id:'tilapia',    name:'Tilápia grelhada',           emoji:'🐟',cat:'Proteínas',kcal:128,prot:26.0,carb:0.0,fat:2.7,unit:'g',src:'taco'},
+  {id:'salmon',     name:'Salmão grelhado',            emoji:'🐟',cat:'Proteínas',kcal:206,prot:20.0,carb:0.0,fat:13.0,unit:'g',src:'taco'},
+  {id:'camarao',    name:'Camarão cozido',             emoji:'🦐',cat:'Proteínas',kcal:99, prot:21.0,carb:0.0,fat:1.1,unit:'g',src:'taco'},
+  {id:'ovo',        name:'Ovo inteiro',                emoji:'🥚',cat:'Proteínas',kcal:77, prot:6.3,carb:0.6,fat:5.3,unit:'unid',src:'taco'},
+  {id:'clara',      name:'Clara de ovo',               emoji:'🥚',cat:'Proteínas',kcal:17, prot:3.6,carb:0.2,fat:0.1,unit:'unid',src:'taco'},
+  {id:'linguica',   name:'Linguiça toscana',           emoji:'🌭',cat:'Proteínas',kcal:270,prot:15.0,carb:3.0,fat:22.0,unit:'g',src:'taco'},
+  {id:'linguica_f', name:'Linguiça de frango',         emoji:'🌭',cat:'Proteínas',kcal:183,prot:19.0,carb:2.0,fat:11.0,unit:'g',src:'taco'},
+  {id:'peito_peru', name:'Peito de peru',              emoji:'🦃',cat:'Proteínas',kcal:108,prot:18.9,carb:0.5,fat:3.3,unit:'g',src:'taco'},
+  {id:'presunto',   name:'Presunto cozido',            emoji:'🥓',cat:'Proteínas',kcal:117,prot:16.0,carb:2.0,fat:5.2,unit:'g',src:'taco'},
+  {id:'bacon',      name:'Bacon grelhado',             emoji:'🥓',cat:'Proteínas',kcal:541,prot:14.6,carb:1.5,fat:52.0,unit:'g',src:'taco'},
+  // ── Laticínios ───────────────────────────────────────────────
+  {id:'leite_i',    name:'Leite integral',             emoji:'🥛',cat:'Laticínios',kcal:61, prot:3.2,carb:4.8,fat:3.3,unit:'ml',src:'taco'},
+  {id:'leite_d',    name:'Leite desnatado',            emoji:'🥛',cat:'Laticínios',kcal:36, prot:3.4,carb:5.0,fat:0.1,unit:'ml',src:'taco'},
+  {id:'leite_s',    name:'Leite semidesnatado',        emoji:'🥛',cat:'Laticínios',kcal:47, prot:3.3,carb:4.9,fat:1.5,unit:'ml',src:'taco'},
+  {id:'iogurte_g',  name:'Iogurte grego integral',     emoji:'🥛',cat:'Laticínios',kcal:97, prot:9.0,carb:3.8,fat:5.0,unit:'g',src:'taco'},
+  {id:'iogurte_d',  name:'Iogurte natural desnatado',  emoji:'🥛',cat:'Laticínios',kcal:44, prot:4.5,carb:6.3,fat:0.1,unit:'g',src:'taco'},
+  {id:'queijo_m',   name:'Queijo mussarela',           emoji:'🧀',cat:'Laticínios',kcal:254,prot:22.0,carb:0.0,fat:18.0,unit:'g',src:'taco'},
+  {id:'queijo_c',   name:'Queijo cottage',             emoji:'🧀',cat:'Laticínios',kcal:98, prot:11.0,carb:3.4,fat:4.3,unit:'g',src:'taco'},
+  {id:'queijo_p',   name:'Queijo parmesão',            emoji:'🧀',cat:'Laticínios',kcal:431,prot:36.0,carb:0.0,fat:31.0,unit:'g',src:'taco'},
+  {id:'queijo_mn',  name:'Queijo minas frescal',       emoji:'🧀',cat:'Laticínios',kcal:264,prot:17.4,carb:3.2,fat:20.2,unit:'g',src:'taco'},
+  {id:'queijo_pr',  name:'Queijo prato',               emoji:'🧀',cat:'Laticínios',kcal:346,prot:23.0,carb:0.9,fat:27.0,unit:'g',src:'taco'},
+  {id:'requeijao',  name:'Requeijão cremoso',          emoji:'🧀',cat:'Laticínios',kcal:210,prot:8.0,carb:4.0,fat:18.0,unit:'g',src:'taco'},
+  {id:'kefir',      name:'Kefir',                      emoji:'🥛',cat:'Laticínios',kcal:52, prot:3.4,carb:5.4,fat:1.5,unit:'ml',src:'taco'},
+  {id:'creme_l',    name:'Creme de leite',             emoji:'🥛',cat:'Laticínios',kcal:277,prot:2.1,carb:4.8,fat:27.0,unit:'g',src:'taco'},
+  {id:'leite_cond', name:'Leite condensado',           emoji:'🥛',cat:'Laticínios',kcal:321,prot:7.5,carb:55.0,fat:8.1,unit:'g',src:'taco'},
+  // ── Suplementos ──────────────────────────────────────────────
+  {id:'whey',       name:'Whey Protein concentrado',   emoji:'💪',cat:'Suplementos',kcal:380,prot:74.0,carb:10.0,fat:6.0,unit:'g',src:'taco'},
+  {id:'whey_iso',   name:'Whey Protein isolado',       emoji:'💪',cat:'Suplementos',kcal:370,prot:90.0,carb:3.0,fat:2.0,unit:'g',src:'taco'},
+  {id:'whey_3w',    name:'Whey 3W — Growth Suplementos',emoji:'💪',cat:'Suplementos',kcal:113,prot:22.0,carb:5.0,fat:2.0,unit:'g',src:'br'},
+  {id:'iso_whey',   name:'Iso Whey Zero — Growth Suplementos',emoji:'💪',cat:'Suplementos',kcal:107,prot:24.0,carb:1.0,fat:1.0,unit:'g',src:'br'},
+  {id:'whey_int',   name:'Whey Protein — Integralmédica',emoji:'💪',cat:'Suplementos',kcal:375,prot:72.0,carb:11.0,fat:6.0,unit:'g',src:'br'},
+  {id:'whey_max',   name:'Whey Protein — Max Titanium', emoji:'💪',cat:'Suplementos',kcal:369,prot:71.0,carb:12.0,fat:5.5,unit:'g',src:'br'},
+  {id:'whey_pro',   name:'Whey Protein — Probiótica',  emoji:'💪',cat:'Suplementos',kcal:378,prot:73.0,carb:10.5,fat:6.0,unit:'g',src:'br'},
+  {id:'caseina',    name:'Caseína',                    emoji:'💪',cat:'Suplementos',kcal:360,prot:75.0,carb:8.0,fat:3.0,unit:'g',src:'taco'},
+  {id:'albumina',   name:'Albumina',                   emoji:'💪',cat:'Suplementos',kcal:360,prot:80.0,carb:4.0,fat:1.0,unit:'g',src:'taco'},
+  {id:'creatina',   name:'Creatina monohidratada',     emoji:'⚡',cat:'Suplementos',kcal:0,  prot:0.0,carb:0.0,fat:0.0,unit:'g',src:'taco'},
+  {id:'dextrose',   name:'Dextrose',                   emoji:'⚡',cat:'Suplementos',kcal:375,prot:0.0,carb:94.0,fat:0.0,unit:'g',src:'taco'},
+  {id:'malto',      name:'Maltodextrina',              emoji:'⚡',cat:'Suplementos',kcal:375,prot:0.0,carb:95.0,fat:0.0,unit:'g',src:'taco'},
+  {id:'bcaa',       name:'BCAA',                       emoji:'⚡',cat:'Suplementos',kcal:320,prot:80.0,carb:0.0,fat:0.0,unit:'g',src:'taco'},
+  {id:'colageno',   name:'Colágeno hidrolisado',       emoji:'💊',cat:'Suplementos',kcal:320,prot:80.0,carb:0.0,fat:0.0,unit:'g',src:'taco'},
+  {id:'hipercal',   name:'Hipercalórico',              emoji:'🏋️',cat:'Suplementos',kcal:385,prot:18.0,carb:65.0,fat:8.0,unit:'g',src:'taco'},
+  {id:'pre_treino', name:'Pré-treino',                 emoji:'⚡',cat:'Suplementos',kcal:28, prot:4.0,carb:5.0,fat:0.0,unit:'g',src:'taco'},
+  {id:'vit_c',      name:'Vitamina C (ácido ascórbico)',emoji:'💊',cat:'Suplementos',kcal:0,  prot:0.0,carb:0.0,fat:0.0,unit:'g',src:'taco'},
+  {id:'omega3',     name:'Ômega 3 (cápsula)',          emoji:'💊',cat:'Suplementos',kcal:9,  prot:0.0,carb:0.0,fat:1.0,unit:'unid',src:'taco'},
+  // ── Gorduras & Óleos ─────────────────────────────────────────
+  {id:'azeite',     name:'Azeite de oliva',            emoji:'🫒',cat:'Gorduras',kcal:884,prot:0.0,carb:0.0,fat:100.0,unit:'ml',src:'taco'},
+  {id:'oleo_coco',  name:'Óleo de coco',               emoji:'🥥',cat:'Gorduras',kcal:862,prot:0.0,carb:0.0,fat:100.0,unit:'ml',src:'taco'},
+  {id:'manteiga',   name:'Manteiga',                   emoji:'🧈',cat:'Gorduras',kcal:717,prot:0.9,carb:0.0,fat:81.0,unit:'g',src:'taco'},
+  {id:'margarina',  name:'Margarina',                  emoji:'🧈',cat:'Gorduras',kcal:543,prot:0.6,carb:0.8,fat:59.0,unit:'g',src:'taco'},
+  {id:'pasta_am',   name:'Pasta de amendoim',          emoji:'🥜',cat:'Gorduras',kcal:598,prot:25.0,carb:22.0,fat:50.0,unit:'g',src:'taco'},
+  {id:'amendoim',   name:'Amendoim torrado',           emoji:'🥜',cat:'Gorduras',kcal:567,prot:26.0,carb:16.0,fat:49.0,unit:'g',src:'taco'},
+  {id:'abacate',    name:'Abacate',                    emoji:'🥑',cat:'Gorduras',kcal:160,prot:2.0,carb:9.0,fat:15.0,unit:'g',src:'taco'},
+  {id:'castanha',   name:'Castanha do Pará',           emoji:'🥜',cat:'Gorduras',kcal:656,prot:14.0,carb:12.0,fat:63.0,unit:'g',src:'taco'},
+  {id:'castanha_c', name:'Castanha de caju',           emoji:'🥜',cat:'Gorduras',kcal:570,prot:18.5,carb:29.0,fat:46.0,unit:'g',src:'taco'},
+  {id:'nozes',      name:'Nozes',                      emoji:'🥜',cat:'Gorduras',kcal:654,prot:15.0,carb:14.0,fat:65.0,unit:'g',src:'taco'},
+  {id:'amendoa',    name:'Amêndoa',                    emoji:'🥜',cat:'Gorduras',kcal:579,prot:21.0,carb:22.0,fat:50.0,unit:'g',src:'taco'},
+  {id:'far_am',     name:'Farinha de amêndoa',         emoji:'🥜',cat:'Gorduras',kcal:600,prot:21.0,carb:22.0,fat:54.0,unit:'g',src:'taco'},
+  // ── Frutas ───────────────────────────────────────────────────
+  {id:'banana',     name:'Banana',                     emoji:'🍌',cat:'Frutas',kcal:89, prot:1.1,carb:23.0,fat:0.3,unit:'g',src:'taco'},
+  {id:'maca',       name:'Maçã',                       emoji:'🍎',cat:'Frutas',kcal:52, prot:0.3,carb:14.0,fat:0.2,unit:'g',src:'taco'},
+  {id:'laranja',    name:'Laranja',                    emoji:'🍊',cat:'Frutas',kcal:47, prot:0.9,carb:12.0,fat:0.1,unit:'g',src:'taco'},
+  {id:'manga',      name:'Manga',                      emoji:'🥭',cat:'Frutas',kcal:60, prot:0.8,carb:15.0,fat:0.4,unit:'g',src:'taco'},
+  {id:'mamao',      name:'Mamão papaia',               emoji:'🍈',cat:'Frutas',kcal:43, prot:0.5,carb:11.0,fat:0.1,unit:'g',src:'taco'},
+  {id:'morango',    name:'Morango',                    emoji:'🍓',cat:'Frutas',kcal:32, prot:0.7,carb:7.7,fat:0.3,unit:'g',src:'taco'},
+  {id:'uva',        name:'Uva',                        emoji:'🍇',cat:'Frutas',kcal:69, prot:0.7,carb:18.0,fat:0.2,unit:'g',src:'taco'},
+  {id:'melancia',   name:'Melancia',                   emoji:'🍉',cat:'Frutas',kcal:30, prot:0.6,carb:7.6,fat:0.2,unit:'g',src:'taco'},
+  {id:'abacaxi',    name:'Abacaxi',                    emoji:'🍍',cat:'Frutas',kcal:48, prot:0.9,carb:12.3,fat:0.1,unit:'g',src:'taco'},
+  {id:'pera',       name:'Pera',                       emoji:'🍐',cat:'Frutas',kcal:55, prot:0.5,carb:13.7,fat:0.1,unit:'g',src:'taco'},
+  {id:'kiwi',       name:'Kiwi',                       emoji:'🥝',cat:'Frutas',kcal:61, prot:1.1,carb:14.6,fat:0.5,unit:'g',src:'taco'},
+  {id:'goiaba',     name:'Goiaba',                     emoji:'🍏',cat:'Frutas',kcal:54, prot:2.6,carb:11.2,fat:1.0,unit:'g',src:'taco'},
+  {id:'acai',       name:'Açaí (polpa sem açúcar)',    emoji:'🫐',cat:'Frutas',kcal:58, prot:1.1,carb:6.2,fat:5.0,unit:'g',src:'taco'},
+  {id:'limao',      name:'Limão',                      emoji:'🍋',cat:'Frutas',kcal:29, prot:1.1,carb:6.3,fat:0.4,unit:'g',src:'taco'},
+  {id:'melao',      name:'Melão',                      emoji:'🍈',cat:'Frutas',kcal:29, prot:0.7,carb:7.3,fat:0.2,unit:'g',src:'taco'},
+  {id:'maracuja',   name:'Maracujá (polpa)',           emoji:'🍊',cat:'Frutas',kcal:68, prot:2.4,carb:13.6,fat:1.9,unit:'g',src:'taco'},
+  {id:'tangerina',  name:'Tangerina',                  emoji:'🍊',cat:'Frutas',kcal:38, prot:0.9,carb:9.5,fat:0.2,unit:'g',src:'taco'},
+  {id:'pessego',    name:'Pêssego',                    emoji:'🍑',cat:'Frutas',kcal:39, prot:0.9,carb:9.0,fat:0.1,unit:'g',src:'taco'},
+  {id:'caju',       name:'Caju (pedúnculo)',            emoji:'🍏',cat:'Frutas',kcal:43, prot:0.8,carb:10.6,fat:0.4,unit:'g',src:'taco'},
+  // ── Verduras & Legumes ────────────────────────────────────────
+  {id:'brocolis',   name:'Brócolis cozido',            emoji:'🥦',cat:'Verduras',kcal:34, prot:2.8,carb:7.0,fat:0.4,unit:'g',src:'taco'},
+  {id:'espinafre',  name:'Espinafre cru',              emoji:'🥬',cat:'Verduras',kcal:23, prot:2.9,carb:3.6,fat:0.4,unit:'g',src:'taco'},
+  {id:'alface',     name:'Alface',                     emoji:'🥬',cat:'Verduras',kcal:15, prot:1.4,carb:2.9,fat:0.2,unit:'g',src:'taco'},
+  {id:'tomate',     name:'Tomate',                     emoji:'🍅',cat:'Verduras',kcal:18, prot:0.9,carb:3.9,fat:0.2,unit:'g',src:'taco'},
+  {id:'cenoura',    name:'Cenoura crua',               emoji:'🥕',cat:'Verduras',kcal:41, prot:0.9,carb:10.0,fat:0.2,unit:'g',src:'taco'},
+  {id:'abobrinha',  name:'Abobrinha cozida',           emoji:'🥒',cat:'Verduras',kcal:17, prot:1.2,carb:3.1,fat:0.3,unit:'g',src:'taco'},
+  {id:'couve',      name:'Couve-manteiga refogada',    emoji:'🥬',cat:'Verduras',kcal:35, prot:3.2,carb:5.5,fat:0.8,unit:'g',src:'taco'},
+  {id:'couve_f',    name:'Couve-flor cozida',          emoji:'🥦',cat:'Verduras',kcal:28, prot:2.1,carb:4.9,fat:0.3,unit:'g',src:'taco'},
+  {id:'chuchu',     name:'Chuchu cozido',              emoji:'🥒',cat:'Verduras',kcal:18, prot:0.8,carb:3.9,fat:0.1,unit:'g',src:'taco'},
+  {id:'berinjela',  name:'Berinjela cozida',           emoji:'🫑',cat:'Verduras',kcal:24, prot:1.2,carb:5.0,fat:0.2,unit:'g',src:'taco'},
+  {id:'pimentao',   name:'Pimentão',                   emoji:'🫑',cat:'Verduras',kcal:20, prot:0.9,carb:4.2,fat:0.2,unit:'g',src:'taco'},
+  {id:'beterraba',  name:'Beterraba cozida',           emoji:'🫐',cat:'Verduras',kcal:43, prot:1.6,carb:9.3,fat:0.1,unit:'g',src:'taco'},
+  {id:'pepino',     name:'Pepino cru',                 emoji:'🥒',cat:'Verduras',kcal:13, prot:0.7,carb:2.5,fat:0.1,unit:'g',src:'taco'},
+  {id:'cebola',     name:'Cebola crua',                emoji:'🧅',cat:'Verduras',kcal:36, prot:1.2,carb:7.4,fat:0.2,unit:'g',src:'taco'},
+  {id:'alho',       name:'Alho cru',                   emoji:'🧄',cat:'Verduras',kcal:149,prot:6.4,carb:32.0,fat:0.5,unit:'g',src:'taco'},
+  {id:'repolho',    name:'Repolho cru',                emoji:'🥬',cat:'Verduras',kcal:24, prot:1.4,carb:5.0,fat:0.3,unit:'g',src:'taco'},
+  {id:'vagem',      name:'Vagem cozida',               emoji:'🫛',cat:'Verduras',kcal:28, prot:1.8,carb:5.8,fat:0.2,unit:'g',src:'taco'},
+  {id:'aspargo',    name:'Aspargo cozido',             emoji:'🌿',cat:'Verduras',kcal:18, prot:2.4,carb:1.5,fat:0.2,unit:'g',src:'taco'},
+  // ── Extras & Preparações ─────────────────────────────────────
+  {id:'mel',        name:'Mel',                        emoji:'🍯',cat:'Extras',kcal:304,prot:0.3,carb:82.0,fat:0.0,unit:'g',src:'taco'},
+  {id:'acucar',     name:'Açúcar refinado',            emoji:'🍬',cat:'Extras',kcal:387,prot:0.0,carb:100.0,fat:0.0,unit:'g',src:'taco'},
+  {id:'cafe',       name:'Café (infusão)',             emoji:'☕',cat:'Extras',kcal:2,  prot:0.3,carb:0.0,fat:0.0,unit:'ml',src:'taco'},
+  {id:'achocolatado',name:'Achocolatado',              emoji:'🍫',cat:'Extras',kcal:79, prot:3.5,carb:13.5,fat:1.3,unit:'ml',src:'taco'},
+  {id:'choc_lk',    name:'Chocolate ao leite',         emoji:'🍫',cat:'Extras',kcal:520,prot:7.0,carb:59.0,fat:29.0,unit:'g',src:'taco'},
+  {id:'choc_ma',    name:'Chocolate meio amargo',      emoji:'🍫',cat:'Extras',kcal:494,prot:6.0,carb:64.0,fat:28.0,unit:'g',src:'taco'},
+  {id:'sorvete',    name:'Sorvete de creme',           emoji:'🍦',cat:'Extras',kcal:212,prot:3.5,carb:28.0,fat:10.0,unit:'g',src:'taco'},
+  {id:'pizza',      name:'Pizza de mussarela',         emoji:'🍕',cat:'Extras',kcal:266,prot:12.0,carb:32.0,fat:10.0,unit:'g',src:'taco'},
+  {id:'hamburguer', name:'Hambúrguer bovino',          emoji:'🍔',cat:'Extras',kcal:295,prot:17.0,carb:24.0,fat:14.0,unit:'g',src:'taco'},
+  {id:'pipoca',     name:'Pipoca salgada',             emoji:'🍿',cat:'Extras',kcal:377,prot:12.0,carb:67.0,fat:9.0,unit:'g',src:'taco'},
+  {id:'refri_cola', name:'Refrigerante cola',          emoji:'🥤',cat:'Extras',kcal:37, prot:0.0,carb:9.6,fat:0.0,unit:'ml',src:'taco'},
+  {id:'suco_l',     name:'Suco de laranja natural',   emoji:'🍊',cat:'Extras',kcal:45, prot:0.7,carb:10.9,fat:0.2,unit:'ml',src:'taco'},
+  {id:'maionese',   name:'Maionese',                   emoji:'🫙',cat:'Extras',kcal:656,prot:1.2,carb:5.5,fat:70.0,unit:'g',src:'taco'},
+  {id:'ketchup',    name:'Ketchup',                    emoji:'🫙',cat:'Extras',kcal:101,prot:1.8,carb:25.0,fat:0.2,unit:'g',src:'taco'},
+  {id:'arroz_f',    name:'Arroz com feijão',           emoji:'🍚',cat:'Extras',kcal:103,prot:3.7,carb:19.7,fat:0.8,unit:'g',src:'taco'},
 ];
 
 const DEFAULT_MEALS=[
@@ -1541,6 +1730,65 @@ function deleteMealConfig(id){
   renderMealConfig();
 }
 
+// ── Food search utilities ───────────────────────────────
+// Normaliza string: remove acentos, lowercase, trim
+function normStr(s){
+  return(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim();
+}
+// Score de similaridade por bigramas (0-1)
+function bigramSim(a,b){
+  const bg=s=>{const m=new Set();for(let i=0;i<s.length-1;i++)m.add(s.slice(i,i+2));return m;};
+  const ba=bg(a),bb=bg(b);
+  if(!ba.size||!bb.size)return 0;
+  const inter=[...ba].filter(x=>bb.has(x)).length;
+  return(2*inter)/(ba.size+bb.size);
+}
+// Dicionário de marcas brasileiras de suplementos → aliases para busca
+const BR_BRAND_ALIASES={
+  'growth':['growth suplementos','growth supplements'],
+  'integralmedica':['integralmedica','integralmédica'],
+  'max titanium':['max titanium'],
+  'probiotica':['probiotica','probiótica'],
+  'darkness':['darkness'],
+  'black skull':['black skull'],
+  'vitafor':['vitafor'],
+  'nutrata':['nutrata'],
+  'optimum':['optimum nutrition','gold standard'],
+  'universal':['universal nutrition'],
+  'muscletech':['muscletech'],
+};
+
+function searchLocalFoods(q){
+  if(!q.trim())return[];
+  const nq=normStr(q);
+  const words=nq.split(/\s+/).filter(w=>w.length>=2);
+  return FOODS.map(f=>{
+    const nn=normStr(f.name),nc=normStr(f.cat);
+    let score=0;
+    // match exato da query completa no nome → maior peso
+    if(nn===nq)score+=20;
+    else if(nn.includes(nq))score+=12;
+    // match por palavra
+    for(const w of words){
+      if(nn.includes(w))score+=4;
+      else if(nc.includes(w))score+=1.5;
+      else{
+        // fuzzy por bigramas
+        const sim=bigramSim(nn,w);
+        if(sim>0.65)score+=sim*3;
+        // match parcial por trigrama
+        const words_nn=nn.split(' ');
+        for(const wn of words_nn){if(bigramSim(wn,w)>0.7)score+=1.5;}
+      }
+    }
+    // boost para marcas brasileiras na query
+    for(const[key]of Object.entries(BR_BRAND_ALIASES)){
+      if(nq.includes(key)&&nn.includes(key))score+=5;
+    }
+    return{f,score};
+  }).filter(x=>x.score>0).sort((a,b)=>b.score-a.score).map(x=>x.f);
+}
+
 // ── Food search ────────────────────────────────────────
 function openFoodSearch(mealKey){
   openForMeal=mealKey;
@@ -1588,95 +1836,146 @@ function searchLocalFoods(q){
   }).filter(x=>x.score>0).sort((a,b)=>b.score-a.score).map(x=>x.f);
 }
 
+// ── Online food search engine ──────────────────────────
 const _nonLatin=/[؀-ۿЀ-ӿͰ-Ͽ一-鿿぀-ヿ]/;
-function _offProductName(p){return(p['product_name_pt-BR']||p.product_name_pt||p.product_name||'').trim();}
-async function _offFetch(query,signal){
-  const url=`https://world.openfoodfacts.org/api/v2/search?q=${encodeURIComponent(query)}&page_size=30&fields=product_name,product_name_pt,product_name_pt-BR,brands,nutriments`;
-  const res=await fetch(url,{signal});
-  if(!res.ok)throw new Error('HTTP '+res.status);
-  const data=await res.json();
-  return(data.products||[]).filter(p=>{
-    const name=_offProductName(p);
-    const n=p.nutriments||{};
-    return name&&!_nonLatin.test(name)&&n['energy-kcal_100g']>0;
-  });
+
+function _offProductName(p){
+  return(p['product_name_pt-BR']||p.product_name_pt||p.product_name||'').trim();
 }
-function _offToFood(p){
+function _isValidProduct(p){
+  const name=_offProductName(p);
+  const n=p.nutriments||{};
+  return name&&!_nonLatin.test(name)&&n['energy-kcal_100g']>0;
+}
+function _offToFood(p,src){
   const n=p.nutriments||{};
   const brand=p.brands?p.brands.split(',')[0].trim():'';
-  const name=_offProductName(p)+(brand?` — ${brand}`:'');
+  const rawName=_offProductName(p);
+  const name=rawName+(brand&&!rawName.toLowerCase().includes(brand.toLowerCase())?` — ${brand}`:'');
   const id='off_'+Math.random().toString(36).slice(2);
   const food={id,name,emoji:'🛒',cat:'Internet',
     kcal:Math.round(n['energy-kcal_100g']||0),
     prot:+((n['proteins_100g']||0)).toFixed(1),
     carb:+((n['carbohydrates_100g']||0)).toFixed(1),
     fat:+((n['fat_100g']||0)).toFixed(1),
-    unit:'g',online:true};
+    unit:'g',online:true,src:src||'off'};
   onlineCache[id]=food;
   return food;
 }
+async function _fetchOFF(query,signal){
+  const url=`https://world.openfoodfacts.org/api/v2/search?q=${encodeURIComponent(query)}&page_size=40&fields=product_name,product_name_pt,product_name_pt-BR,brands,nutriments`;
+  const r=await fetch(url,{signal});
+  if(!r.ok)throw new Error('OFF '+r.status);
+  const d=await r.json();
+  return(d.products||[]).filter(_isValidProduct);
+}
+async function _fetchUSDA(query,signal){
+  const url=`https://api.nal.usda.gov/fdc/v1/foods/search?query=${encodeURIComponent(query)}&api_key=DEMO_KEY&dataType=Branded,Foundation&pageSize=20&fields=description,brandOwner,foodNutrients`;
+  const r=await fetch(url,{signal});
+  if(!r.ok)return[];
+  const d=await r.json();
+  return(d.foods||[]).map(f=>{
+    const getNut=id=>(f.foodNutrients||[]).find(n=>n.nutrientId===id)?.value||0;
+    const kcal=Math.round(getNut(1008));
+    if(!kcal)return null;
+    const name=(f.description||'').trim()+(f.brandOwner?` — ${f.brandOwner}`:'');
+    if(_nonLatin.test(name))return null;
+    const id2='usda_'+Math.random().toString(36).slice(2);
+    const food={id:id2,name,emoji:'🛒',cat:'Internet',
+      kcal,prot:+getNut(1003).toFixed(1),carb:+getNut(1005).toFixed(1),fat:+getNut(1004).toFixed(1),
+      unit:'g',online:true,src:'usda'};
+    onlineCache[id2]=food;
+    return food;
+  }).filter(Boolean);
+}
+// Remove duplicatas por similaridade de nome normalizado
+function _dedup(foods){
+  const seen=[];
+  return foods.filter(f=>{
+    const nn=normStr(f.name).slice(0,30);
+    if(seen.some(s=>bigramSim(s,nn)>0.78))return false;
+    seen.push(nn);return true;
+  });
+}
+// Relevância: quantas palavras da query o produto cobre (0-1)
+function _relevance(name,brand,qWords){
+  const h=normStr(name)+' '+normStr(brand);
+  const hits=qWords.filter(w=>h.includes(w)||bigramSim(h,w)>0.7).length;
+  return qWords.length?hits/qWords.length:0;
+}
+
 async function fetchOnlineFoods(q){
   if(lastQuery!==q)return;
+  const ctrl=new AbortController();
+  const timer=setTimeout(()=>ctrl.abort(),16000);
+  const qWords=normStr(q).split(/\s+/).filter(w=>w.length>=3);
+  const shortQ=qWords.slice(0,2).join(' ');
   try{
-    const ctrl=new AbortController();
-    const timer=setTimeout(()=>ctrl.abort(),14000);
-    const qWords=q.toLowerCase().split(/\s+/).filter(w=>w.length>=2);
-    // isRelevant: nome ou marca contém pelo menos 1 palavra da busca
-    const isRelevant=p=>{
-      const name=_offProductName(p).toLowerCase();
-      const brand=(p.brands||'').toLowerCase();
-      return qWords.some(w=>name.includes(w)||brand.includes(w));
-    };
-
-    // 1ª tentativa: query completa com filtro de relevância
-    let products=(await _offFetch(q,ctrl.signal)).filter(isRelevant);
-
-    // 2ª tentativa: se não achou nada, busca com as 2 primeiras palavras (nome do alimento sem marca)
-    if(!products.length&&qWords.length>2){
-      const shortQ=qWords.slice(0,2).join(' ');
-      const more=await _offFetch(shortQ,ctrl.signal);
-      // com query curta e específica não precisa de filtro de relevância — a própria busca já é precisa
-      products=more;
+    // OFF: full query
+    let offProducts=await _fetchOFF(q,ctrl.signal);
+    // Se pouco resultado e query longa, também tenta shortQ
+    if(offProducts.length<5&&shortQ&&shortQ!==normStr(q)){
+      const more=await _fetchOFF(shortQ,ctrl.signal);
+      // merge sem duplicar
+      const existNames=new Set(offProducts.map(p=>normStr(_offProductName(p)).slice(0,25)));
+      offProducts=[...offProducts,...more.filter(p=>!existNames.has(normStr(_offProductName(p)).slice(0,25)))];
     }
+    // Ordenar por relevância
+    offProducts.sort((a,b)=>{
+      const ra=_relevance(_offProductName(a),a.brands||'',qWords);
+      const rb=_relevance(_offProductName(b),b.brands||'',qWords);
+      return rb-ra;
+    });
+    let onlineFoods=_dedup(offProducts.slice(0,20)).map(p=>_offToFood(p,'off'));
 
-    // 3ª tentativa: se ainda vazio, tenta cada palavra individualmente
-    if(!products.length){
-      for(const w of qWords){
-        if(w.length<4)continue;
-        const more=(await _offFetch(w,ctrl.signal)).filter(isRelevant);
-        if(more.length){products=more;break;}
-      }
+    // USDA fallback: só chama se OFF retornou poucos resultados relevantes
+    if(onlineFoods.length<4){
+      try{
+        const usdaFoods=await _fetchUSDA(shortQ||q,ctrl.signal);
+        const usdaFiltered=usdaFoods.filter(f=>_relevance(f.name,'',qWords)>0.3);
+        // merge com dedup contra OFF results
+        const offNorms=new Set(onlineFoods.map(f=>normStr(f.name).slice(0,25)));
+        const newUsda=usdaFiltered.filter(f=>!offNorms.has(normStr(f.name).slice(0,25)));
+        onlineFoods=[...onlineFoods,...newUsda.slice(0,8)];
+      }catch{}
     }
 
     clearTimeout(timer);
     if(lastQuery!==q)return;
-
-    const onlineFoods=products.slice(0,15).map(_offToFood);
     const local=searchLocalFoods(q);
+    // Remove do online o que já apareceu no local (dedup cross-source)
+    const localNorms=new Set(local.map(f=>normStr(f.name).slice(0,20)));
+    const filteredOnline=onlineFoods.filter(f=>!localNorms.has(normStr(f.name).slice(0,20)));
+
     let html='';
-    if(local.length)html+=`<div class="food-cat-header">Banco local</div>`+local.map(f=>foodResultHTML(f,false)).join('');
-    if(onlineFoods.length){
-      html+=`<div class="food-cat-header">🌐 Internet</div>`+onlineFoods.map(f=>foodResultHTML(f,true)).join('');
-    } else {
-      html+=local.length?'':`<div style="padding:32px;text-align:center;color:var(--text2);font-size:14px">Nenhum resultado para "<b>${q}</b>"</div>`;
+    if(local.length)html+=`<div class="food-cat-header">📋 Banco local</div>`+local.map(f=>foodResultHTML(f,false)).join('');
+    if(filteredOnline.length){
+      html+=`<div class="food-cat-header">🌐 Internet</div>`+filteredOnline.slice(0,12).map(f=>foodResultHTML(f,true)).join('');
     }
-    document.getElementById('food-results').innerHTML=html||`<div style="padding:32px;text-align:center;color:var(--text2);font-size:14px">Nenhum resultado encontrado</div>`;
+    if(!html){
+      html=`<div style="padding:40px 24px;text-align:center;color:var(--text2);font-size:14px;line-height:1.6">Nenhum resultado para "<b>${q}</b>"<br><span style="font-size:12px;color:var(--text3)">Tente termos mais simples ou use o código de barras 📷</span></div>`;
+    }
+    document.getElementById('food-results').innerHTML=html;
   }catch(e){
     if(lastQuery!==q)return;
+    clearTimeout(timer);
     const local=searchLocalFoods(q);
     document.getElementById('food-results').innerHTML=
-      (local.length?`<div class="food-cat-header">Banco local</div>`+local.map(f=>foodResultHTML(f,false)).join(''):'')
+      (local.length?`<div class="food-cat-header">📋 Banco local</div>`+local.map(f=>foodResultHTML(f,false)).join(''):'')
       +`<div style="padding:12px 16px;font-size:12px;color:var(--text2)">🌐 Resultados online indisponíveis no momento</div>`;
   }
 }
 
 function foodResultHTML(f,isOnline){
   const per=f.unit==='unid'?'por unidade':'por 100'+f.unit;
-  const tag=isOnline?`<span class="food-online-tag">online</span>`:'';
+  let srcBadge='';
+  if(f.src==='taco'||f.src==='br')srcBadge=`<span class="food-source-badge src-taco">${f.src==='taco'?'TACO':'BR'}</span>`;
+  else if(isOnline&&f.src==='usda')srcBadge=`<span class="food-source-badge src-usda">USDA</span>`;
+  else if(isOnline)srcBadge=`<span class="food-source-badge src-off">OFF</span>`;
   return`<div class="food-result-item" onclick="selectFood('${f.id}')">
     <div class="food-result-emoji">${f.emoji}</div>
     <div class="food-result-info">
-      <div class="food-result-name">${f.name}${tag}</div>
+      <div class="food-result-name">${f.name}${srcBadge}</div>
       <div class="food-result-sub">${f.kcal} kcal · P:${f.prot}g C:${f.carb}g G:${f.fat}g · ${per}</div>
     </div>
     <div class="food-result-badge">${f.kcal} kcal</div>
@@ -1724,6 +2023,111 @@ function confirmAddFood(){
     );
   }
   saveDiet(d);closeFoodOverlay();renderDiet();
+}
+
+// ── Barcode scanner ────────────────────────────────────
+let _bcStream=null,_bcDetecting=false;
+
+async function openBarcodeScanner(){
+  const overlay=document.getElementById('barcode-overlay');
+  overlay.classList.add('open');
+  _setBarStatus('Iniciando câmera…');
+  document.getElementById('barcode-manual-row').style.display='none';
+  document.getElementById('barcode-fallback-msg').textContent='';
+  try{
+    _bcStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280}}});
+    const video=document.getElementById('barcode-video');
+    video.srcObject=_bcStream;
+    await video.play();
+    if('BarcodeDetector' in window){
+      _setBarStatus('Escaneando…');
+      _bcDetecting=true;
+      _bcScan(video);
+    } else {
+      _setBarStatus('Scanner não suportado neste navegador.');
+      _showBarcodeManual('Digite o código de barras abaixo:');
+    }
+  }catch(e){
+    _setBarStatus('Câmera indisponível.');
+    _showBarcodeManual('Digite o código EAN/UPC manualmente:');
+  }
+}
+function _bcScan(video){
+  if(!_bcDetecting)return;
+  const det=new BarcodeDetector({formats:['ean_13','ean_8','upc_a','upc_e','code_128','code_39']});
+  const tick=async()=>{
+    if(!_bcDetecting)return;
+    try{
+      const codes=await det.detect(video);
+      if(codes.length){
+        _bcDetecting=false;
+        await lookupBarcode(codes[0].rawValue);
+        return;
+      }
+    }catch{}
+    if(_bcDetecting)requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+function _setBarStatus(msg){
+  const el=document.getElementById('barcode-status');
+  if(el)el.textContent=msg;
+}
+function _showBarcodeManual(msg){
+  document.getElementById('barcode-manual-row').style.display='flex';
+  document.getElementById('barcode-fallback-msg').textContent=msg||'';
+  setTimeout(()=>document.getElementById('barcode-manual-input')?.focus(),200);
+}
+function closeBarcodeScanner(){
+  _bcDetecting=false;
+  if(_bcStream){_bcStream.getTracks().forEach(t=>t.stop());_bcStream=null;}
+  document.getElementById('barcode-overlay').classList.remove('open');
+}
+function lookupBarcodeManual(){
+  const ean=(document.getElementById('barcode-manual-input')?.value||'').trim();
+  if(ean)lookupBarcode(ean);
+}
+async function lookupBarcode(ean){
+  _setBarStatus(`Buscando: ${ean}…`);
+  try{
+    const ctrl=new AbortController();
+    setTimeout(()=>ctrl.abort(),10000);
+    const r=await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(ean)}.json?fields=product_name,product_name_pt,product_name_pt-BR,brands,nutriments`,{signal:ctrl.signal});
+    const d=await r.json();
+    if(d.status===1&&d.product&&_isValidProduct(d.product)){
+      const food=_offToFood(d.product,'off');
+      closeBarcodeScanner();
+      if(openForMeal){
+        // abre diretamente na tela de quantidade
+        selectFood(food.id);
+        document.getElementById('food-overlay').classList.add('open');
+      } else {
+        openFoodSearch(null);
+        setTimeout(()=>selectFood(food.id),100);
+      }
+      return;
+    }
+    // não encontrado: mostra mensagem e abre busca por texto
+    closeBarcodeScanner();
+    _setBarStatus('');
+    const name=d.product?_offProductName(d.product):'';
+    if(openForMeal)document.getElementById('food-overlay').classList.add('open');
+    if(name){
+      document.getElementById('food-search-input').value=name;
+      filterFoods();
+    } else {
+      _showBarcodeManual('');
+      if(!openForMeal)openFoodSearch(null);
+    }
+    document.getElementById('food-results').innerHTML=
+      `<div style="padding:20px 16px;color:var(--text2);font-size:13px;text-align:center">
+        ⚠️ Produto <b>${ean}</b> não encontrado na base.<br>
+        <span style="font-size:12px">Busque manualmente pelo nome acima.</span>
+      </div>`;
+  }catch(e){
+    _setBarStatus('Erro ao buscar código. Tente novamente.');
+    _showBarcodeManual('');
+  }
 }
 
 // ── Voice recording ────────────────────────────────────
