@@ -694,6 +694,8 @@ body{
       </div>
       <div class="header-actions">
         <button class="icon-btn" id="theme-btn" onclick="toggleTheme()"></button>
+        <button class="icon-btn" id="privacy-btn" onclick="togglePrivacy()" title="Ocultar dados">👁️</button>
+        <button class="icon-btn" onclick="refreshData()" title="Atualizar">🔄</button>
         <button class="icon-btn" id="sync-btn" onclick="handleSyncBtn()">☁️</button>
         <button class="add-btn" onclick="openAdd()">＋</button>
       </div>
@@ -730,6 +732,8 @@ body{
       </div>
       <div style="display:flex;gap:8px">
         <button class="icon-btn" id="diet-theme-btn" onclick="toggleTheme()"></button>
+        <button class="icon-btn" id="diet-privacy-btn" onclick="togglePrivacy()" title="Ocultar dados">👁️</button>
+        <button class="icon-btn" onclick="refreshData()" title="Atualizar">🔄</button>
         <button class="icon-btn" onclick="openMealConfig()" title="Configurar refeições">⚙️</button>
         <button class="icon-btn" id="diet-sync-btn" onclick="handleSyncBtn()">☁️</button>
       </div>
@@ -1050,6 +1054,16 @@ let activeScreen='habits';
 let dietDate=today2();
 let openForMeal=null,selectedFood=null,searchTimer=null,lastQuery='',onlineCache={};
 let editingEntry=null,cfgMealsEditing=[];
+let privacyMode=false;
+function mask(t){return privacyMode?'••••••':t}
+function maskN(n){return privacyMode?'••':n}
+function togglePrivacy(){
+  privacyMode=!privacyMode;
+  const icon=privacyMode?'🙈':'👁️';
+  ['privacy-btn','diet-privacy-btn'].forEach(id=>{const b=document.getElementById(id);if(b)b.textContent=icon;});
+  activeScreen==='diet'?renderDiet():render();
+}
+function refreshData(){if(fbUser)loadFromCloud();else{render();if(activeScreen==='diet')renderDiet();}}
 
 function today2(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function dateKey2(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
@@ -1102,32 +1116,32 @@ function renderDiet(){
     <div class="calorie-card">
       <div class="calorie-card-title">
         Calorias restantes
-        <button class="goal-edit-btn" onclick="editGoal()">Meta: ${goal}</button>
+        <button class="goal-edit-btn" onclick="editGoal()">Meta: ${privacyMode?'••••':goal}</button>
       </div>
       <div class="calorie-formula">
-        <div class="cal-f-item"><div class="cal-f-val">${goal}</div><div class="cal-f-lbl">Meta</div></div>
+        <div class="cal-f-item"><div class="cal-f-val">${maskN(goal)}</div><div class="cal-f-lbl">Meta</div></div>
         <div class="cal-f-op">−</div>
-        <div class="cal-f-item"><div class="cal-f-val">${totals.kcal}</div><div class="cal-f-lbl">Ingerido</div></div>
+        <div class="cal-f-item"><div class="cal-f-val">${maskN(totals.kcal)}</div><div class="cal-f-lbl">Ingerido</div></div>
         <div class="cal-f-op">=</div>
-        <div class="cal-f-item cal-f-result${over?' danger':''}"><div class="cal-f-val">${Math.abs(remaining)}</div><div class="cal-f-lbl">${over?'Excesso':'Restante'}</div></div>
+        <div class="cal-f-item cal-f-result${over?' danger':''}"><div class="cal-f-val">${maskN(Math.abs(remaining))}</div><div class="cal-f-lbl">${over?'Excesso':'Restante'}</div></div>
       </div>
-      <div class="calorie-track"><div class="calorie-track-fill${over?' danger':''}" style="width:${pct}%"></div></div>
+      <div class="calorie-track"><div class="calorie-track-fill${over?' danger':''}" style="width:${privacyMode?0:pct}%"></div></div>
     </div>
     <div class="macro-row">
       <div class="macro-pill">
         <div class="macro-pill-label">Proteína</div>
-        <div class="macro-pill-val" style="color:#EF4444">${totals.prot}g</div>
-        <div class="macro-pill-bar"><div class="macro-pill-bar-fill" style="width:${Math.min(100,totals.prot/gProt*100)}%;background:#EF4444"></div></div>
+        <div class="macro-pill-val" style="color:#EF4444">${maskN(totals.prot)}g</div>
+        <div class="macro-pill-bar"><div class="macro-pill-bar-fill" style="width:${privacyMode?0:Math.min(100,totals.prot/gProt*100)}%;background:#EF4444"></div></div>
       </div>
       <div class="macro-pill">
         <div class="macro-pill-label">Carboidrato</div>
-        <div class="macro-pill-val" style="color:#F59E0B">${totals.carb}g</div>
-        <div class="macro-pill-bar"><div class="macro-pill-bar-fill" style="width:${Math.min(100,totals.carb/gCarb*100)}%;background:#F59E0B"></div></div>
+        <div class="macro-pill-val" style="color:#F59E0B">${maskN(totals.carb)}g</div>
+        <div class="macro-pill-bar"><div class="macro-pill-bar-fill" style="width:${privacyMode?0:Math.min(100,totals.carb/gCarb*100)}%;background:#F59E0B"></div></div>
       </div>
       <div class="macro-pill">
         <div class="macro-pill-label">Gordura</div>
-        <div class="macro-pill-val" style="color:#8B5CF6">${totals.fat}g</div>
-        <div class="macro-pill-bar"><div class="macro-pill-bar-fill" style="width:${Math.min(100,totals.fat/gFat*100)}%;background:#8B5CF6"></div></div>
+        <div class="macro-pill-val" style="color:#8B5CF6">${maskN(totals.fat)}g</div>
+        <div class="macro-pill-bar"><div class="macro-pill-bar-fill" style="width:${privacyMode?0:Math.min(100,totals.fat/gFat*100)}%;background:#8B5CF6"></div></div>
       </div>
     </div>
   `;
@@ -1138,12 +1152,12 @@ function renderDiet(){
     const mt=calcMealTotal(entries);
     const foodRows=entries.map(e=>`
       <div class="meal-food-item">
-        <div class="food-item-emoji">${findFoodEmoji(e.fid)}</div>
+        <div class="food-item-emoji">${privacyMode?'🍽️':findFoodEmoji(e.fid)}</div>
         <div class="food-item-info">
-          <div class="food-item-name">${e.name}</div>
-          <div class="food-item-sub">${e.qty}${e.unit} · P:${e.prot}g C:${e.carb}g G:${e.fat}g</div>
+          <div class="food-item-name">${mask(e.name)}</div>
+          <div class="food-item-sub">${maskN(e.qty)}${e.unit} · P:${maskN(e.prot)}g C:${maskN(e.carb)}g G:${maskN(e.fat)}g</div>
         </div>
-        <div class="food-item-kcal">${e.kcal} kcal</div>
+        <div class="food-item-kcal">${maskN(e.kcal)} kcal</div>
         <button class="food-item-edit" onclick="editFoodEntry('${m.id}','${e.eid}')">✏️</button>
         <button class="food-item-del" onclick="removeFoodEntry('${m.id}','${e.eid}')">×</button>
       </div>`).join('');
@@ -1152,8 +1166,8 @@ function renderDiet(){
         <div class="meal-header">
           <div class="meal-icon-wrap" style="background:${m.bg}"><span>${m.emoji}</span></div>
           <div class="meal-title-wrap">
-            <div class="meal-name-text">${m.name}</div>
-            <div class="meal-kcal-text">${mt.kcal>0?mt.kcal+' kcal':'Sem alimentos'}</div>
+            <div class="meal-name-text">${mask(m.name)}</div>
+            <div class="meal-kcal-text">${privacyMode?'•••':mt.kcal>0?mt.kcal+' kcal':'Sem alimentos'}</div>
           </div>
         </div>
         ${foodRows}
@@ -1655,7 +1669,7 @@ function render(){
   else if(allDone){document.getElementById('hero-title').textContent='Perfeito! 🎉';document.getElementById('hero-sub').textContent=`${total} de ${total} concluídos`;}
   else{document.getElementById('hero-title').textContent=`${done} de ${total} concluídos`;document.getElementById('hero-sub').textContent=done===0?'Vamos começar o dia!':`${total-done} restante${total-done===1?'':'s'}`;}
   if(habits.length===0){document.getElementById('list').innerHTML=`<div class="empty-state"><div class="empty-icon">🎯</div><div class="empty-title">Sem hábitos ainda</div><div class="empty-sub">Crie seu primeiro hábito e comece a construir uma rotina incrível.</div><button class="empty-cta" onclick="openAdd()">Criar hábito</button></div>`;}
-  else{document.getElementById('list').innerHTML=habits.map(h=>{const isDone=(comp[t]||[]).includes(h.id),streak=calcStreak(h.id,comp),streakHtml=streak>0?`<div class="habit-streak ${streak>=3?'streak-hot':'streak-cold'}">🔥 ${streak} ${streak===1?'dia':'dias'}</div>`:'',inds=days.map(d=>{if(d>t)return`<div class="day-ind"><div class="ind"></div></div>`;const ok=(comp[d]||[]).includes(h.id);if(ok)return`<div class="day-ind"><div class="ind done" style="background:${h.color}">✓</div></div>`;if(d===t)return`<div class="day-ind"><div class="ind pending"></div></div>`;return`<div class="day-ind"><div class="ind missed">×</div></div>`;}).join('');return`<div class="habit-row${isDone?' done':''}"><div class="ring-tap" onclick="toggle('${h.id}',event)">${miniRing(h.id,comp,h.color)}</div><div class="habit-info" onclick="openDetail('${h.id}')"><div class="habit-name" style="${isDone?'':` color:${h.color}`}">${h.emoji} ${h.name}</div>${streakHtml}</div><div class="day-inds" onclick="openDetail('${h.id}')">${inds}</div></div>`;}).join('');}
+  else{document.getElementById('list').innerHTML=habits.map(h=>{const isDone=(comp[t]||[]).includes(h.id),streak=calcStreak(h.id,comp),streakHtml=streak>0?`<div class="habit-streak ${streak>=3?'streak-hot':'streak-cold'}">🔥 ${streak} ${streak===1?'dia':'dias'}</div>`:'',inds=days.map(d=>{if(d>t)return`<div class="day-ind"><div class="ind"></div></div>`;const ok=(comp[d]||[]).includes(h.id);if(ok)return`<div class="day-ind"><div class="ind done" style="background:${h.color}">✓</div></div>`;if(d===t)return`<div class="day-ind"><div class="ind pending"></div></div>`;return`<div class="day-ind"><div class="ind missed">×</div></div>`;}).join('');return`<div class="habit-row${isDone?' done':''}"><div class="ring-tap" onclick="toggle('${h.id}',event)">${miniRing(h.id,comp,h.color)}</div><div class="habit-info" onclick="openDetail('${h.id}')"><div class="habit-name" style="${isDone?'':` color:${h.color}`}">${privacyMode?'★':h.emoji} ${mask(h.name)}</div>${privacyMode?'':streakHtml}</div><div class="day-inds" onclick="openDetail('${h.id}')">${inds}</div></div>`;}).join('');}
 }
 
 render();
