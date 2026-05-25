@@ -430,6 +430,22 @@ body{
   font-size:12px;font-weight:700;color:var(--accent);
   background:var(--accent-lt);padding:4px 10px;border-radius:99px;flex-shrink:0;
 }
+.food-online-tag{
+  font-size:10px;font-weight:700;color:var(--green);
+  background:rgba(34,197,94,.12);padding:2px 7px;border-radius:99px;margin-left:6px;vertical-align:middle;
+}
+.food-loading{
+  display:flex;align-items:center;gap:10px;
+  padding:14px 16px;color:var(--text2);font-size:13px;font-weight:500;
+}
+.food-loading-dots{display:flex;gap:4px}
+.food-loading-dots span{
+  width:6px;height:6px;border-radius:50%;background:var(--accent);
+  animation:fld .9s infinite;
+}
+.food-loading-dots span:nth-child(2){animation-delay:.2s}
+.food-loading-dots span:nth-child(3){animation-delay:.4s}
+@keyframes fld{0%,80%,100%{opacity:.25;transform:scale(.75)}40%{opacity:1;transform:scale(1)}}
 
 /* ── Quantity view (inside food overlay) ── */
 #food-qty-view{display:none;flex:1;flex-direction:column;padding:20px 16px}
@@ -807,7 +823,7 @@ let activeScreen='habits';
 
 // ── Diet state ─────────────────────────────────────────
 let dietDate=today2();
-let openForMeal=null,selectedFood=null;
+let openForMeal=null,selectedFood=null,searchTimer=null,lastQuery='',onlineCache={};
 
 function today2(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function dateKey2(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
@@ -946,34 +962,81 @@ function backToSearch(){showFoodSearchView()}
 
 function filterFoods(){
   const q=document.getElementById('food-search-input').value.toLowerCase().trim();
-  let results;
+  lastQuery=q;
+  clearTimeout(searchTimer);
   if(!q){
     const cats=[...new Set(FOODS.map(f=>f.cat))];
-    results=cats.map(cat=>{
-      const foods=FOODS.filter(f=>f.cat===cat);
-      return`<div class="food-cat-header">${cat}</div>`+foods.map(f=>foodResultHTML(f)).join('');
-    }).join('');
-  } else {
-    // Divide a busca em palavras e aceita alimentos que contenham pelo menos uma
-    const words=q.split(/\s+/).filter(w=>w.length>1);
-    const scored=FOODS.map(f=>{
-      const name=f.name.toLowerCase(),cat=f.cat.toLowerCase();
-      const score=words.reduce((acc,w)=>acc+(name.includes(w)?2:0)+(cat.includes(w)?1:0),0);
-      return{f,score};
-    }).filter(x=>x.score>0).sort((a,b)=>b.score-a.score);
-    results=scored.length
-      ?scored.map(x=>foodResultHTML(x.f)).join('')
-      :`<div style="padding:32px;text-align:center;color:var(--text2);font-size:14px">Nenhum resultado para "<b>${q}</b>"<br><br><span style="font-size:12px">Tente termos como: whey, frango, arroz, ovo...</span></div>`;
+    document.getElementById('food-results').innerHTML=cats.map(cat=>`<div class="food-cat-header">${cat}</div>`+FOODS.filter(f=>f.cat===cat).map(f=>foodResultHTML(f,false)).join('')).join('');
+    return;
   }
-  document.getElementById('food-results').innerHTML=results;
+  // Resultados locais imediatos
+  const local=searchLocalFoods(q);
+  let html='';
+  if(local.length){html+=`<div class="food-cat-header">Banco local</div>`+local.map(f=>foodResultHTML(f,false)).join('');}
+  html+=`<div class="food-cat-header">🌐 Internet</div><div class="food-loading"><div class="food-loading-dots"><span></span><span></span><span></span></div>Buscando...</div>`;
+  document.getElementById('food-results').innerHTML=html;
+  // Busca online com debounce
+  searchTimer=setTimeout(()=>fetchOnlineFoods(q),500);
 }
 
-function foodResultHTML(f){
+function searchLocalFoods(q){
+  const words=q.split(/\s+/).filter(w=>w.length>1);
+  return FOODS.map(f=>{
+    const name=f.name.toLowerCase(),cat=f.cat.toLowerCase();
+    const score=words.reduce((acc,w)=>acc+(name.includes(w)?2:0)+(cat.includes(w)?1:0),0);
+    return{f,score};
+  }).filter(x=>x.score>0).sort((a,b)=>b.score-a.score).map(x=>x.f);
+}
+
+async function fetchOnlineFoods(q){
+  if(lastQuery!==q)return;
+  try{
+    const url=`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(q)}&search_simple=1&action=process&json=1&page_size=20&fields=product_name,nutriments,brands,product_name_pt`;
+    const res=await fetch(url,{signal:AbortSignal.timeout(8000)});
+    const data=await res.json();
+    if(lastQuery!==q)return;
+    const products=(data.products||[]).filter(p=>{
+      const n=p.nutriments;
+      return(p.product_name||p.product_name_pt)&&n&&(n['energy-kcal_100g']||n['energy-kcal'])>0;
+    }).slice(0,15);
+    const onlineFoods=products.map(p=>{
+      const n=p.nutriments;
+      const kcal=Math.round(n['energy-kcal_100g']||n['energy-kcal']||0);
+      const prot=+((n['proteins_100g']||0)).toFixed(1);
+      const carb=+((n['carbohydrates_100g']||0)).toFixed(1);
+      const fat=+((n['fat_100g']||0)).toFixed(1);
+      const brand=p.brands?p.brands.split(',')[0].trim():'';
+      const name=(p.product_name_pt||p.product_name||'').trim()+(brand?` — ${brand}`:'');
+      const id='off_'+Math.random().toString(36).slice(2);
+      const food={id,name,emoji:'🛒',cat:'Internet',kcal,prot,carb,fat,unit:'g',online:true};
+      onlineCache[id]=food;
+      return food;
+    });
+    const local=searchLocalFoods(q);
+    let html='';
+    if(local.length)html+=`<div class="food-cat-header">Banco local</div>`+local.map(f=>foodResultHTML(f,false)).join('');
+    if(onlineFoods.length){
+      html+=`<div class="food-cat-header">🌐 Internet</div>`+onlineFoods.map(f=>foodResultHTML(f,true)).join('');
+    } else {
+      html+=local.length?'':`<div style="padding:32px;text-align:center;color:var(--text2);font-size:14px">Nenhum resultado para "<b>${q}</b>"</div>`;
+    }
+    document.getElementById('food-results').innerHTML=html||`<div style="padding:32px;text-align:center;color:var(--text2);font-size:14px">Nenhum resultado encontrado</div>`;
+  }catch(e){
+    if(lastQuery!==q)return;
+    const local=searchLocalFoods(q);
+    document.getElementById('food-results').innerHTML=
+      (local.length?`<div class="food-cat-header">Banco local</div>`+local.map(f=>foodResultHTML(f,false)).join(''):'')
+      +`<div style="padding:12px 16px;font-size:12px;color:var(--text2)">⚠️ Sem conexão — mostrando apenas resultados locais</div>`;
+  }
+}
+
+function foodResultHTML(f,isOnline){
   const per=f.unit==='unid'?'por unidade':'por 100'+f.unit;
+  const tag=isOnline?`<span class="food-online-tag">online</span>`:'';
   return`<div class="food-result-item" onclick="selectFood('${f.id}')">
     <div class="food-result-emoji">${f.emoji}</div>
     <div class="food-result-info">
-      <div class="food-result-name">${f.name}</div>
+      <div class="food-result-name">${f.name}${tag}</div>
       <div class="food-result-sub">${f.kcal} kcal · P:${f.prot}g C:${f.carb}g G:${f.fat}g · ${per}</div>
     </div>
     <div class="food-result-badge">${f.kcal} kcal</div>
@@ -981,7 +1044,8 @@ function foodResultHTML(f){
 }
 
 function selectFood(fid){
-  selectedFood=FOODS.find(f=>f.id===fid);if(!selectedFood)return;
+  selectedFood=FOODS.find(f=>f.id===fid)||onlineCache[fid];
+  if(!selectedFood)return;
   document.getElementById('qty-emoji').textContent=selectedFood.emoji;
   document.getElementById('qty-name').textContent=selectedFood.name;
   const per=selectedFood.unit==='unid'?'por unidade':`por 100${selectedFood.unit}`;
