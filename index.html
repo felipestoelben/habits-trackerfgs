@@ -74,8 +74,9 @@ body{
 
 /* ── Sidebar ── */
 #sidebar-backdrop{
-  position:absolute;inset:0;background:rgba(0,0,0,.45);z-index:350;
+  position:absolute;inset:0;background:rgba(0,0,0,.4);z-index:350;
   opacity:0;pointer-events:none;transition:opacity .3s;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
 }
 #sidebar-backdrop.open{opacity:1;pointer-events:all}
 #sidebar{
@@ -127,7 +128,7 @@ body{
 .add-btn:active{transform:scale(.86);opacity:.85}
 
 /* ── HABITS SCREEN ── */
-#screen-habits{padding-bottom:calc(env(safe-area-inset-bottom,0px)+32px)}
+#screen-habits{padding-bottom:calc(env(safe-area-inset-bottom,0px)+82px)}
 .main-header{
   padding:calc(env(safe-area-inset-top,0px)+20px) 20px 14px;
   position:sticky;top:0;background:var(--bg);z-index:20;
@@ -152,7 +153,7 @@ body{
   position:absolute;inset:0;display:flex;flex-direction:column;
   align-items:center;justify-content:center;pointer-events:none;
 }
-.hero-pct{font-size:23px;font-weight:900;letter-spacing:-.6px;line-height:1;color:var(--accent)}
+.hero-pct{font-size:28px;font-weight:900;letter-spacing:-.8px;line-height:1;color:var(--accent)}
 .hero-pct-lbl{font-size:9px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-top:2px}
 .hero-info{flex:1;min-width:0}
 .hero-title{font-size:17px;font-weight:800;letter-spacing:-.3px}
@@ -215,8 +216,8 @@ body{
 }
 .habit-streak{
   display:inline-flex;align-items:center;gap:3px;
-  font-size:10px;font-weight:700;margin-top:4px;
-  padding:2px 8px 2px 5px;border-radius:99px;
+  font-size:11px;font-weight:700;margin-top:4px;
+  padding:3px 9px 3px 6px;border-radius:99px;
 }
 .streak-hot{color:#F97316;background:rgba(249,115,22,.12)}
 .streak-cold{color:var(--text3);background:var(--surface2)}
@@ -353,13 +354,13 @@ body{
 .color-circle.selected .ck{opacity:1}
 
 /* ── DIET SCREEN ── */
-#screen-diet{padding-bottom:calc(env(safe-area-inset-bottom,0px)+32px)}
+#screen-diet{padding-bottom:calc(env(safe-area-inset-bottom,0px)+82px)}
 .diet-header{
   padding:calc(env(safe-area-inset-top,0px)+16px) 16px 12px;
   position:sticky;top:0;background:var(--bg);z-index:20;
 }
 .diet-header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.diet-header-title{font-size:18px;font-weight:800;letter-spacing:-.3px}
+.diet-header-title{font-size:22px;font-weight:900;letter-spacing:-.5px}
 .diet-date-nav{display:flex;align-items:center;gap:0;background:var(--surface);border-radius:99px;box-shadow:var(--shadow-sm);overflow:hidden}
 .diet-date-btn{
   width:36px;height:36px;border:none;background:transparent;color:var(--text2);
@@ -382,16 +383,16 @@ body{
 .cal-f-op{font-size:18px;font-weight:300;color:var(--text3);padding-bottom:18px;flex-shrink:0}
 .cal-f-result .cal-f-val{color:var(--accent);font-size:26px}
 .cal-f-result.danger .cal-f-val{color:var(--red)}
-.calorie-track{margin-top:14px;height:5px;border-radius:99px;background:var(--sep);overflow:hidden}
+.calorie-track{margin-top:14px;height:8px;border-radius:99px;background:var(--sep);overflow:hidden}
 .calorie-track-fill{height:100%;border-radius:99px;background:var(--accent);transition:width .6s cubic-bezier(.34,1.4,.64,1)}
 .calorie-track-fill.danger{background:var(--red)}
 
 /* Macro pills */
 .macro-row{display:flex;gap:8px}
-.macro-pill{flex:1;background:var(--surface);border-radius:var(--r-lg);padding:12px 12px 10px;box-shadow:var(--shadow-sm)}
-.macro-pill-label{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
-.macro-pill-val{font-size:17px;font-weight:800;letter-spacing:-.3px}
-.macro-pill-bar{height:3px;border-radius:99px;background:var(--sep);margin-top:6px;overflow:hidden}
+.macro-pill{flex:1;background:var(--surface);border-radius:var(--r-lg);padding:13px 12px 11px;box-shadow:var(--shadow-sm)}
+.macro-pill-label{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px}
+.macro-pill-val{font-size:18px;font-weight:900;letter-spacing:-.4px}
+.macro-pill-bar{height:4px;border-radius:99px;background:var(--sep);margin-top:8px;overflow:hidden}
 .macro-pill-bar-fill{height:100%;border-radius:99px;transition:width .6s ease}
 
 /* Meal sections */
@@ -402,8 +403,9 @@ body{
   border-bottom:1px solid var(--sep);cursor:pointer;user-select:none;
 }
 .meal-icon-wrap{
-  width:34px;height:34px;border-radius:10px;
-  display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;
+  width:40px;height:40px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;
+  box-shadow:0 2px 8px rgba(0,0,0,.1);
 }
 .meal-title-wrap{flex:1}
 .meal-name-text{font-size:15px;font-weight:700}
@@ -641,8 +643,9 @@ body{
 #privacy-banner.visible{transform:translateY(0)}
 /* ── Meal config sheet ── */
 #meal-cfg-backdrop{
-  position:absolute;inset:0;background:rgba(0,0,0,.45);z-index:220;
+  position:absolute;inset:0;background:rgba(0,0,0,.4);z-index:220;
   opacity:0;pointer-events:none;transition:opacity .3s;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
 }
 #meal-cfg-backdrop.open{opacity:1;pointer-events:all}
 #meal-cfg-sheet{
@@ -726,6 +729,53 @@ body{
   font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;
 }
 .cfg-ep-btn:active{background:var(--sep)}
+
+/* ── Habit card entrance animation ── */
+@keyframes hcard-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.habit-card{animation:hcard-in .26s cubic-bezier(.32,0,.2,1) both}
+.habit-card:nth-child(2){animation-delay:35ms}
+.habit-card:nth-child(3){animation-delay:70ms}
+.habit-card:nth-child(4){animation-delay:105ms}
+.habit-card:nth-child(5){animation-delay:140ms}
+.habit-card:nth-child(6){animation-delay:175ms}
+.habit-card:nth-child(n+7){animation-delay:200ms}
+
+/* ── Diet header subtitle ── */
+.diet-header-sub{font-size:12px;font-weight:500;color:var(--text2);margin-top:2px}
+
+/* ── Sidebar utility items ── */
+.sidebar-actions{padding:8px 10px;border-bottom:1px solid var(--sep)}
+.sidebar-action-row{display:flex;gap:6px}
+
+/* ── Bottom Tab Bar ── */
+.tab-bar{
+  position:fixed;bottom:0;left:0;right:0;z-index:15;
+  height:calc(56px + env(safe-area-inset-bottom,0px));
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  background:rgba(255,255,255,.92);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-top:1px solid var(--sep);
+  display:flex;align-items:stretch;
+}
+[data-theme="dark"] .tab-bar{background:rgba(28,28,30,.92)}
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme="light"]) .tab-bar{background:rgba(28,28,30,.92)}
+}
+@media(min-width:500px){
+  .tab-bar{left:50%;transform:translateX(-50%);width:430px;right:auto;
+    border-radius:0 0 48px 48px;overflow:hidden;}
+}
+.tab-item{
+  flex:1;border:none;background:transparent;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;padding:0 0 2px;cursor:pointer;
+  color:var(--text3);transition:color .2s;
+}
+.tab-item:active{opacity:.6}
+.tab-item.active{color:var(--accent)}
+.tab-icon{font-size:22px;line-height:1;transition:transform .2s}
+.tab-item.active .tab-icon{transform:scale(1.15)}
+.tab-label{font-size:10px;font-weight:700;letter-spacing:.3px}
 </style>
 </head>
 <body>
@@ -750,6 +800,13 @@ body{
     <button class="nav-item" id="nav-diet" onclick="showScreen('diet')">
       <span class="nav-icon">🥗</span><span>Dieta</span>
     </button>
+    <div style="height:1px;background:var(--sep);margin:8px 4px"></div>
+    <button class="nav-item" id="sidebar-theme-btn" onclick="toggleTheme()">
+      <span class="nav-icon" id="theme-icon">🌙</span><span>Alternar tema</span>
+    </button>
+    <button class="nav-item" id="sidebar-sync-btn" onclick="handleSyncBtn()">
+      <span class="nav-icon" id="sync-icon">☁️</span><span id="sync-label">Entrar com Google</span>
+    </button>
   </nav>
   <div class="sidebar-footer">
     <div class="sidebar-user" id="sidebar-user">
@@ -771,10 +828,8 @@ body{
         </div>
       </div>
       <div class="header-actions">
-        <button class="icon-btn" id="theme-btn" onclick="toggleTheme()"></button>
         <button class="icon-btn" id="privacy-btn" onclick="togglePrivacy()" title="Ocultar dados">👁️</button>
-        <button class="icon-btn" onclick="refreshData()" title="Atualizar">🔄</button>
-        <button class="icon-btn" id="sync-btn" onclick="handleSyncBtn()">☁️</button>
+        <button class="icon-btn" onclick="refreshData()" title="Atualizar">↻</button>
         <button class="add-btn" onclick="openAdd()">＋</button>
       </div>
     </div>
@@ -806,14 +861,15 @@ body{
     <div class="diet-header-top">
       <div style="display:flex;align-items:center;gap:10px">
         <button class="icon-btn" onclick="toggleSidebar()">☰</button>
-        <div class="diet-header-title">Dieta</div>
+        <div>
+          <div class="diet-header-title">Dieta</div>
+          <div class="diet-header-sub" id="diet-header-sub">Hoje</div>
+        </div>
       </div>
       <div style="display:flex;gap:8px">
-        <button class="icon-btn" id="diet-theme-btn" onclick="toggleTheme()"></button>
         <button class="icon-btn" id="diet-privacy-btn" onclick="togglePrivacy()" title="Ocultar dados">👁️</button>
-        <button class="icon-btn" onclick="refreshData()" title="Atualizar">🔄</button>
+        <button class="icon-btn" onclick="refreshData()" title="Atualizar">↻</button>
         <button class="icon-btn" onclick="openMealConfig()" title="Configurar refeições">⚙️</button>
-        <button class="icon-btn" id="diet-sync-btn" onclick="handleSyncBtn()">☁️</button>
       </div>
     </div>
     <div class="diet-date-nav">
@@ -990,6 +1046,18 @@ body{
   <button class="cfg-done-btn" onclick="closeMealConfig()">Concluído</button>
 </div>
 
+<!-- ══ TAB BAR ══ -->
+<div class="tab-bar" id="tab-bar">
+  <button class="tab-item active" id="tab-habits" onclick="showScreen('habits')">
+    <div class="tab-icon">🎯</div>
+    <div class="tab-label">Hábitos</div>
+  </button>
+  <button class="tab-item" id="tab-diet" onclick="showScreen('diet')">
+    <div class="tab-icon">🥗</div>
+    <div class="tab-label">Dieta</div>
+  </button>
+</div>
+
 </div><!-- .app-shell -->
 
 <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
@@ -1008,9 +1076,9 @@ function handleSyncBtn(){
   else{const p=new firebase.auth.GoogleAuthProvider();auth.signInWithPopup(p).catch(e=>{if(e.code==='auth/popup-blocked'||e.code==='auth/cancelled-popup-request')auth.signInWithRedirect(p);else console.error(e);});}
 }
 function updateSyncBtn(){
-  ['sync-btn','diet-sync-btn'].forEach(id=>{const b=document.getElementById(id);if(!b)return;
-    b.innerHTML=fbUser&&fbUser.photoURL?`<img src="${fbUser.photoURL}" style="width:26px;height:26px;border-radius:50%;pointer-events:none">`:(fbUser?'👤':'☁️');
-  });
+  const si=document.getElementById('sync-icon'),sl=document.getElementById('sync-label');
+  if(si)si.innerHTML=fbUser&&fbUser.photoURL?`<img src="${fbUser.photoURL}" style="width:24px;height:24px;border-radius:50%;pointer-events:none">`:(fbUser?'👤':'☁️');
+  if(sl)sl.textContent=fbUser?'Sair da conta':'Entrar com Google';
   const av=document.getElementById('sidebar-avatar'),nm=document.getElementById('sidebar-name');
   if(av)av.innerHTML=fbUser&&fbUser.photoURL?`<img src="${fbUser.photoURL}" style="width:32px;height:32px;border-radius:50%">`:(fbUser?'👤':'☁️');
   if(nm)nm.textContent=fbUser?fbUser.displayName||'Conectado':'Não conectado';
@@ -1190,6 +1258,8 @@ function renderDiet(){
   let label=isToday?'Hoje':isYesterday?'Ontem':(()=>{const d=new Date(dietDate+'T12:00:00');return d.getDate()+'/'+String(d.getMonth()+1).padStart(2,'0')})();
   document.getElementById('diet-date-label').textContent=label;
   const nb=document.getElementById('diet-next-btn');if(nb)nb.disabled=dietDate>=t;
+  const sub=document.getElementById('diet-header-sub');
+  if(sub){const h=new Date().getHours();sub.textContent=isToday?(h<12?"Bom dia":(h<17?"Boa tarde":"Boa noite")):label;}
 
   const totals=calcDayTotals(dietDate);
   const goal=getGoal();
@@ -1721,6 +1791,8 @@ function showScreen(name){
   document.getElementById('screen-diet').style.display=name==='diet'?'':'none';
   document.getElementById('nav-habits').classList.toggle('active',name==='habits');
   document.getElementById('nav-diet').classList.toggle('active',name==='diet');
+  document.getElementById('tab-habits').classList.toggle('active',name==='habits');
+  document.getElementById('tab-diet').classList.toggle('active',name==='diet');
   closeSidebar();
   if(name==='diet'){dietDate=today2();renderDiet();}
   if(name==='habits')render();
@@ -1730,7 +1802,7 @@ function showScreen(name){
 function isDarkNow(){const s=localStorage.getItem('theme');return s?s==='dark':window.matchMedia('(prefers-color-scheme:dark)').matches}
 function applyTheme(dark){
   document.documentElement.setAttribute('data-theme',dark?'dark':'light');
-  ['theme-btn','diet-theme-btn'].forEach(id=>{const b=document.getElementById(id);if(b)b.textContent=dark?'☀️':'🌙';});
+  const ti=document.getElementById('theme-icon');if(ti)ti.textContent=dark?'☀️':'🌙';
 }
 function toggleTheme(){const dark=!isDarkNow();localStorage.setItem('theme',dark?'dark':'light');applyTheme(dark)}
 applyTheme(isDarkNow());
