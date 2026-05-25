@@ -572,6 +572,84 @@ body{
   margin-top:auto;
 }
 .qty-add-btn:active{opacity:.8}
+
+/* ── Meal config sheet ── */
+#meal-cfg-backdrop{
+  position:absolute;inset:0;background:rgba(0,0,0,.45);z-index:220;
+  opacity:0;pointer-events:none;transition:opacity .3s;
+}
+#meal-cfg-backdrop.open{opacity:1;pointer-events:all}
+#meal-cfg-sheet{
+  position:absolute;bottom:0;left:0;right:0;
+  background:var(--surface);border-radius:var(--r-xl) var(--r-xl) 0 0;
+  z-index:230;padding-bottom:env(safe-area-inset-bottom,0px);
+  transform:translateY(100%);transition:transform .32s cubic-bezier(.32,0,.2,1);
+  box-shadow:0 -4px 30px rgba(0,0,0,.2);max-height:85dvh;overflow-y:auto;
+}
+#meal-cfg-sheet.open{transform:translateY(0)}
+.cfg-handle{width:36px;height:4px;border-radius:99px;background:var(--sep);margin:12px auto 0}
+.cfg-title{font-size:17px;font-weight:800;padding:14px 20px 10px}
+.cfg-meal-row{display:flex;align-items:center;gap:10px;padding:8px 16px}
+.cfg-meal-row+.cfg-meal-row{border-top:1px solid var(--sep)}
+.cfg-emoji-btn{
+  width:40px;height:40px;border-radius:12px;border:none;
+  background:var(--surface2);font-size:20px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  transition:background .12s;
+}
+.cfg-emoji-btn:active{background:var(--sep)}
+.cfg-name-input{
+  flex:1;border:none;background:var(--surface2);border-radius:10px;
+  padding:9px 12px;font-size:15px;font-weight:600;color:var(--text);
+  font-family:inherit;outline:none;transition:background .15s;
+}
+.cfg-name-input:focus{background:var(--accent-lt)}
+.cfg-del-btn{
+  width:32px;height:32px;border-radius:50%;border:none;
+  background:rgba(239,68,68,.1);color:#EF4444;font-size:16px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.cfg-add-meal-btn{
+  display:flex;align-items:center;gap:10px;padding:14px 16px;
+  border:none;background:transparent;color:var(--accent);
+  font-size:15px;font-weight:700;cursor:pointer;width:100%;
+}
+.cfg-add-meal-btn .plus-circle{
+  width:28px;height:28px;border-radius:50%;background:var(--accent-lt);
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+}
+.cfg-done-btn{
+  margin:4px 16px 16px;padding:14px;border-radius:var(--r-lg);border:none;
+  background:linear-gradient(135deg,#818CF8,#6366F1,#4F46E5);
+  color:#fff;font-size:15px;font-weight:700;cursor:pointer;width:calc(100% - 32px);
+  box-shadow:0 3px 12px rgba(var(--accent-rgb),.4);
+}
+/* Meal header config btn */
+.meal-cfg-btn{
+  width:30px;height:30px;border-radius:50%;border:none;
+  background:var(--surface2);color:var(--text2);font-size:14px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:background .12s;flex-shrink:0;
+}
+.meal-cfg-btn:active{background:var(--sep)}
+/* Food item edit btn */
+.food-item-edit{
+  width:28px;height:28px;border-radius:50%;border:none;
+  background:var(--accent-lt);color:var(--accent);font-size:13px;
+  cursor:pointer;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;transition:opacity .15s;
+}
+.food-item-edit:active{opacity:.6}
+/* Emoji mini picker inside cfg */
+.cfg-emoji-picker{
+  display:none;padding:10px 16px 0;flex-wrap:wrap;gap:4px;
+}
+.cfg-emoji-picker.open{display:flex}
+.cfg-ep-btn{
+  width:36px;height:36px;border-radius:8px;border:none;background:var(--surface2);
+  font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+}
+.cfg-ep-btn:active{background:var(--sep)}
 </style>
 </head>
 <body>
@@ -652,6 +730,7 @@ body{
       </div>
       <div style="display:flex;gap:8px">
         <button class="icon-btn" id="diet-theme-btn" onclick="toggleTheme()"></button>
+        <button class="icon-btn" onclick="openMealConfig()" title="Configurar refeições">⚙️</button>
         <button class="icon-btn" id="diet-sync-btn" onclick="handleSyncBtn()">☁️</button>
       </div>
     </div>
@@ -817,6 +896,18 @@ body{
   </div>
 </div>
 
+<!-- ══ MEAL CONFIG SHEET ══ -->
+<div id="meal-cfg-backdrop" onclick="closeMealConfig()"></div>
+<div id="meal-cfg-sheet">
+  <div class="cfg-handle"></div>
+  <div class="cfg-title">Configurar refeições</div>
+  <div id="cfg-meals-list"></div>
+  <button class="cfg-add-meal-btn" onclick="addNewMeal()">
+    <div class="plus-circle">＋</div> Nova refeição
+  </button>
+  <button class="cfg-done-btn" onclick="closeMealConfig()">Concluído</button>
+</div>
+
 </div><!-- .app-shell -->
 
 <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
@@ -842,8 +933,8 @@ function updateSyncBtn(){
   if(av)av.innerHTML=fbUser&&fbUser.photoURL?`<img src="${fbUser.photoURL}" style="width:32px;height:32px;border-radius:50%">`:(fbUser?'👤':'☁️');
   if(nm)nm.textContent=fbUser?fbUser.displayName||'Conectado':'Não conectado';
 }
-async function loadFromCloud(){if(!fbUser)return;try{const s=await db.collection('users').doc(fbUser.uid).get();if(s.exists){const d=s.data();if(d.habits)localStorage.setItem('habits',JSON.stringify(d.habits));if(d.comp)localStorage.setItem('comp',JSON.stringify(d.comp));if(d.diet)localStorage.setItem('diet',JSON.stringify(d.diet));if(d.dietGoal)localStorage.setItem('dietGoal',String(d.dietGoal));render();if(activeScreen==='diet')renderDiet();}else pushToCloud();}catch(e){console.warn(e);}}
-async function pushToCloud(){if(!fbUser)return;try{await db.collection('users').doc(fbUser.uid).set({habits:getHabits(),comp:getComp(),diet:getDiet(),dietGoal:getGoal(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});}catch(e){console.warn(e);}}
+async function loadFromCloud(){if(!fbUser)return;try{const s=await db.collection('users').doc(fbUser.uid).get();if(s.exists){const d=s.data();if(d.habits)localStorage.setItem('habits',JSON.stringify(d.habits));if(d.comp)localStorage.setItem('comp',JSON.stringify(d.comp));if(d.diet)localStorage.setItem('diet',JSON.stringify(d.diet));if(d.dietGoal)localStorage.setItem('dietGoal',String(d.dietGoal));if(d.dietMeals)localStorage.setItem('dietMeals',JSON.stringify(d.dietMeals));render();if(activeScreen==='diet')renderDiet();}else pushToCloud();}catch(e){console.warn(e);}}
+async function pushToCloud(){if(!fbUser)return;try{await db.collection('users').doc(fbUser.uid).set({habits:getHabits(),comp:getComp(),diet:getDiet(),dietGoal:getGoal(),dietMeals:getDietMeals(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});}catch(e){console.warn(e);}}
 
 // ── Food DB ────────────────────────────────────────────
 const FOODS=[
@@ -913,12 +1004,21 @@ const FOODS=[
   {id:'achocolatado',name:'Achocolatado',emoji:'🍫',cat:'Extras',kcal:79,prot:3.5,carb:13.5,fat:1.3,unit:'ml'},
 ];
 
-const MEALS=[
-  {key:'cafe',  name:'Café da manhã',emoji:'☕',color:'#F97316',bg:'rgba(249,115,22,.12)'},
-  {key:'almoco',name:'Almoço',       emoji:'🍽️',color:'#EAB308',bg:'rgba(234,179,8,.12)'},
-  {key:'jantar',name:'Jantar',       emoji:'🌙',color:'#6366F1',bg:'rgba(99,102,241,.12)'},
-  {key:'lanche',name:'Lanche',       emoji:'🍎',color:'#22C55E',bg:'rgba(34,197,94,.12)'},
+const DEFAULT_MEALS=[
+  {id:'cafe',  name:'Café da manhã',emoji:'☕',color:'#F97316',bg:'rgba(249,115,22,.12)'},
+  {id:'almoco',name:'Almoço',       emoji:'🍽️',color:'#EAB308',bg:'rgba(234,179,8,.12)'},
+  {id:'jantar',name:'Jantar',       emoji:'🌙',color:'#6366F1',bg:'rgba(99,102,241,.12)'},
+  {id:'lanche',name:'Lanche',       emoji:'🍎',color:'#22C55E',bg:'rgba(34,197,94,.12)'},
 ];
+const CFG_EMOJIS=['☕','🍽️','🌙','🍎','🥗','🍕','🌮','🍜','🥪','🥤','🍳','🥞','🍱','🥘','🧁','🫖','🍰','🥙','🧆','🥑','🐟','🥩','🫘','🌮','🥞'];
+const MEAL_PALETTE=[
+  {color:'#F97316',bg:'rgba(249,115,22,.12)'},{color:'#EAB308',bg:'rgba(234,179,8,.12)'},
+  {color:'#6366F1',bg:'rgba(99,102,241,.12)'},{color:'#22C55E',bg:'rgba(34,197,94,.12)'},
+  {color:'#EF4444',bg:'rgba(239,68,68,.12)'},{color:'#3B82F6',bg:'rgba(59,130,246,.12)'},
+  {color:'#8B5CF6',bg:'rgba(139,92,246,.12)'},{color:'#EC4899',bg:'rgba(236,72,153,.12)'},
+];
+function getDietMeals(){const raw=localStorage.getItem('dietMeals');if(raw)try{return JSON.parse(raw);}catch(e){}return DEFAULT_MEALS.map(m=>({...m}));}
+function saveDietMeals(meals){localStorage.setItem('dietMeals',JSON.stringify(meals));pushToCloud();}
 
 // ── Habits data ────────────────────────────────────────
 const DEFAULT_HABITS=[
@@ -949,6 +1049,7 @@ let activeScreen='habits';
 // ── Diet state ─────────────────────────────────────────
 let dietDate=today2();
 let openForMeal=null,selectedFood=null,searchTimer=null,lastQuery='',onlineCache={};
+let editingEntry=null,cfgMealsEditing=[];
 
 function today2(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function dateKey2(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
@@ -958,8 +1059,9 @@ function saveDiet(d){localStorage.setItem('diet',JSON.stringify(d));pushToCloud(
 function getGoal(){return parseInt(localStorage.getItem('dietGoal')||'2000')}
 function saveGoal(g){localStorage.setItem('dietGoal',String(g));pushToCloud()}
 function getDietDay(dk){
-  const d=getDiet();
-  if(!d[dk])d[dk]={meals:{cafe:[],almoco:[],jantar:[],lanche:[]}};
+  const d=getDiet();const meals=getDietMeals();
+  if(!d[dk])d[dk]={meals:Object.fromEntries(meals.map(m=>[m.id,[]]))};
+  else meals.forEach(m=>{if(!d[dk].meals[m.id])d[dk].meals[m.id]=[];});
   return d[dk];
 }
 function calcMacros(food,qty){
@@ -1030,9 +1132,9 @@ function renderDiet(){
     </div>
   `;
 
-  const day=getDietDay(dietDate);
-  document.getElementById('meals-wrap').innerHTML=MEALS.map(m=>{
-    const entries=day.meals[m.key]||[];
+  const day=getDietDay(dietDate);const meals=getDietMeals();
+  document.getElementById('meals-wrap').innerHTML=meals.map(m=>{
+    const entries=day.meals[m.id]||[];
     const mt=calcMealTotal(entries);
     const foodRows=entries.map(e=>`
       <div class="meal-food-item">
@@ -1042,7 +1144,8 @@ function renderDiet(){
           <div class="food-item-sub">${e.qty}${e.unit} · P:${e.prot}g C:${e.carb}g G:${e.fat}g</div>
         </div>
         <div class="food-item-kcal">${e.kcal} kcal</div>
-        <button class="food-item-del" onclick="removeFoodEntry('${m.key}','${e.eid}')">×</button>
+        <button class="food-item-edit" onclick="editFoodEntry('${m.id}','${e.eid}')">✏️</button>
+        <button class="food-item-del" onclick="removeFoodEntry('${m.id}','${e.eid}')">×</button>
       </div>`).join('');
     return `
       <div class="meal-card">
@@ -1054,7 +1157,7 @@ function renderDiet(){
           </div>
         </div>
         ${foodRows}
-        <button class="meal-add-btn" onclick="openFoodSearch('${m.key}')">
+        <button class="meal-add-btn" onclick="openFoodSearch('${m.id}')">
           <div class="plus-circle">＋</div>
           Adicionar alimento
         </button>
@@ -1065,15 +1168,101 @@ function renderDiet(){
 function findFoodEmoji(fid){const f=FOODS.find(f=>f.id===fid);return f?f.emoji:'🍽️'}
 
 function removeFoodEntry(mealKey,eid){
-  const d=getDiet(),day=d[dietDate]||(d[dietDate]={meals:{cafe:[],almoco:[],jantar:[],lanche:[]}});
-  day.meals[mealKey]=(day.meals[mealKey]||[]).filter(e=>e.eid!==eid);
+  const d=getDiet();
+  if(!d[dietDate])return;
+  (d[dietDate].meals[mealKey]=d[dietDate].meals[mealKey]||[]);
+  d[dietDate].meals[mealKey]=d[dietDate].meals[mealKey].filter(e=>e.eid!==eid);
   saveDiet(d);renderDiet();
+}
+
+// ── Edit food entry ────────────────────────────────────
+function editFoodEntry(mealId,eid){
+  const day=getDietDay(dietDate);
+  const entry=(day.meals[mealId]||[]).find(e=>e.eid===eid);
+  if(!entry)return;
+  let food=FOODS.find(f=>f.id===entry.fid)||onlineCache[entry.fid];
+  if(!food){
+    const factor=entry.unit==='unid'?entry.qty:entry.qty/100;
+    food={id:entry.fid,name:entry.name,emoji:findFoodEmoji(entry.fid),unit:entry.unit,
+      kcal:factor>0?+(entry.kcal/factor).toFixed(1):entry.kcal,
+      prot:factor>0?+(entry.prot/factor).toFixed(1):entry.prot,
+      carb:factor>0?+(entry.carb/factor).toFixed(1):entry.carb,
+      fat:factor>0?+(entry.fat/factor).toFixed(1):entry.fat};
+  }
+  editingEntry={mealId,eid};openForMeal=mealId;selectedFood=food;
+  document.getElementById('qty-emoji').textContent=food.emoji;
+  document.getElementById('qty-name').textContent=food.name;
+  const per=food.unit==='unid'?'por unidade':`por 100${food.unit}`;
+  document.getElementById('qty-per100').textContent=`${food.kcal} kcal · P:${food.prot}g C:${food.carb}g G:${food.fat}g · ${per}`;
+  document.getElementById('qty-unit-badge').textContent=food.unit==='unid'?'unid':food.unit;
+  document.getElementById('qty-input').value=entry.qty;
+  document.getElementById('qty-add-btn').textContent='Salvar alterações';
+  document.getElementById('food-search-view').style.display='none';
+  document.getElementById('food-qty-view').classList.add('open');
+  document.getElementById('voice-view').classList.remove('open');
+  document.getElementById('food-overlay').classList.add('open');
+  updateQtyPreview();
+}
+
+// ── Meal config ────────────────────────────────────────
+function openMealConfig(){
+  cfgMealsEditing=getDietMeals().map(m=>({...m}));
+  renderMealConfig();
+  document.getElementById('meal-cfg-backdrop').classList.add('open');
+  document.getElementById('meal-cfg-sheet').classList.add('open');
+}
+function closeMealConfig(){
+  document.querySelectorAll('.cfg-name-input').forEach(inp=>{
+    const meal=cfgMealsEditing.find(m=>m.id===inp.dataset.id);
+    if(meal&&inp.value.trim())meal.name=inp.value.trim();
+  });
+  saveDietMeals(cfgMealsEditing);
+  document.getElementById('meal-cfg-backdrop').classList.remove('open');
+  document.getElementById('meal-cfg-sheet').classList.remove('open');
+  renderDiet();
+}
+function renderMealConfig(){
+  document.getElementById('cfg-meals-list').innerHTML=cfgMealsEditing.map(m=>`
+    <div class="cfg-meal-row" id="cfg-row-${m.id}">
+      <button class="cfg-emoji-btn" onclick="toggleEmojiPicker('${m.id}')">${m.emoji}</button>
+      <input class="cfg-name-input" data-id="${m.id}" value="${m.name}" placeholder="Nome da refeição" onchange="updateMealName('${m.id}',this.value)">
+      ${cfgMealsEditing.length>1?`<button class="cfg-del-btn" onclick="deleteMealConfig('${m.id}')">−</button>`:''}
+    </div>
+    <div class="cfg-emoji-picker" id="cfg-ep-${m.id}">
+      ${CFG_EMOJIS.map(e=>`<button class="cfg-ep-btn" onclick="setMealEmoji('${m.id}','${e}')">${e}</button>`).join('')}
+    </div>`).join('');
+}
+function toggleEmojiPicker(id){
+  const ep=document.getElementById('cfg-ep-'+id);if(!ep)return;
+  const open=ep.classList.contains('open');
+  document.querySelectorAll('.cfg-emoji-picker').forEach(el=>el.classList.remove('open'));
+  if(!open)ep.classList.add('open');
+}
+function setMealEmoji(id,emoji){
+  const meal=cfgMealsEditing.find(m=>m.id===id);if(!meal)return;
+  meal.emoji=emoji;
+  const btn=document.querySelector(`#cfg-row-${id} .cfg-emoji-btn`);if(btn)btn.textContent=emoji;
+  document.getElementById('cfg-ep-'+id).classList.remove('open');
+}
+function updateMealName(id,val){const meal=cfgMealsEditing.find(m=>m.id===id);if(meal&&val.trim())meal.name=val.trim();}
+function addNewMeal(){
+  const idx=cfgMealsEditing.length%MEAL_PALETTE.length;
+  const {color,bg}=MEAL_PALETTE[idx];
+  const id='meal_'+Date.now().toString(36);
+  cfgMealsEditing.push({id,name:'Nova refeição',emoji:CFG_EMOJIS[idx%CFG_EMOJIS.length],color,bg});
+  renderMealConfig();
+  setTimeout(()=>{const inputs=document.querySelectorAll('.cfg-name-input');const last=inputs[inputs.length-1];if(last){last.focus();last.select();}},60);
+}
+function deleteMealConfig(id){
+  if(cfgMealsEditing.length<=1)return;
+  cfgMealsEditing=cfgMealsEditing.filter(m=>m.id!==id);
+  renderMealConfig();
 }
 
 // ── Food search ────────────────────────────────────────
 function openFoodSearch(mealKey){
   openForMeal=mealKey;
-  const m=MEALS.find(m=>m.key===mealKey);
+  const m=getDietMeals().find(m=>m.id===mealKey);
   document.getElementById('food-overlay-title').textContent=m?'Adicionar em '+m.name:'Adicionar alimento';
   document.getElementById('food-search-input').value='';
   showFoodSearchView();
@@ -1081,7 +1270,11 @@ function openFoodSearch(mealKey){
   setTimeout(()=>document.getElementById('food-search-input').focus(),200);
   filterFoods();
 }
-function closeFoodOverlay(){document.getElementById('food-overlay').classList.remove('open');openForMeal=null;selectedFood=null}
+function closeFoodOverlay(){
+  document.getElementById('food-overlay').classList.remove('open');
+  openForMeal=null;selectedFood=null;editingEntry=null;
+  document.getElementById('qty-add-btn').textContent='Adicionar à refeição';
+}
 function showFoodSearchView(){document.getElementById('food-search-view').style.display='flex';document.getElementById('food-qty-view').classList.remove('open')}
 function backToSearch(){showFoodSearchView()}
 
@@ -1197,11 +1390,17 @@ function confirmAddFood(){
   if(!selectedFood||!openForMeal)return;
   const qty=parseFloat(document.getElementById('qty-input').value);
   if(!qty||qty<=0){document.getElementById('qty-input').focus();return;}
-  const m=calcMacros(selectedFood,qty);
-  const entry={eid:'e'+Date.now().toString(36),fid:selectedFood.id,name:selectedFood.name,qty,unit:selectedFood.unit,...m};
+  const macros=calcMacros(selectedFood,qty);
   const d=getDiet();
-  if(!d[dietDate])d[dietDate]={meals:{cafe:[],almoco:[],jantar:[],lanche:[]}};
-  (d[dietDate].meals[openForMeal]=d[dietDate].meals[openForMeal]||[]).push(entry);
+  if(editingEntry){
+    const entries=d[dietDate]?.meals[editingEntry.mealId];
+    if(entries){const idx=entries.findIndex(e=>e.eid===editingEntry.eid);if(idx>=0)entries[idx]={...entries[idx],qty,unit:selectedFood.unit,...macros};}
+  } else {
+    if(!d[dietDate])d[dietDate]={meals:Object.fromEntries(getDietMeals().map(m=>[m.id,[]]))};
+    (d[dietDate].meals[openForMeal]=d[dietDate].meals[openForMeal]||[]).push(
+      {eid:'e'+Date.now().toString(36),fid:selectedFood.id,name:selectedFood.name,qty,unit:selectedFood.unit,...macros}
+    );
+  }
   saveDiet(d);closeFoodOverlay();renderDiet();
 }
 
@@ -1352,7 +1551,7 @@ function removeVoiceItem(i){
 function confirmVoiceItems(){
   if(!openForMeal||voiceItems.length===0)return;
   const d=getDiet();
-  if(!d[dietDate])d[dietDate]={meals:{cafe:[],almoco:[],jantar:[],lanche:[]}};
+  if(!d[dietDate])d[dietDate]={meals:Object.fromEntries(getDietMeals().map(m=>[m.id,[]]))};
   for(const item of voiceItems){
     const m=calcMacros(item.food,item.qty);
     const entry={
