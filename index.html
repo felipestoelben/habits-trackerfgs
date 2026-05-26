@@ -596,15 +596,16 @@ body{
 #barcode-overlay.open{display:flex}
 .barcode-close-btn{
   position:absolute;
-  top:calc(env(safe-area-inset-top,0px)+14px);
+  top:calc(max(env(safe-area-inset-top,0px),20px) + 10px);
   left:16px;
-  z-index:30;
-  width:44px;height:44px;border-radius:50%;border:none;
-  background:rgba(0,0,0,.55);
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-  color:#fff;font-size:20px;cursor:pointer;
+  z-index:500;
+  width:48px;height:48px;border-radius:50%;border:2px solid rgba(255,255,255,.25);
+  background:rgba(0,0,0,.65);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  color:#fff;font-size:22px;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
-  box-shadow:0 2px 12px rgba(0,0,0,.4);
+  box-shadow:0 2px 16px rgba(0,0,0,.6);
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
 }
 .barcode-close-btn:active{opacity:.7;transform:scale(.9)}
 .barcode-hdr-title-fixed{
@@ -1326,6 +1327,7 @@ body{
       <div class="food-overlay-top">
         <button class="food-overlay-back" onclick="closeFoodOverlay()">‹</button>
         <div class="food-overlay-title" id="food-overlay-title">Adicionar alimento</div>
+        <button class="icon-btn" onclick="closeFoodOverlay();toggleSidebar()" style="margin-left:auto;flex-shrink:0">☰</button>
       </div>
       <div class="food-search-bar">
         <span class="food-search-icon">🔍</span>
@@ -1401,8 +1403,8 @@ body{
 
 <!-- ══ BARCODE SCANNER ══ -->
 <div id="barcode-overlay">
-  <video id="barcode-video" autoplay playsinline muted></video>
   <button class="barcode-close-btn" onclick="closeBarcodeScanner()">✕</button>
+  <video id="barcode-video" autoplay playsinline muted></video>
   <div class="barcode-hdr-title-fixed">Ler código de barras</div>
   <div class="barcode-aim-wrap">
     <div class="barcode-aim">
@@ -2061,10 +2063,20 @@ const _nonLatin=/[؀-ۿЀ-ӿͰ-Ͽ一-鿿぀-ヿ]/;
 function _offProductName(p){
   return(p['product_name_pt-BR']||p.product_name_pt||p.product_name||'').trim();
 }
+function _parseKcal(n){
+  if(n['energy-kcal_100g']>0)return n['energy-kcal_100g'];
+  if(n['energy-kcal']>0)return n['energy-kcal'];
+  if(n['energy_100g']>0)return Math.round(n['energy_100g']/4.184);
+  if(n['energy']>0)return Math.round(n['energy']/4.184);
+  return 0;
+}
 function _isValidProduct(p){
   const name=_offProductName(p);
   const n=p.nutriments||{};
-  return name&&!_nonLatin.test(name)&&n['energy-kcal_100g']>0;
+  return name.length>2&&!_nonLatin.test(name)&&_parseKcal(n)>0;
+}
+function _isValidBarcode(p){
+  return _offProductName(p).length>2;
 }
 function _offToFood(p,src){
   const n=p.nutriments||{};
@@ -2073,10 +2085,10 @@ function _offToFood(p,src){
   const name=rawName+(brand&&!rawName.toLowerCase().includes(brand.toLowerCase())?` — ${brand}`:'');
   const id='off_'+Math.random().toString(36).slice(2);
   const food={id,name,emoji:'🛒',cat:'Internet',
-    kcal:Math.round(n['energy-kcal_100g']||0),
-    prot:+((n['proteins_100g']||0)).toFixed(1),
-    carb:+((n['carbohydrates_100g']||0)).toFixed(1),
-    fat:+((n['fat_100g']||0)).toFixed(1),
+    kcal:Math.round(_parseKcal(n)),
+    prot:+((n['proteins_100g']||n['proteins']||0)).toFixed(1),
+    carb:+((n['carbohydrates_100g']||n['carbohydrates']||0)).toFixed(1),
+    fat:+((n['fat_100g']||n['fat']||0)).toFixed(1),
     unit:'g',online:true,src:src||'off'};
   onlineCache[id]=food;
   return food;
@@ -2307,46 +2319,43 @@ function lookupBarcodeManual(){
   if(ean)lookupBarcode(ean);
 }
 async function lookupBarcode(ean){
-  _setBarStatus(`Buscando: ${ean}…`);
-  try{
-    const ctrl=new AbortController();
-    setTimeout(()=>ctrl.abort(),10000);
-    const r=await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(ean)}.json?fields=product_name,product_name_pt,product_name_pt-BR,brands,nutriments`,{signal:ctrl.signal});
-    const d=await r.json();
-    if(d.status===1&&d.product&&_isValidProduct(d.product)){
-      const food=_offToFood(d.product,'off');
-      closeBarcodeScanner();
-      if(openForMeal){
-        // abre diretamente na tela de quantidade
-        selectFood(food.id);
-        document.getElementById('food-overlay').classList.add('open');
-      } else {
-        openFoodSearch(null);
-        setTimeout(()=>selectFood(food.id),100);
+  _setBarStatus(`Buscando código ${ean}…`);
+  const fields='product_name,product_name_pt,product_name_pt-BR,brands,nutriments,quantity';
+  const endpoints=[
+    `https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(ean)}.json?fields=${fields}&lc=pt`,
+    `https://br.openfoodfacts.org/api/v2/product/${encodeURIComponent(ean)}.json?fields=${fields}`,
+  ];
+  let product=null;
+  for(const url of endpoints){
+    try{
+      const ctrl=new AbortController();
+      setTimeout(()=>ctrl.abort(),8000);
+      const r=await fetch(url,{signal:ctrl.signal});
+      if(!r.ok)continue;
+      const d=await r.json();
+      if(d.status===1&&d.product&&_isValidBarcode(d.product)){
+        product=d.product;break;
       }
-      return;
-    }
-    // não encontrado: mostra mensagem e abre busca por texto
-    closeBarcodeScanner();
-    _setBarStatus('');
-    const name=d.product?_offProductName(d.product):'';
-    if(openForMeal)document.getElementById('food-overlay').classList.add('open');
-    if(name){
-      document.getElementById('food-search-input').value=name;
-      filterFoods();
-    } else {
-      _showBarcodeManual('');
-      if(!openForMeal)openFoodSearch(null);
-    }
-    document.getElementById('food-results').innerHTML=
-      `<div style="padding:20px 16px;color:var(--text2);font-size:13px;text-align:center">
-        ⚠️ Produto <b>${ean}</b> não encontrado na base.<br>
-        <span style="font-size:12px">Busque manualmente pelo nome acima.</span>
-      </div>`;
-  }catch(e){
-    _setBarStatus('Erro ao buscar código. Tente novamente.');
-    _showBarcodeManual('');
+    }catch{}
   }
+  if(product){
+    const food=_offToFood(product,'off');
+    closeBarcodeScanner();
+    if(!openForMeal)openFoodSearch(null);
+    document.getElementById('food-overlay').classList.add('open');
+    setTimeout(()=>selectFood(food.id),100);
+    return;
+  }
+  // não encontrado — abre busca textual com msg
+  closeBarcodeScanner();
+  if(!openForMeal)openFoodSearch(null);
+  document.getElementById('food-overlay').classList.add('open');
+  document.getElementById('food-results').innerHTML=
+    `<div style="padding:24px 16px;text-align:center">
+      <div style="font-size:36px;margin-bottom:8px">🔍</div>
+      <div style="font-size:14px;font-weight:700;color:var(--text)">Código não encontrado</div>
+      <div style="font-size:12px;color:var(--text2);margin-top:6px">EAN: ${ean}<br>Busque pelo nome do produto acima</div>
+    </div>`;
 }
 
 // ── Voice recording ────────────────────────────────────
@@ -2667,6 +2676,7 @@ function openSidebar(){document.getElementById('sidebar').classList.add('open');
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebar-backdrop').classList.remove('open')}
 function showScreen(name){
   activeScreen=name;
+  closeFoodOverlay();closeBarcodeScanner();
   document.getElementById('screen-habits').style.display=name==='habits'?'':'none';
   document.getElementById('screen-diet').style.display=name==='diet'?'':'none';
   document.getElementById('screen-sub').style.display=name==='sub'?'':'none';
