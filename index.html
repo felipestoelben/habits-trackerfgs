@@ -2520,11 +2520,13 @@ const SUB_CATS=[
   {id:'fat',   label:'gorduras',    emoji:'🥑',cats:['Gorduras']},
   {id:'fruit', label:'frutas',      emoji:'🍎',cats:['Frutas']},
   {id:'veg',   label:'vegetais',    emoji:'🥦',cats:['Verduras']},
+  {id:'extra', label:'extras',      emoji:'🫙',cats:['Extras']},
+  {id:'all',   label:'geral',       emoji:'🔍',cats:null},
 ];
 const SUB_CAT_COLORS={
   'Cereais':'#F59E0B','Proteínas':'#EF4444','Laticínios':'#3B82F6',
   'Suplementos':'#8B5CF6','Gorduras':'#F97316','Frutas':'#F43F5E',
-  'Verduras':'#10B981','Extras':'#6B7280',
+  'Verduras':'#10B981','Extras':'#6B7280','all':'#6366F1',
 };
 function initSubLanding(){
   const strip=document.getElementById('sub-cats-strip');
@@ -2542,7 +2544,7 @@ function setSubCat(id){
 function renderSubFoodList(){
   const cat=SUB_CATS.find(c=>c.id===subActiveCat);
   if(!cat)return;
-  const foods=FOODS.filter(f=>cat.cats.includes(f.cat));
+  const foods=cat.cats===null?[...FOODS]:FOODS.filter(f=>cat.cats.includes(f.cat));
   document.getElementById('sub-food-count').textContent=`${foods.length} alimentos`;
   document.getElementById('sub-food-list-wrap').innerHTML=foods.map(f=>`
     <div class="sub-food-row" onclick="selectSubFood('${f.id}')">
@@ -2623,7 +2625,7 @@ function calcAndRenderSubs(){
   else{qtyFactor=(subUnit==='kg'?qty*1000:qty)/100;totalKcal=f.kcal*qtyFactor;}
   document.getElementById('sub-qty-kcal-display').textContent=`≈ ${Math.round(totalKcal)} kcal`;
   if(totalKcal<=0)return;
-  const catDef=SUB_CATS.find(c=>c.cats.includes(f.cat));
+  const catDef=SUB_CATS.find(c=>c.cats!==null&&c.cats.includes(f.cat));
   const groupCats=catDef?catDef.cats:[f.cat];
   const candidates=FOODS.filter(c=>c.id!==f.id&&groupCats.includes(c.cat)&&c.kcal>0);
   const origProtE=(f.prot*qtyFactor)*4,origCarbE=(f.carb*qtyFactor)*4,origFatE=(f.fat*qtyFactor)*9;
