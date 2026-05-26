@@ -2431,8 +2431,19 @@ function confirmAddFood(){
   saveDiet(d);closeFoodOverlay();renderDiet();
 }
 
-// ── Barcode scanner ────────────────────────────────────
-let _bcStream=null,_bcDetecting=false;
+// ── Barcode scanner (ZXing universal — iOS Safari + Chrome + Firefox) ──
+let _bcStream=null,_bcDetecting=false,_zxingReader=null;
+
+function _loadZXing(){
+  if(typeof ZXing!=='undefined')return Promise.resolve(true);
+  return new Promise(res=>{
+    const s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js';
+    s.onload=()=>res(true);
+    s.onerror=()=>res(false);
+    document.head.appendChild(s);
+  });
+}
 
 async function openBarcodeScanner(){
   const overlay=document.getElementById('barcode-overlay');
@@ -2440,24 +2451,51 @@ async function openBarcodeScanner(){
   _setBarStatus('Iniciando câmera…');
   document.getElementById('barcode-manual-row').style.display='none';
   document.getElementById('barcode-fallback-msg').textContent='';
+
+  const video=document.getElementById('barcode-video');
+
+  // Step 1: get camera stream (back camera, works on all browsers)
   try{
-    _bcStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280}}});
-    const video=document.getElementById('barcode-video');
-    video.srcObject=_bcStream;
-    await video.play();
-    if('BarcodeDetector' in window){
-      _setBarStatus('Escaneando…');
-      _bcDetecting=true;
-      _bcScan(video);
-    } else {
-      _setBarStatus('Scanner não suportado neste navegador.');
-      _showBarcodeManual('Digite o código de barras abaixo:');
-    }
+    _bcStream=await navigator.mediaDevices.getUserMedia({
+      video:{facingMode:'environment',width:{ideal:1280},height:{ideal:720}}
+    });
   }catch(e){
-    _setBarStatus('Câmera indisponível.');
+    _setBarStatus('Câmera indisponível ou permissão negada.');
     _showBarcodeManual('Digite o código EAN/UPC manualmente:');
+    return;
+  }
+
+  // Step 2: try ZXing (works on Safari iOS, Firefox, Chrome — all browsers)
+  const zxingOk=await _loadZXing();
+  if(zxingOk){
+    try{
+      _zxingReader=new ZXing.BrowserMultiFormatReader();
+      _bcDetecting=true;
+      _setBarStatus('Escaneando…');
+      await _zxingReader.decodeFromStream(_bcStream,video,async(result,err)=>{
+        if(!_bcDetecting||!result)return;
+        _bcDetecting=false;
+        await lookupBarcode(result.getText());
+      });
+      return;
+    }catch(e){
+      // ZXing failed — fall through to native
+    }
+  }
+
+  // Step 3: fallback — native BarcodeDetector (Chrome/Edge only)
+  video.srcObject=_bcStream;
+  await video.play();
+  if('BarcodeDetector' in window){
+    _setBarStatus('Escaneando…');
+    _bcDetecting=true;
+    _bcScan(video);
+  } else {
+    _setBarStatus('Scanner não suportado neste navegador.');
+    _showBarcodeManual('Digite o código de barras abaixo:');
   }
 }
+
 function _bcScan(video){
   if(!_bcDetecting)return;
   const det=new BarcodeDetector({formats:['ean_13','ean_8','upc_a','upc_e','code_128','code_39']});
@@ -2465,20 +2503,13 @@ function _bcScan(video){
     if(!_bcDetecting)return;
     try{
       const codes=await det.detect(video);
-      if(codes.length){
-        _bcDetecting=false;
-        await lookupBarcode(codes[0].rawValue);
-        return;
-      }
+      if(codes.length){_bcDetecting=false;await lookupBarcode(codes[0].rawValue);return;}
     }catch{}
     if(_bcDetecting)requestAnimationFrame(tick);
   };
   requestAnimationFrame(tick);
 }
-function _setBarStatus(msg){
-  const el=document.getElementById('barcode-status');
-  if(el)el.textContent=msg;
-}
+function _setBarStatus(msg){const el=document.getElementById('barcode-status');if(el)el.textContent=msg;}
 function _showBarcodeManual(msg){
   document.getElementById('barcode-manual-row').style.display='flex';
   document.getElementById('barcode-fallback-msg').textContent=msg||'';
@@ -2486,7 +2517,9 @@ function _showBarcodeManual(msg){
 }
 function closeBarcodeScanner(){
   _bcDetecting=false;
+  if(_zxingReader){try{_zxingReader.reset();}catch(e){}_zxingReader=null;}
   if(_bcStream){_bcStream.getTracks().forEach(t=>t.stop());_bcStream=null;}
+  const v=document.getElementById('barcode-video');if(v)v.srcObject=null;
   document.getElementById('barcode-overlay').classList.remove('open');
 }
 function lookupBarcodeManual(){
