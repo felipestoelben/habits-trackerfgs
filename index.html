@@ -538,8 +538,7 @@ body{
 .food-overlay-title{font-size:17px;font-weight:700}
 .food-search-bar{
   display:flex;align-items:center;gap:10px;
-  background:var(--surface);border-radius:12px;padding:10px 14px;
-  box-shadow:var(--shadow-sm);
+  background:var(--surface2);border-radius:12px;padding:10px 14px;
 }
 .food-search-icon{font-size:16px;color:var(--text2);flex-shrink:0}
 .food-search-input{
@@ -548,21 +547,47 @@ body{
 }
 .food-search-input::placeholder{color:var(--text3)}
 .food-results{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
-.food-cat-header{font-size:11px;font-weight:800;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;padding:14px 16px 6px}
+.food-cat-header{
+  font-size:11px;font-weight:800;color:var(--text2);text-transform:uppercase;
+  letter-spacing:.6px;padding:16px 16px 8px;
+  position:sticky;top:0;z-index:1;background:var(--bg);
+  border-bottom:1px solid var(--sep);
+}
 .food-result-item{
-  display:flex;align-items:center;padding:12px 16px;gap:12px;cursor:pointer;
+  display:flex;align-items:center;padding:11px 16px;gap:12px;cursor:pointer;
   transition:background .1s;
+  border-bottom:1px solid var(--sep);
 }
-.food-result-item:active{background:var(--surface2)}
-.food-result-item+.food-result-item{border-top:1px solid var(--sep)}
-.food-result-emoji{font-size:24px;flex-shrink:0;width:32px;text-align:center}
+.food-result-item:active{background:var(--accent-lt)}
+.food-result-emoji-box{
+  width:42px;height:42px;border-radius:10px;background:var(--surface2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;flex-shrink:0;
+}
 .food-result-info{flex:1;min-width:0}
-.food-result-name{font-size:15px;font-weight:600}
-.food-result-sub{font-size:12px;color:var(--text2);margin-top:2px;font-weight:500}
-.food-result-badge{
-  font-size:12px;font-weight:700;color:var(--accent);
-  background:var(--accent-lt);padding:4px 10px;border-radius:99px;flex-shrink:0;
+.food-result-name{font-size:14px;font-weight:700;line-height:1.3}
+.food-result-sub{font-size:11.5px;color:var(--text2);margin-top:3px;font-weight:400}
+.food-result-kcal{display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0;gap:1px}
+.food-result-kcal-val{font-size:16px;font-weight:800;color:var(--text)}
+.food-result-kcal-lbl{font-size:10px;font-weight:600;color:var(--text2)}
+/* empty state */
+.food-empty-state{
+  display:flex;flex-direction:column;align-items:center;
+  padding:48px 24px 32px;text-align:center;
 }
+.food-empty-icon{font-size:56px;margin-bottom:14px;line-height:1}
+.food-empty-title{font-size:18px;font-weight:700;margin-bottom:6px}
+.food-empty-sub{font-size:13px;color:var(--text2);margin-bottom:24px;line-height:1.5}
+.food-quick-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.food-quick-chip{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:8px 14px;border-radius:99px;
+  background:var(--surface2);border:1px solid var(--sep);
+  font-size:13px;font-weight:600;color:var(--text);
+  cursor:pointer;transition:background .12s,transform .1s;
+  -webkit-tap-highlight-color:transparent;
+}
+.food-quick-chip:active{background:var(--accent-lt);border-color:var(--accent);transform:scale(.95)}
 .food-online-tag{
   font-size:10px;font-weight:700;color:var(--green);
   background:rgba(34,197,94,.12);padding:2px 7px;border-radius:99px;margin-left:6px;vertical-align:middle;
@@ -1331,7 +1356,7 @@ body{
       </div>
       <div class="food-search-bar">
         <span class="food-search-icon">🔍</span>
-        <input class="food-search-input" id="food-search-input" type="text" placeholder="Buscar alimento..." oninput="filterFoods()" autocomplete="off">
+        <input class="food-search-input" id="food-search-input" type="text" placeholder="Buscar alimento…" oninput="filterFoods()" autocomplete="off">
         <button class="scan-btn" onclick="openBarcodeScanner()" title="Ler código de barras">📷</button>
         <button class="voice-mic-btn" id="voice-mic-btn" onclick="openVoiceView()" title="Registrar por voz">🎙️</button>
       </div>
@@ -2034,8 +2059,17 @@ function filterFoods(){
   lastQuery=q;
   clearTimeout(searchTimer);
   if(!q){
-    const cats=[...new Set(FOODS.map(f=>f.cat))];
-    document.getElementById('food-results').innerHTML=cats.map(cat=>`<div class="food-cat-header">${cat}</div>`+FOODS.filter(f=>f.cat===cat).map(f=>foodResultHTML(f,false)).join('')).join('');
+    const chips=[
+      {e:'🍚',l:'arroz'},{e:'🍗',l:'frango'},{e:'🥚',l:'ovos'},{e:'🫘',l:'feijão'},
+      {e:'🍌',l:'banana'},{e:'🥛',l:'leite'},{e:'🥩',l:'carne'},{e:'🌾',l:'aveia'}
+    ];
+    document.getElementById('food-results').innerHTML=
+      `<div class="food-empty-state">
+        <div class="food-empty-icon">🍽️</div>
+        <div class="food-empty-title">O que você vai comer?</div>
+        <div class="food-empty-sub">Digite o nome ou escolha uma sugestão</div>
+        <div class="food-quick-chips">${chips.map(c=>`<button class="food-quick-chip" onclick="quickFoodSearch('${c.l}')">${c.e} ${c.l}</button>`).join('')}</div>
+      </div>`;
     return;
   }
   // Resultados locais imediatos
@@ -2046,6 +2080,12 @@ function filterFoods(){
   document.getElementById('food-results').innerHTML=html;
   // Busca online com debounce
   searchTimer=setTimeout(()=>fetchOnlineFoods(q),500);
+}
+
+function quickFoodSearch(q){
+  const inp=document.getElementById('food-search-input');
+  inp.value=q;
+  filterFoods();
 }
 
 function searchLocalFoods(q){
@@ -2198,18 +2238,21 @@ async function fetchOnlineFoods(q){
 }
 
 function foodResultHTML(f,isOnline){
-  const per=f.unit==='unid'?'por unidade':'por 100'+f.unit;
+  const per=f.unit==='unid'?'por unid':'por 100'+f.unit;
   let srcBadge='';
   if(f.src==='taco'||f.src==='br')srcBadge=`<span class="food-source-badge src-taco">${f.src==='taco'?'TACO':'BR'}</span>`;
   else if(isOnline&&f.src==='usda')srcBadge=`<span class="food-source-badge src-usda">USDA</span>`;
   else if(isOnline)srcBadge=`<span class="food-source-badge src-off">OFF</span>`;
   return`<div class="food-result-item" onclick="selectFood('${f.id}')">
-    <div class="food-result-emoji">${f.emoji}</div>
+    <div class="food-result-emoji-box">${f.emoji}</div>
     <div class="food-result-info">
       <div class="food-result-name">${f.name}${srcBadge}</div>
-      <div class="food-result-sub">${f.kcal} kcal · P:${f.prot}g C:${f.carb}g G:${f.fat}g · ${per}</div>
+      <div class="food-result-sub">P ${f.prot}g · C ${f.carb}g · G ${f.fat}g · ${per}</div>
     </div>
-    <div class="food-result-badge">${f.kcal} kcal</div>
+    <div class="food-result-kcal">
+      <span class="food-result-kcal-val">${f.kcal}</span>
+      <span class="food-result-kcal-lbl">kcal</span>
+    </div>
   </div>`;
 }
 
