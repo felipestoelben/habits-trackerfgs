@@ -74,7 +74,14 @@ body{
   }
   .tab-bar{border-radius:0 0 48px 48px;overflow:hidden}
 }
-/* Desktop: two-column layout (800px+) */
+/* Desktop: two-column layout (800px+) — declarado APÓS .app-shell base para cascata correta */
+.app-shell{
+  max-width:430px;width:100%;margin:0 auto;position:relative;overflow:hidden;
+  height:100svh;height:100dvh;height:-webkit-fill-available;
+  background:var(--bg);
+  display:flex;flex-direction:column;
+}
+/* Desktop: two-column layout (800px+) — DEVE vir após .app-shell base */
 @media(min-width:800px){
   body{background:#DDDDE8}
   [data-theme="dark"] body{background:#050508}
@@ -106,12 +113,6 @@ body{
   .header-greeting{font-size:30px}
   .diet-header-title{font-size:26px}
   .sub-header-title{font-size:26px}
-}
-.app-shell{
-  max-width:430px;width:100%;margin:0 auto;position:relative;overflow:hidden;
-  height:100svh;height:100dvh;height:-webkit-fill-available;
-  background:var(--bg);
-  display:flex;flex-direction:column;
 }
 
 /* ── Overlay base ── */
