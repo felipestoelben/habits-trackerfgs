@@ -918,102 +918,147 @@ body{
   overscroll-behavior-y:contain;padding-bottom:32px;
 }
 .sub-header{
-  padding:calc(max(env(safe-area-inset-top,0px),20px) + 10px) 16px 12px;
+  padding:calc(max(env(safe-area-inset-top,0px),20px) + 10px) 16px 0;
   position:sticky;top:0;z-index:20;
-  background:rgba(242,242,247,.88);
+  background:rgba(242,242,247,.92);
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border-bottom:1px solid rgba(0,0,0,.05);
+  border-bottom:1px solid rgba(0,0,0,.06);
 }
-[data-theme="dark"] .sub-header{background:rgba(0,0,0,.78)}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .sub-header{background:rgba(0,0,0,.78)}}
-.sub-header-title{font-size:26px;font-weight:900;letter-spacing:-.6px}
-.sub-header-sub{font-size:12px;font-weight:500;color:var(--text2);margin-top:2px}
-.sub-search-wrap{padding:10px 0 0}
+[data-theme="dark"] .sub-header{background:rgba(0,0,0,.85)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .sub-header{background:rgba(0,0,0,.85)}}
+.sub-header-title{font-size:26px;font-weight:900;letter-spacing:-.6px;margin-bottom:2px}
+.sub-header-sub{font-size:12px;font-weight:500;color:var(--text2)}
+.sub-search-wrap{padding:10px 0 12px}
 .sub-search-bar{
   display:flex;align-items:center;gap:8px;
-  background:var(--surface);border-radius:var(--r-md);
-  border:1.5px solid var(--sep);padding:0 12px;
-  box-shadow:var(--shadow-sm);
+  background:var(--surface2);border-radius:var(--r-md);
+  padding:0 12px;
 }
-.sub-search-icon{font-size:16px;color:var(--text3)}
+.sub-search-icon{font-size:15px;color:var(--text3)}
 .sub-search-input{
   flex:1;border:none;background:transparent;
   font-size:15px;padding:12px 0;outline:none;color:var(--text);
 }
+/* Autocomplete dropdown */
 .sub-autocomplete{
-  margin:4px 16px 0;
+  margin:0 16px 4px;
   background:var(--surface);border-radius:var(--r-md);
-  box-shadow:var(--shadow-md);overflow:hidden;display:none;
+  box-shadow:var(--shadow-md);overflow:hidden;display:none;z-index:10;position:relative;
 }
-.sub-autocomplete-item{
+.sub-ac-item{
   display:flex;align-items:center;gap:10px;padding:11px 14px;
   border-bottom:1px solid var(--sep);cursor:pointer;
 }
-.sub-autocomplete-item:last-child{border-bottom:none}
-.sub-autocomplete-item:active{background:var(--accent-lt)}
-.sub-ac-emoji{font-size:20px}
+.sub-ac-item:last-child{border-bottom:none}
+.sub-ac-item:active{background:var(--accent-lt)}
+.sub-ac-emoji{font-size:20px;width:28px;text-align:center}
 .sub-ac-info{flex:1;min-width:0}
 .sub-ac-name{font-size:14px;font-weight:600;color:var(--text)}
 .sub-ac-meta{font-size:11.5px;color:var(--text2);margin-top:1px}
-.sub-selected-wrap{padding:10px 16px 0;display:none}
-.sub-selected-chip{
-  background:var(--surface);border-radius:var(--r-md);
-  border:1.5px solid var(--accent-lt);box-shadow:var(--shadow-sm);overflow:hidden;
+/* Category chips */
+.sub-cats-strip{
+  display:flex;gap:8px;padding:10px 16px 8px;
+  overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;
 }
-.sub-chip-food{display:flex;align-items:center;gap:10px;padding:10px 12px}
-.sub-chip-emoji{font-size:24px}
-.sub-chip-info{flex:1;min-width:0}
-.sub-chip-name{font-size:14px;font-weight:700;color:var(--text)}
-.sub-chip-kcal{font-size:12px;color:var(--text2);margin-top:2px}
-.sub-chip-clear{border:none;background:transparent;color:var(--text3);font-size:20px;padding:8px 12px;cursor:pointer}
-.sub-qty-row{
-  display:flex;align-items:center;gap:8px;
-  padding:8px 12px 12px;border-top:1px solid var(--sep);flex-wrap:wrap;
+.sub-cats-strip::-webkit-scrollbar{display:none}
+.sub-cat-chip{
+  flex-shrink:0;display:flex;align-items:center;gap:5px;
+  padding:7px 14px;border-radius:99px;
+  border:1.5px solid var(--sep);background:var(--surface);
+  font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;white-space:nowrap;
 }
-.sub-qty-label{font-size:13px;color:var(--text2);font-weight:500}
-.sub-qty-input{
-  border:1.5px solid var(--sep);border-radius:var(--r-sm);
-  background:var(--surface2);color:var(--text);
-  font-size:16px;font-weight:700;width:80px;padding:6px 10px;text-align:center;outline:none;
+.sub-cat-chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.sub-cat-chip:active{opacity:.75}
+/* Food list on landing */
+.sub-food-count{
+  font-size:11px;font-weight:800;color:var(--text2);
+  text-transform:uppercase;letter-spacing:.6px;
+  padding:4px 16px 8px;
 }
-.sub-qty-input:focus{border-color:var(--accent)}
-.sub-unit-seg{display:flex;gap:4px}
-.sub-unit-btn{
+.sub-food-list-wrap{margin:0 16px 16px;overflow:hidden;border-radius:var(--r-lg);box-shadow:var(--shadow-sm)}
+.sub-food-row{
+  display:flex;align-items:center;gap:12px;
+  padding:11px 14px;background:var(--surface);
+  border-bottom:1px solid var(--sep);cursor:pointer;
+}
+.sub-food-row:last-child{border-bottom:none}
+.sub-food-row:active{background:var(--accent-lt)}
+.sub-food-row-emoji{font-size:22px;width:32px;text-align:center;flex-shrink:0}
+.sub-food-row-info{flex:1;min-width:0}
+.sub-food-row-name{font-size:14px;font-weight:600;color:var(--text)}
+.sub-food-row-meta{font-size:11.5px;color:var(--text2);margin-top:2px}
+.sub-food-row-arr{color:var(--text3);font-size:16px}
+/* Detail view */
+.sub-detail-top{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 16px 12px;background:var(--surface);
+  border-bottom:1px solid var(--sep);
+}
+.sub-back-btn{
+  border:none;background:var(--surface2);border-radius:50%;
+  width:36px;height:36px;font-size:22px;color:var(--text);
+  cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+}
+.sub-detail-emoji{font-size:34px;flex-shrink:0}
+.sub-detail-info{flex:1;min-width:0}
+.sub-detail-name{font-size:16px;font-weight:800;color:var(--text);line-height:1.2}
+.sub-detail-badge{
+  display:inline-flex;align-items:center;
+  margin-top:5px;padding:3px 10px;border-radius:99px;
+  font-size:11px;font-weight:700;color:#fff;
+}
+/* Qty card */
+.sub-qty-card{
+  margin:12px 16px;background:var(--surface);
+  border-radius:var(--r-md);border:1.5px solid var(--sep);padding:12px 14px;
+}
+.sub-qty-card-label{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px}
+.sub-qty-card-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sub-qty-main-input{
+  border:2px solid var(--accent);border-radius:var(--r-sm);
+  background:var(--accent-lt);color:var(--accent);
+  font-size:18px;font-weight:800;
+  width:90px;padding:7px 10px;text-align:center;outline:none;
+}
+.sub-qty-unit-seg{display:flex;gap:4px}
+.sub-qty-unit-btn{
   border:1.5px solid var(--sep);background:var(--surface2);
   border-radius:var(--r-sm);color:var(--text2);
-  font-size:12px;font-weight:700;padding:5px 10px;cursor:pointer;
+  font-size:12px;font-weight:700;padding:6px 10px;cursor:pointer;
 }
-.sub-unit-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
-.sub-calc-btn{
-  flex:1;background:var(--accent);border:none;border-radius:var(--r-sm);
-  color:#fff;font-size:13px;font-weight:700;padding:8px 12px;cursor:pointer;
+.sub-qty-unit-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.sub-qty-kcal-display{
+  flex:1;text-align:right;font-size:13px;font-weight:700;
+  color:var(--text2);white-space:nowrap;min-width:80px;
 }
-.sub-calc-btn:active{opacity:.8}
-.sub-results-wrap{padding:12px 16px}
-.sub-results-title{font-size:12px;font-weight:800;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
-.sub-card{
-  background:var(--surface);border-radius:var(--r-lg);
-  box-shadow:var(--shadow-sm);padding:14px;margin-bottom:10px;
-  display:flex;align-items:center;gap:12px;position:relative;overflow:hidden;
+/* Sort row */
+.sub-list-section{padding:4px 16px 8px}
+.sub-list-hint{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px}
+.sub-sort-row{display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.sub-sort-row::-webkit-scrollbar{display:none}
+.sub-sort-btn{
+  flex-shrink:0;border:1.5px solid var(--sep);background:var(--surface2);
+  border-radius:99px;color:var(--text2);
+  font-size:11px;font-weight:700;padding:5px 13px;cursor:pointer;white-space:nowrap;
 }
-.sub-card::before{
-  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
-  background:var(--sub-color,var(--accent));border-radius:0 2px 2px 0;
+.sub-sort-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+/* Result items */
+.sub-result-list-wrap{margin:0 16px 16px;overflow:hidden;border-radius:var(--r-lg);box-shadow:var(--shadow-sm)}
+.sub-result-row{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 14px;background:var(--surface);border-bottom:1px solid var(--sep);
 }
-.sub-card-emoji{font-size:26px;flex-shrink:0}
-.sub-card-info{flex:1;min-width:0}
-.sub-card-name{font-size:14px;font-weight:700;color:var(--text)}
-.sub-card-qty{font-size:22px;font-weight:900;color:var(--sub-color,var(--accent));margin-top:2px;letter-spacing:-.5px}
-.sub-card-macros{font-size:11.5px;color:var(--text2);margin-top:4px}
-.sub-match-badge{
-  flex-shrink:0;background:var(--sub-color,var(--accent));
-  color:#fff;font-size:11px;font-weight:800;
-  border-radius:20px;padding:4px 10px;letter-spacing:.2px;align-self:flex-start;
+.sub-result-row:last-child{border-bottom:none}
+.sub-result-emoji-box{
+  width:42px;height:42px;border-radius:var(--r-sm);
+  background:var(--surface2);display:flex;align-items:center;justify-content:center;
+  font-size:22px;flex-shrink:0;
 }
-.sub-empty{text-align:center;padding:48px 24px}
-.sub-empty-icon{font-size:52px;margin-bottom:12px}
-.sub-empty-title{font-size:17px;font-weight:800;color:var(--text)}
-.sub-empty-sub{font-size:13px;color:var(--text2);margin-top:8px;line-height:1.5}
+.sub-result-info{flex:1;min-width:0}
+.sub-result-name{font-size:14px;font-weight:700;color:var(--text)}
+.sub-result-sub{font-size:12px;color:var(--text2);margin-top:2px}
+.sub-result-qty{font-size:18px;font-weight:900;letter-spacing:-.4px;white-space:nowrap}
+.sub-no-results{text-align:center;padding:32px 20px;color:var(--text2);font-size:14px}
 
 /* ── Bottom Tab Bar ── */
 .tab-bar{
@@ -1155,6 +1200,7 @@ body{
 
 <!-- ══ SUBSTITUTIONS SCREEN ══ -->
 <div id="screen-sub" style="display:none">
+  <!-- Sticky header + search -->
   <div class="sub-header">
     <div class="sub-header-title">🔄 Substituições</div>
     <div class="sub-header-sub">Encontre equivalentes calóricos</div>
@@ -1162,37 +1208,41 @@ body{
       <div class="sub-search-bar">
         <span class="sub-search-icon">🔍</span>
         <input class="sub-search-input" id="sub-search-input" type="text"
-          placeholder="Buscar alimento..." oninput="filterSubFoods()" autocomplete="off">
+          placeholder="o que você quer trocar? (arroz, frango…)" oninput="filterSubFoods()" autocomplete="off">
       </div>
     </div>
   </div>
+  <!-- Autocomplete -->
   <div class="sub-autocomplete" id="sub-autocomplete"></div>
-  <div class="sub-selected-wrap" id="sub-selected-wrap">
-    <div class="sub-selected-chip">
-      <div class="sub-chip-food">
-        <div class="sub-chip-emoji" id="sub-chip-emoji"></div>
-        <div class="sub-chip-info">
-          <div class="sub-chip-name" id="sub-chip-name"></div>
-          <div class="sub-chip-kcal" id="sub-chip-kcal"></div>
-        </div>
-        <button class="sub-chip-clear" onclick="clearSubFood()">×</button>
-      </div>
-      <div class="sub-qty-row">
-        <span class="sub-qty-label">Qtd</span>
-        <input class="sub-qty-input" id="sub-qty-input" type="number" value="100" min="1" max="9999" oninput="calcAndRenderSubs()">
-        <div class="sub-unit-seg" id="sub-unit-seg"></div>
-        <button class="sub-calc-btn" onclick="calcAndRenderSubs()">Calcular</button>
+  <!-- LANDING: browse by category -->
+  <div id="sub-landing">
+    <div class="sub-cats-strip" id="sub-cats-strip"></div>
+    <div class="sub-food-count" id="sub-food-count"></div>
+    <div class="sub-food-list-wrap" id="sub-food-list-wrap"></div>
+  </div>
+  <!-- DETAIL: food selected -->
+  <div id="sub-detail" style="display:none">
+    <div class="sub-detail-top">
+      <button class="sub-back-btn" onclick="clearSubFood()">‹</button>
+      <div class="sub-detail-emoji" id="sub-detail-emoji"></div>
+      <div class="sub-detail-info">
+        <div class="sub-detail-name" id="sub-detail-name"></div>
+        <div class="sub-detail-badge" id="sub-detail-badge"></div>
       </div>
     </div>
-  </div>
-  <div class="sub-results-wrap" id="sub-results-wrap" style="display:none">
-    <div class="sub-results-title">Substituições equivalentes</div>
-    <div id="sub-results-list"></div>
-  </div>
-  <div class="sub-empty" id="sub-empty">
-    <div class="sub-empty-icon">🔄</div>
-    <div class="sub-empty-title">Substituições Alimentares</div>
-    <div class="sub-empty-sub">Busque um alimento e descubra opções equivalentes da mesma categoria com calorias similares.</div>
+    <div class="sub-qty-card">
+      <div class="sub-qty-card-label">quanto tem na sua dieta?</div>
+      <div class="sub-qty-card-row">
+        <input class="sub-qty-main-input" id="sub-qty-input" type="number" value="100" min="1" max="9999" oninput="calcAndRenderSubs()">
+        <div class="sub-qty-unit-seg" id="sub-qty-unit-seg"></div>
+        <div class="sub-qty-kcal-display" id="sub-qty-kcal-display">≈ 0 kcal</div>
+      </div>
+    </div>
+    <div class="sub-list-section">
+      <div class="sub-list-hint">você pode trocar por · mesma quantidade calórica</div>
+      <div class="sub-sort-row" id="sub-sort-row"></div>
+    </div>
+    <div class="sub-result-list-wrap" id="sub-result-list-wrap"></div>
   </div>
 </div>
 
@@ -2463,22 +2513,47 @@ function confirmVoiceItems(){
 }
 
 // ── Substitution Screen ────────────────────────────────
-let subSelectedFood=null,subUnit='g';
-const SUB_CAT_GROUPS={
-  'Cereais':['Cereais'],
-  'Proteínas':['Proteínas','Suplementos'],
-  'Laticínios':['Laticínios','Proteínas'],
-  'Suplementos':['Suplementos','Proteínas'],
-  'Gorduras':['Gorduras'],
-  'Frutas':['Frutas'],
-  'Verduras':['Verduras'],
-  'Extras':['Extras'],
-};
-const SUB_COLORS={
+let subSelectedFood=null,subUnit='g',subSort='padrao',subActiveCat='carb';
+const SUB_CATS=[
+  {id:'carb',  label:'carboidratos',emoji:'🌾',cats:['Cereais']},
+  {id:'prot',  label:'proteínas',   emoji:'🍗',cats:['Proteínas','Suplementos','Laticínios']},
+  {id:'fat',   label:'gorduras',    emoji:'🥑',cats:['Gorduras']},
+  {id:'fruit', label:'frutas',      emoji:'🍎',cats:['Frutas']},
+  {id:'veg',   label:'vegetais',    emoji:'🥦',cats:['Verduras']},
+];
+const SUB_CAT_COLORS={
   'Cereais':'#F59E0B','Proteínas':'#EF4444','Laticínios':'#3B82F6',
-  'Suplementos':'#8B5CF6','Gorduras':'#F97316','Frutas':'#34D399',
+  'Suplementos':'#8B5CF6','Gorduras':'#F97316','Frutas':'#F43F5E',
   'Verduras':'#10B981','Extras':'#6B7280',
 };
+function initSubLanding(){
+  const strip=document.getElementById('sub-cats-strip');
+  strip.innerHTML=SUB_CATS.map(c=>`
+    <button class="sub-cat-chip${c.id===subActiveCat?' active':''}" onclick="setSubCat('${c.id}')">
+      ${c.emoji} ${c.label}
+    </button>`).join('');
+  renderSubFoodList();
+}
+function setSubCat(id){
+  subActiveCat=id;
+  document.querySelectorAll('.sub-cat-chip').forEach(b=>b.classList.toggle('active',b.dataset.id===id||b.textContent.trim().includes(SUB_CATS.find(c=>c.id===id).label)));
+  renderSubFoodList();
+}
+function renderSubFoodList(){
+  const cat=SUB_CATS.find(c=>c.id===subActiveCat);
+  if(!cat)return;
+  const foods=FOODS.filter(f=>cat.cats.includes(f.cat));
+  document.getElementById('sub-food-count').textContent=`${foods.length} alimentos`;
+  document.getElementById('sub-food-list-wrap').innerHTML=foods.map(f=>`
+    <div class="sub-food-row" onclick="selectSubFood('${f.id}')">
+      <div class="sub-food-row-emoji">${f.emoji}</div>
+      <div class="sub-food-row-info">
+        <div class="sub-food-row-name">${f.name}</div>
+        <div class="sub-food-row-meta">${f.kcal} kcal · P:${f.prot}g C:${f.carb}g G:${f.fat}g · por 100${f.unit}</div>
+      </div>
+      <div class="sub-food-row-arr">›</div>
+    </div>`).join('');
+}
 function filterSubFoods(){
   const q=document.getElementById('sub-search-input').value.trim();
   const ac=document.getElementById('sub-autocomplete');
@@ -2486,7 +2561,7 @@ function filterSubFoods(){
   const results=searchLocalFoods(q).slice(0,8);
   if(!results.length){ac.style.display='none';return;}
   ac.innerHTML=results.map(f=>`
-    <div class="sub-autocomplete-item" onclick="selectSubFood('${f.id}')">
+    <div class="sub-ac-item" onclick="selectSubFood('${f.id}')">
       <div class="sub-ac-emoji">${f.emoji}</div>
       <div class="sub-ac-info">
         <div class="sub-ac-name">${f.name}</div>
@@ -2498,30 +2573,45 @@ function filterSubFoods(){
 function selectSubFood(id){
   const f=FOODS.find(x=>x.id===id);
   if(!f)return;
-  subSelectedFood=f;
+  subSelectedFood=f;subSort='padrao';
   subUnit=f.unit==='unid'?'unid':'g';
   document.getElementById('sub-search-input').value='';
   document.getElementById('sub-autocomplete').style.display='none';
-  document.getElementById('sub-chip-emoji').textContent=f.emoji;
-  document.getElementById('sub-chip-name').textContent=f.name;
-  document.getElementById('sub-chip-kcal').textContent=`${f.kcal} kcal · P:${f.prot}g C:${f.carb}g G:${f.fat}g · por 100${f.unit}`;
+  document.getElementById('sub-landing').style.display='none';
+  // populate detail header
+  const color=SUB_CAT_COLORS[f.cat]||'var(--accent)';
+  document.getElementById('sub-detail-emoji').textContent=f.emoji;
+  document.getElementById('sub-detail-name').textContent=f.name;
+  const badge=document.getElementById('sub-detail-badge');
+  badge.textContent=`${f.kcal} kcal · ${f.cat.toLowerCase()}`;
+  badge.style.background=color;
+  // unit buttons
   const units=f.unit==='unid'?['unid']:['g','kg'];
-  document.getElementById('sub-unit-seg').innerHTML=units.map(u=>`<button class="sub-unit-btn${u===subUnit?' active':''}" onclick="setSubUnit('${u}')">${u}</button>`).join('');
+  document.getElementById('sub-qty-unit-seg').innerHTML=units.map(u=>`<button class="sub-qty-unit-btn${u===subUnit?' active':''}" onclick="setSubUnit('${u}')">${u}</button>`).join('');
   document.getElementById('sub-qty-input').value=f.unit==='unid'?'1':'100';
-  document.getElementById('sub-selected-wrap').style.display='block';
-  document.getElementById('sub-empty').style.display='none';
+  // sort buttons
+  document.getElementById('sub-sort-row').innerHTML=
+    [['padrao','padrão'],['az','a → z'],['menor','menor g'],['maior','maior g']].map(([v,l])=>
+    `<button class="sub-sort-btn${v===subSort?' active':''}" onclick="setSubSort('${v}')">${l}</button>`).join('');
+  document.getElementById('sub-detail').style.display='block';
   calcAndRenderSubs();
 }
 function clearSubFood(){
   subSelectedFood=null;
-  document.getElementById('sub-selected-wrap').style.display='none';
-  document.getElementById('sub-results-wrap').style.display='none';
-  document.getElementById('sub-empty').style.display='block';
-  document.getElementById('sub-search-input').value='';
+  document.getElementById('sub-detail').style.display='none';
+  document.getElementById('sub-landing').style.display='block';
 }
 function setSubUnit(u){
   subUnit=u;
-  document.querySelectorAll('.sub-unit-btn').forEach(b=>b.classList.toggle('active',b.textContent===u));
+  document.querySelectorAll('.sub-qty-unit-btn').forEach(b=>b.classList.toggle('active',b.textContent===u));
+  calcAndRenderSubs();
+}
+function setSubSort(s){
+  subSort=s;
+  document.querySelectorAll('.sub-sort-btn').forEach(b=>b.classList.toggle('active',b.textContent===(['padrao','padrão','az','a → z','menor','menor g','maior','maior g'].filter((_,i)=>i%2===0).indexOf(s)>=0?b.textContent:null)));
+  document.getElementById('sub-sort-row').innerHTML=
+    [['padrao','padrão'],['az','a → z'],['menor','menor g'],['maior','maior g']].map(([v,l])=>
+    `<button class="sub-sort-btn${v===s?' active':''}" onclick="setSubSort('${v}')">${l}</button>`).join('');
   calcAndRenderSubs();
 }
 function calcAndRenderSubs(){
@@ -2531,43 +2621,39 @@ function calcAndRenderSubs(){
   let totalKcal,qtyFactor;
   if(f.unit==='unid'){qtyFactor=qty;totalKcal=f.kcal*qty;}
   else{qtyFactor=(subUnit==='kg'?qty*1000:qty)/100;totalKcal=f.kcal*qtyFactor;}
+  document.getElementById('sub-qty-kcal-display').textContent=`≈ ${Math.round(totalKcal)} kcal`;
   if(totalKcal<=0)return;
-  const origProt=f.prot*qtyFactor,origCarb=f.carb*qtyFactor,origFat=f.fat*qtyFactor;
-  const origProtE=origProt*4,origCarbE=origCarb*4,origFatE=origFat*9;
-  const catGroup=SUB_CAT_GROUPS[f.cat]||[f.cat];
-  const candidates=FOODS.filter(c=>c.id!==f.id&&catGroup.includes(c.cat)&&c.kcal>0);
-  const results=candidates.map(c=>{
-    let equivQty;
-    if(c.unit==='unid'){equivQty=+(totalKcal/c.kcal).toFixed(1);}
-    else{equivQty=Math.round((totalKcal/c.kcal)*100);}
-    const cFactor=c.unit==='unid'?equivQty:equivQty/100;
-    const cProt=+(c.prot*cFactor).toFixed(1);
-    const cCarb=+(c.carb*cFactor).toFixed(1);
-    const cFat=+(c.fat*cFactor).toFixed(1);
-    const cKcal=Math.round(c.kcal*cFactor);
-    const diffProt=Math.abs(origProtE-(cProt*4)),diffCarb=Math.abs(origCarbE-(cCarb*4)),diffFat=Math.abs(origFatE-(cFat*9));
+  const catDef=SUB_CATS.find(c=>c.cats.includes(f.cat));
+  const groupCats=catDef?catDef.cats:[f.cat];
+  const candidates=FOODS.filter(c=>c.id!==f.id&&groupCats.includes(c.cat)&&c.kcal>0);
+  const origProtE=(f.prot*qtyFactor)*4,origCarbE=(f.carb*qtyFactor)*4,origFatE=(f.fat*qtyFactor)*9;
+  let results=candidates.map(c=>{
+    const equivQty=c.unit==='unid'?+(totalKcal/c.kcal).toFixed(1):Math.round((totalKcal/c.kcal)*100);
+    const cf=c.unit==='unid'?equivQty:equivQty/100;
+    const cProt=+(c.prot*cf).toFixed(1),cCarb=+(c.carb*cf).toFixed(1),cFat=+(c.fat*cf).toFixed(1);
+    const cKcal=Math.round(c.kcal*cf);
     const totalE=origProtE+origCarbE+origFatE||1;
-    const macroScore=Math.max(0,100-((diffProt*2+diffCarb+diffFat*1.5)/totalE*100));
-    const match=Math.round(macroScore);
+    const diff=(Math.abs(origProtE-cProt*4)*2+Math.abs(origCarbE-cCarb*4)+Math.abs(origFatE-cFat*9)*1.5)/totalE*100;
+    const match=Math.max(0,Math.round(100-diff/3));
     return{c,equivQty,cProt,cCarb,cFat,cKcal,match};
-  }).sort((a,b)=>b.match-a.match).slice(0,12);
-  const color=SUB_COLORS[f.cat]||'var(--accent)';
-  document.getElementById('sub-results-list').innerHTML=results.length
-    ?results.map(r=>subCardHTML(r,color)).join('')
-    :`<div class="sub-empty"><div class="sub-empty-icon">🤷</div><div class="sub-empty-title">Sem substituições</div><div class="sub-empty-sub">Não encontramos outros alimentos nesta categoria.</div></div>`;
-  document.getElementById('sub-results-wrap').style.display='block';
-}
-function subCardHTML({c,equivQty,cProt,cCarb,cFat,cKcal,match},color){
-  const unitLabel=c.unit==='unid'?`${equivQty} unid`:`${equivQty}g`;
-  return`<div class="sub-card" style="--sub-color:${color}">
-    <div class="sub-card-emoji">${c.emoji}</div>
-    <div class="sub-card-info">
-      <div class="sub-card-name">${c.name}</div>
-      <div class="sub-card-qty">${unitLabel}</div>
-      <div class="sub-card-macros">P:${cProt}g · C:${cCarb}g · G:${cFat}g · ${cKcal} kcal</div>
-    </div>
-    <div class="sub-match-badge">${match}%</div>
-  </div>`;
+  });
+  if(subSort==='padrao')results.sort((a,b)=>b.match-a.match);
+  else if(subSort==='az')results.sort((a,b)=>a.c.name.localeCompare(b.c.name,'pt'));
+  else if(subSort==='menor')results.sort((a,b)=>a.equivQty-b.equivQty);
+  else if(subSort==='maior')results.sort((a,b)=>b.equivQty-a.equivQty);
+  results=results.slice(0,15);
+  const color=SUB_CAT_COLORS[f.cat]||'var(--accent)';
+  document.getElementById('sub-result-list-wrap').innerHTML=results.length
+    ?results.map(r=>`
+      <div class="sub-result-row">
+        <div class="sub-result-emoji-box">${r.c.emoji}</div>
+        <div class="sub-result-info">
+          <div class="sub-result-name">${r.c.name}</div>
+          <div class="sub-result-sub">P:${r.cProt}g · C:${r.cCarb}g · G:${r.cFat}g</div>
+        </div>
+        <div class="sub-result-qty" style="color:${color}">${r.c.unit==='unid'?r.equivQty+' un':r.equivQty+'g'}</div>
+      </div>`).join('')
+    :`<div class="sub-no-results">Nenhuma substituição encontrada nesta categoria.</div>`;
 }
 
 // ── Sidebar + navigation ───────────────────────────────
@@ -2591,6 +2677,7 @@ function showScreen(name){
   closeSidebar();
   if(name==='diet'){dietDate=today2();renderDiet();}
   if(name==='habits')render();
+  if(name==='sub')initSubLanding();
 }
 
 // ── Theme ──────────────────────────────────────────────
