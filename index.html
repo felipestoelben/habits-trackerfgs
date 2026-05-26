@@ -93,10 +93,11 @@ body{
     flex-direction:row;
   }
   #sidebar{
-    position:static;transform:none!important;
-    width:240px;flex-shrink:0;height:100%;z-index:1;
-    box-shadow:none;border-right:1px solid var(--sep);
-    padding-top:24px;transition:none;
+    position:static!important;transform:none!important;
+    width:240px!important;flex-shrink:0!important;height:100%!important;z-index:1!important;
+    box-shadow:none!important;border-right:1px solid var(--sep)!important;
+    padding-top:24px!important;transition:none!important;
+    left:auto!important;top:auto!important;bottom:auto!important;
   }
   #sidebar-backdrop{display:none!important}
   .sidebar-toggle{display:none!important}
@@ -110,6 +111,8 @@ body{
   .sub-food-list-wrap,.sub-result-list-wrap{max-width:640px;width:calc(100% - 32px)}
   .sub-autocomplete{max-width:640px;margin:0 auto 4px}
   .sub-food-count{max-width:640px;margin:0 auto}
+  .content-area{overflow:hidden;display:flex;flex-direction:column}
+  #screen-habits,#screen-diet,#screen-sub{flex:1;overflow-y:auto}
   .header-greeting{font-size:30px}
   .diet-header-title{font-size:26px}
   .sub-header-title{font-size:26px}
