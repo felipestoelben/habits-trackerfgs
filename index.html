@@ -915,7 +915,7 @@ body{
 /* ── SUBSTITUTION SCREEN ── */
 #screen-sub{
   flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
-  overscroll-behavior-y:contain;padding-bottom:32px;display:none;
+  overscroll-behavior-y:contain;padding-bottom:32px;
 }
 .sub-header{
   padding:calc(max(env(safe-area-inset-top,0px),20px) + 10px) 16px 12px;
@@ -1154,7 +1154,7 @@ body{
 </div>
 
 <!-- ══ SUBSTITUTIONS SCREEN ══ -->
-<div id="screen-sub">
+<div id="screen-sub" style="display:none">
   <div class="sub-header">
     <div class="sub-header-title">🔄 Substituições</div>
     <div class="sub-header-sub">Encontre equivalentes calóricos</div>
