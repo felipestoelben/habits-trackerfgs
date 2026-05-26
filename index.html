@@ -587,17 +587,28 @@ body{
   display:none;flex-direction:column;
 }
 #barcode-overlay.open{display:flex}
-.barcode-hdr{
-  padding:calc(env(safe-area-inset-top,0px)+14px) 16px 12px;
-  display:flex;align-items:center;gap:12px;
-  background:rgba(0,0,0,.6);position:absolute;top:0;left:0;right:0;z-index:10;
-}
-.barcode-hdr-back{
-  width:36px;height:36px;border-radius:50%;border:none;
-  background:rgba(255,255,255,.15);color:#fff;font-size:18px;cursor:pointer;
+.barcode-close-btn{
+  position:absolute;
+  top:calc(env(safe-area-inset-top,0px)+14px);
+  left:16px;
+  z-index:30;
+  width:44px;height:44px;border-radius:50%;border:none;
+  background:rgba(0,0,0,.55);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  color:#fff;font-size:20px;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 12px rgba(0,0,0,.4);
 }
-.barcode-hdr-title{color:#fff;font-size:17px;font-weight:700}
+.barcode-close-btn:active{opacity:.7;transform:scale(.9)}
+.barcode-hdr-title-fixed{
+  position:absolute;
+  top:calc(env(safe-area-inset-top,0px)+22px);
+  left:0;right:0;
+  z-index:29;
+  text-align:center;color:#fff;font-size:16px;font-weight:700;
+  pointer-events:none;
+  text-shadow:0 1px 6px rgba(0,0,0,.6);
+}
 #barcode-video{width:100%;height:100%;object-fit:cover;display:block}
 .barcode-aim-wrap{
   position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
@@ -1184,11 +1195,9 @@ body{
 
 <!-- ══ BARCODE SCANNER ══ -->
 <div id="barcode-overlay">
-  <div class="barcode-hdr">
-    <button class="barcode-hdr-back" onclick="closeBarcodeScanner()">‹</button>
-    <div class="barcode-hdr-title">Ler código de barras</div>
-  </div>
   <video id="barcode-video" autoplay playsinline muted></video>
+  <button class="barcode-close-btn" onclick="closeBarcodeScanner()">✕</button>
+  <div class="barcode-hdr-title-fixed">Ler código de barras</div>
   <div class="barcode-aim-wrap">
     <div class="barcode-aim">
       <div class="barcode-laser"></div>
