@@ -1661,6 +1661,16 @@ const FOODS=[
   {id:'pao_q',      name:'Pão de queijo',             emoji:'🧆',cat:'Cereais',kcal:323,prot:6.5,carb:52.0,fat:10.0,unit:'g',src:'taco'},
   {id:'biscoito_a', name:'Biscoito água e sal',       emoji:'🫙',cat:'Cereais',kcal:421,prot:9.0,carb:70.0,fat:12.0,unit:'g',src:'taco'},
   {id:'trigo_q',    name:'Trigo para quibe',          emoji:'🌾',cat:'Cereais',kcal:342,prot:11.5,carb:72.0,fat:1.9,unit:'g',src:'taco'},
+  // Versões cruas de cereais
+  {id:'arroz_b_cru',name:'Arroz branco cru',           emoji:'🍚',cat:'Cereais',kcal:362,prot:6.8,carb:79.0,fat:0.6,unit:'g',src:'taco'},
+  {id:'arroz_i_cru',name:'Arroz integral cru',          emoji:'🍚',cat:'Cereais',kcal:360,prot:7.8,carb:77.0,fat:2.7,unit:'g',src:'taco'},
+  {id:'feijao_cru', name:'Feijão preto cru',            emoji:'🫘',cat:'Cereais',kcal:324,prot:21.3,carb:59.2,fat:1.3,unit:'g',src:'taco'},
+  {id:'feijao_c_cru',name:'Feijão carioca cru',         emoji:'🫘',cat:'Cereais',kcal:337,prot:22.1,carb:61.0,fat:1.2,unit:'g',src:'taco'},
+  {id:'batata_cru', name:'Batata inglesa crua',          emoji:'🥔',cat:'Cereais',kcal:58, prot:1.7,carb:13.0,fat:0.1,unit:'g',src:'taco'},
+  {id:'batata_d_cru',name:'Batata doce crua',            emoji:'🍠',cat:'Cereais',kcal:97, prot:1.3,carb:22.5,fat:0.1,unit:'g',src:'taco'},
+  {id:'mandioca_cru',name:'Mandioca crua',               emoji:'🟡',cat:'Cereais',kcal:147,prot:0.7,carb:34.0,fat:0.3,unit:'g',src:'taco'},
+  {id:'macarrao_cru',name:'Macarrão cru (massa seca)',   emoji:'🍝',cat:'Cereais',kcal:358,prot:13.0,carb:72.0,fat:1.8,unit:'g',src:'taco'},
+  {id:'aveia_cru',  name:'Aveia em flocos (cru)',        emoji:'🌾',cat:'Cereais',kcal:394,prot:13.9,carb:66.6,fat:8.5,unit:'g',src:'taco'},
   // ── Proteínas ────────────────────────────────────────────────
   {id:'frango_p',     name:'Frango peito grelhado',        emoji:'🍗',cat:'Proteínas',kcal:159,prot:32.0,carb:0.0,fat:3.0, unit:'g',src:'taco'},
   {id:'frango_p_cru', name:'Frango peito cru',             emoji:'🍗',cat:'Proteínas',kcal:119,prot:22.8,carb:0.0,fat:3.0, unit:'g',src:'taco'},
@@ -1700,6 +1710,24 @@ const FOODS=[
   {id:'peito_peru',   name:'Peito de peru',                 emoji:'🦃',cat:'Proteínas',kcal:108,prot:18.9,carb:0.5,fat:3.3, unit:'g',src:'taco'},
   {id:'presunto',     name:'Presunto cozido',               emoji:'🥓',cat:'Proteínas',kcal:117,prot:16.0,carb:2.0,fat:5.2, unit:'g',src:'taco'},
   {id:'bacon',        name:'Bacon grelhado',                emoji:'🥓',cat:'Proteínas',kcal:541,prot:14.6,carb:1.5,fat:52.0,unit:'g',src:'taco'},
+  // Cortes bovinos adicionais
+  {id:'coxao_m_cru',  name:'Coxão mole cru',               emoji:'🥩',cat:'Proteínas',kcal:109,prot:21.4,carb:0.0,fat:2.5, unit:'g',src:'taco'},
+  {id:'coxao_m_gre',  name:'Coxão mole grelhado',          emoji:'🥩',cat:'Proteínas',kcal:186,prot:29.0,carb:0.0,fat:7.5, unit:'g',src:'taco'},
+  {id:'coxao_d_cru',  name:'Coxão duro cru',               emoji:'🥩',cat:'Proteínas',kcal:112,prot:21.0,carb:0.0,fat:2.9, unit:'g',src:'taco'},
+  {id:'acem_cru',     name:'Acém cru',                      emoji:'🥩',cat:'Proteínas',kcal:145,prot:19.0,carb:0.0,fat:7.5, unit:'g',src:'taco'},
+  {id:'acem_coz',     name:'Acém cozido',                   emoji:'🥩',cat:'Proteínas',kcal:228,prot:27.5,carb:0.0,fat:12.5,unit:'g',src:'taco'},
+  {id:'picanha_cru',  name:'Picanha crua',                  emoji:'🥩',cat:'Proteínas',kcal:203,prot:18.5,carb:0.0,fat:14.0,unit:'g',src:'taco'},
+  {id:'picanha_gre',  name:'Picanha grelhada',              emoji:'🥩',cat:'Proteínas',kcal:280,prot:24.0,carb:0.0,fat:20.0,unit:'g',src:'taco'},
+  {id:'costela_coz',  name:'Costela bovina cozida',         emoji:'🥩',cat:'Proteínas',kcal:260,prot:22.0,carb:0.0,fat:18.5,unit:'g',src:'taco'},
+  {id:'musculo_cru',  name:'Músculo cru',                   emoji:'🥩',cat:'Proteínas',kcal:106,prot:20.8,carb:0.0,fat:2.3, unit:'g',src:'taco'},
+  {id:'musculo_coz',  name:'Músculo cozido',                emoji:'🥩',cat:'Proteínas',kcal:194,prot:30.0,carb:0.0,fat:7.7, unit:'g',src:'taco'},
+  {id:'file_mignon_cru',name:'Filé mignon cru',             emoji:'🥩',cat:'Proteínas',kcal:120,prot:21.5,carb:0.0,fat:3.6, unit:'g',src:'taco'},
+  {id:'file_mignon_gre',name:'Filé mignon grelhado',        emoji:'🥩',cat:'Proteínas',kcal:191,prot:30.0,carb:0.0,fat:7.5, unit:'g',src:'taco'},
+  // Frango adicional
+  {id:'sobrecoxa_cru',name:'Sobrecoxa crua',                emoji:'🍗',cat:'Proteínas',kcal:169,prot:17.5,carb:0.0,fat:11.0,unit:'g',src:'taco'},
+  {id:'sobrecoxa_gre',name:'Sobrecoxa grelhada',            emoji:'🍗',cat:'Proteínas',kcal:232,prot:24.0,carb:0.0,fat:15.0,unit:'g',src:'taco'},
+  {id:'frango_inteiro',name:'Frango inteiro cru',            emoji:'🍗',cat:'Proteínas',kcal:162,prot:17.6,carb:0.0,fat:10.2,unit:'g',src:'taco'},
+  {id:'frango_ass',   name:'Frango assado',                  emoji:'🍗',cat:'Proteínas',kcal:207,prot:28.0,carb:0.0,fat:10.5,unit:'g',src:'taco'},
   // ── Laticínios ───────────────────────────────────────────────
   {id:'leite_i',    name:'Leite integral',             emoji:'🥛',cat:'Laticínios',kcal:61, prot:3.2,carb:4.8,fat:3.3,unit:'ml',src:'taco'},
   {id:'leite_d',    name:'Leite desnatado',            emoji:'🥛',cat:'Laticínios',kcal:36, prot:3.4,carb:5.0,fat:0.1,unit:'ml',src:'taco'},
@@ -1748,11 +1776,18 @@ const FOODS=[
   {id:'amendoa',    name:'Amêndoa',                    emoji:'🥜',cat:'Gorduras',kcal:579,prot:21.0,carb:22.0,fat:50.0,unit:'g',src:'taco'},
   {id:'far_am',     name:'Farinha de amêndoa',         emoji:'🥜',cat:'Gorduras',kcal:600,prot:21.0,carb:22.0,fat:54.0,unit:'g',src:'taco'},
   // ── Frutas ───────────────────────────────────────────────────
-  {id:'banana',     name:'Banana',                     emoji:'🍌',cat:'Frutas',kcal:89, prot:1.1,carb:23.0,fat:0.3,unit:'g',src:'taco'},
-  {id:'maca',       name:'Maçã',                       emoji:'🍎',cat:'Frutas',kcal:52, prot:0.3,carb:14.0,fat:0.2,unit:'g',src:'taco'},
-  {id:'laranja',    name:'Laranja',                    emoji:'🍊',cat:'Frutas',kcal:47, prot:0.9,carb:12.0,fat:0.1,unit:'g',src:'taco'},
-  {id:'manga',      name:'Manga',                      emoji:'🥭',cat:'Frutas',kcal:60, prot:0.8,carb:15.0,fat:0.4,unit:'g',src:'taco'},
-  {id:'mamao',      name:'Mamão papaia',               emoji:'🍈',cat:'Frutas',kcal:43, prot:0.5,carb:11.0,fat:0.1,unit:'g',src:'taco'},
+  {id:'banana_p',   name:'Banana prata',               emoji:'🍌',cat:'Frutas',kcal:98, prot:1.3,carb:26.0,fat:0.1,unit:'g',src:'taco'},
+  {id:'banana_n',   name:'Banana nanica',              emoji:'🍌',cat:'Frutas',kcal:92, prot:1.2,carb:23.8,fat:0.1,unit:'g',src:'taco'},
+  {id:'banana_m',   name:'Banana maçã',                emoji:'🍌',cat:'Frutas',kcal:87, prot:1.1,carb:22.4,fat:0.1,unit:'g',src:'taco'},
+  {id:'banana',     name:'Banana (média)',              emoji:'🍌',cat:'Frutas',kcal:89, prot:1.1,carb:23.0,fat:0.3,unit:'g',src:'taco'},
+  {id:'maca',       name:'Maçã fuji',                  emoji:'🍎',cat:'Frutas',kcal:56, prot:0.3,carb:15.0,fat:0.2,unit:'g',src:'taco'},
+  {id:'maca_v',     name:'Maçã verde',                 emoji:'🍏',cat:'Frutas',kcal:52, prot:0.3,carb:13.8,fat:0.2,unit:'g',src:'taco'},
+  {id:'laranja',    name:'Laranja pera',               emoji:'🍊',cat:'Frutas',kcal:47, prot:0.9,carb:12.0,fat:0.1,unit:'g',src:'taco'},
+  {id:'laranja_b',  name:'Laranja baía',               emoji:'🍊',cat:'Frutas',kcal:43, prot:0.8,carb:11.0,fat:0.1,unit:'g',src:'taco'},
+  {id:'manga',      name:'Manga tommy',                emoji:'🥭',cat:'Frutas',kcal:60, prot:0.8,carb:15.0,fat:0.4,unit:'g',src:'taco'},
+  {id:'manga_p',    name:'Manga palmer',               emoji:'🥭',cat:'Frutas',kcal:56, prot:0.5,carb:14.5,fat:0.3,unit:'g',src:'taco'},
+  {id:'mamao',      name:'Mamão papaya',               emoji:'🍈',cat:'Frutas',kcal:43, prot:0.5,carb:11.0,fat:0.1,unit:'g',src:'taco'},
+  {id:'mamao_f',    name:'Mamão formosa',              emoji:'🍈',cat:'Frutas',kcal:38, prot:0.5,carb:9.5,fat:0.1, unit:'g',src:'taco'},
   {id:'morango',    name:'Morango',                    emoji:'🍓',cat:'Frutas',kcal:32, prot:0.7,carb:7.7,fat:0.3,unit:'g',src:'taco'},
   {id:'uva',        name:'Uva',                        emoji:'🍇',cat:'Frutas',kcal:69, prot:0.7,carb:18.0,fat:0.2,unit:'g',src:'taco'},
   {id:'melancia',   name:'Melancia',                   emoji:'🍉',cat:'Frutas',kcal:30, prot:0.6,carb:7.6,fat:0.2,unit:'g',src:'taco'},
@@ -2129,60 +2164,105 @@ function deleteMealConfig(id){
 }
 
 // ── Food search utilities ───────────────────────────────
-// Normaliza string: remove acentos, lowercase, trim
 function normStr(s){
   return(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim();
 }
-// Score de similaridade por bigramas (0-1)
 function bigramSim(a,b){
   const bg=s=>{const m=new Set();for(let i=0;i<s.length-1;i++)m.add(s.slice(i,i+2));return m;};
-  const ba=bg(a),bb=bg(b);
-  if(!ba.size||!bb.size)return 0;
-  const inter=[...ba].filter(x=>bb.has(x)).length;
-  return(2*inter)/(ba.size+bb.size);
+  const ba=bg(a),bb=bg(b);if(!ba.size||!bb.size)return 0;
+  return(2*[...ba].filter(x=>bb.has(x)).length)/(ba.size+bb.size);
 }
-// Dicionário de marcas brasileiras de suplementos → aliases para busca
+
+// Dicionário de sinônimos para busca inteligente (chave → palavras extras para match)
+const FOOD_SYNONYMS={
+  'carne':      ['patinho','alcatra','lagarto','fraldinha','maminha','contrafile','coxao','acem','picanha','musculo','file mignon','bovina'],
+  'carne crua': ['patinho cru','alcatra crua','coxao mole cru','acem cru','patinho moido cru'],
+  'carne moida':['patinho moido','moida patinho'],
+  'frango':     ['peito','coxa','sobrecoxa','file','ave'],
+  'peixe':      ['tilapia','salmon','salmao','atum','sardinha','camarao','bacalhau'],
+  'batata':     ['batata inglesa','batata doce'],
+  'banana':     ['banana prata','banana nanica','banana maca'],
+  'mamao':      ['mamao papaya','mamao formosa','papaya'],
+  'manga':      ['manga tommy','manga palmer'],
+  'laranja':    ['laranja pera','laranja baia'],
+  'maca':       ['maca fuji','maca verde'],
+  'arroz':      ['arroz branco','arroz integral'],
+  'feijao':     ['feijao preto','feijao carioca','feijao mulatinho'],
+  'leite':      ['leite integral','leite desnatado','leite semidesnatado'],
+  'queijo':     ['queijo mussarela','queijo cottage','queijo parmesao','queijo minas','queijo prato','requeijao'],
+  'iogurte':    ['iogurte grego','iogurte natural'],
+  'suplemento': ['whey','creatina','caseina','albumina','bcaa','colageno'],
+  'whey':       ['whey protein','whey concentrado','whey isolado'],
+  'macarrao':   ['macarrao','massa'],
+  'azeite':     ['azeite oliva','oleo'],
+  'coxao':      ['coxao mole','coxao duro'],
+};
+
+// Marcas brasileiras de suplementos
 const BR_BRAND_ALIASES={
-  'growth':['growth suplementos','growth supplements'],
-  'integralmedica':['integralmedica','integralmédica'],
-  'max titanium':['max titanium'],
-  'probiotica':['probiotica','probiótica'],
-  'darkness':['darkness'],
-  'black skull':['black skull'],
-  'vitafor':['vitafor'],
-  'nutrata':['nutrata'],
+  'growth':['growth suplementos'],'integralmedica':['integralmédica'],
+  'max titanium':['max titanium'],'probiotica':['probiotica'],
+  'darkness':['darkness'],'black skull':['black skull'],
+  'vitafor':['vitafor'],'nutrata':['nutrata'],
   'optimum':['optimum nutrition','gold standard'],
-  'universal':['universal nutrition'],
-  'muscletech':['muscletech'],
 };
 
 function searchLocalFoods(q){
   if(!q.trim())return[];
   const nq=normStr(q);
   const words=nq.split(/\s+/).filter(w=>w.length>=2);
+  const hasCru=nq.includes('cru')||nq.includes('crua')||nq.includes('in natura')||nq.includes('cru');
+
+  // Expande query com sinônimos
+  const extraWords=new Set();
+  for(const[key,vals]of Object.entries(FOOD_SYNONYMS)){
+    if(nq.includes(normStr(key)))vals.forEach(v=>normStr(v).split(' ').forEach(w=>extraWords.add(w)));
+  }
+
   return FOODS.map(f=>{
     const nn=normStr(f.name),nc=normStr(f.cat);
+    const isBR=(f.src==='taco'||f.src==='br');
+    const isCru=nn.includes('cru')||nn.includes('crua')||nn.includes('in natura');
     let score=0;
-    // match exato da query completa no nome → maior peso
-    if(nn===nq)score+=20;
-    else if(nn.includes(nq))score+=12;
-    // match por palavra
+
+    // Match exato e prefixo
+    if(nn===nq)score+=40;
+    else if(nn.startsWith(nq))score+=25;
+    else if(nn.includes(nq))score+=18;
+
+    // Match por palavras da query
+    let wordHits=0;
     for(const w of words){
-      if(nn.includes(w))score+=4;
+      if(nn.includes(w)){score+=6;wordHits++;}
       else if(nc.includes(w))score+=1.5;
       else{
-        // fuzzy por bigramas
         const sim=bigramSim(nn,w);
-        if(sim>0.65)score+=sim*3;
-        // match parcial por trigrama
-        const words_nn=nn.split(' ');
-        for(const wn of words_nn){if(bigramSim(wn,w)>0.7)score+=1.5;}
+        if(sim>0.7)score+=sim*4;
+        else nn.split(' ').forEach(wn=>{if(bigramSim(wn,w)>0.72)score+=2;});
       }
     }
-    // boost para marcas brasileiras na query
-    for(const[key]of Object.entries(BR_BRAND_ALIASES)){
-      if(nq.includes(key)&&nn.includes(key))score+=5;
+
+    // Match por sinônimos expandidos
+    for(const w of extraWords){
+      if(!words.includes(w)&&nn.includes(w))score+=3;
     }
+
+    // Boost TACO/BR — sempre na frente de qualquer resultado online
+    if(isBR)score+=12;
+
+    // Boost alimento cru quando query pede cru
+    if(hasCru&&isCru)score+=15;
+    // Penaliza preparado quando user quer cru (mas não esconde, apenas ordena depois)
+    if(hasCru&&!isCru&&score>0)score-=4;
+
+    // Boost marcas brasileiras
+    for(const[key]of Object.entries(BR_BRAND_ALIASES)){
+      if(nq.includes(key)&&nn.includes(key))score+=8;
+    }
+
+    // Exige ao menos 1 hit real para aparecer
+    if(wordHits===0&&score<=12)score=0;
+
     return{f,score};
   }).filter(x=>x.score>0).sort((a,b)=>b.score-a.score).map(x=>x.f);
 }
@@ -2227,7 +2307,7 @@ function filterFoods(){
   // Resultados locais imediatos
   const local=searchLocalFoods(q);
   let html='';
-  if(local.length){html+=`<div class="food-cat-header">Banco local</div>`+local.map(f=>foodResultHTML(f,false)).join('');}
+  if(local.length){html+=`<div class="food-cat-header">🇧🇷 TACO — Base Brasileira</div>`+local.map(f=>foodResultHTML(f,false)).join('');}
   html+=`<div class="food-cat-header">🌐 Internet</div><div class="food-loading"><div class="food-loading-dots"><span></span><span></span><span></span></div>Buscando...</div>`;
   document.getElementById('food-results').innerHTML=html;
   // Busca online com debounce
@@ -2238,15 +2318,6 @@ function quickFoodSearch(q){
   const inp=document.getElementById('food-search-input');
   inp.value=q;
   filterFoods();
-}
-
-function searchLocalFoods(q){
-  const words=q.split(/\s+/).filter(w=>w.length>1);
-  return FOODS.map(f=>{
-    const name=f.name.toLowerCase(),cat=f.cat.toLowerCase();
-    const score=words.reduce((acc,w)=>acc+(name.includes(w)?2:0)+(cat.includes(w)?1:0),0);
-    return{f,score};
-  }).filter(x=>x.score>0).sort((a,b)=>b.score-a.score).map(x=>x.f);
 }
 
 // ── Online food search engine ──────────────────────────
@@ -2355,15 +2426,13 @@ async function fetchOnlineFoods(q){
     const relevant=offProducts.filter(p=>_relevance(_offProductName(p),p.brands||'',qWords)>=minRel);
     let onlineFoods=_dedup(relevant.slice(0,20)).map(p=>_offToFood(p,'off'));
 
-    // USDA fallback: só chama se OFF retornou poucos resultados relevantes
-    if(onlineFoods.length<4){
+    // USDA: só usa se local+OFF retornou zero resultado útil
+    const localCount=searchLocalFoods(q).length;
+    if(onlineFoods.length===0&&localCount===0){
       try{
         const usdaFoods=await _fetchUSDA(shortQ||q,ctrl.signal);
-        const usdaFiltered=usdaFoods.filter(f=>_relevance(f.name,'',qWords)>0.3);
-        // merge com dedup contra OFF results
-        const offNorms=new Set(onlineFoods.map(f=>normStr(f.name).slice(0,25)));
-        const newUsda=usdaFiltered.filter(f=>!offNorms.has(normStr(f.name).slice(0,25)));
-        onlineFoods=[...onlineFoods,...newUsda.slice(0,8)];
+        const usdaFiltered=usdaFoods.filter(f=>_relevance(f.name,'',qWords)>0.5);
+        onlineFoods=[...usdaFiltered.slice(0,6)];
       }catch{}
     }
 
@@ -2375,10 +2444,11 @@ async function fetchOnlineFoods(q){
     const filteredOnline=onlineFoods.filter(f=>!localNorms.has(normStr(f.name).slice(0,20)));
 
     let html='';
-    if(local.length)html+=`<div class="food-cat-header">📋 Banco local</div>`+local.map(f=>foodResultHTML(f,false)).join('');
-    if(filteredOnline.length){
-      html+=`<div class="food-cat-header">🌐 Internet</div>`+filteredOnline.slice(0,12).map(f=>foodResultHTML(f,true)).join('');
-    }
+    if(local.length)html+=`<div class="food-cat-header">🇧🇷 TACO — Base Brasileira</div>`+local.map(f=>foodResultHTML(f,false)).join('');
+    const offOnly=filteredOnline.filter(f=>f.src!=='usda');
+    const usdaOnly=filteredOnline.filter(f=>f.src==='usda');
+    if(offOnly.length)html+=`<div class="food-cat-header">🌐 Produtos (Open Food Facts)</div>`+offOnly.slice(0,10).map(f=>foodResultHTML(f,true)).join('');
+    if(usdaOnly.length)html+=`<div class="food-cat-header">🇺🇸 USDA (sem resultado BR)</div>`+usdaOnly.slice(0,5).map(f=>foodResultHTML(f,true)).join('');
     if(!html){
       html=`<div style="padding:40px 24px;text-align:center;color:var(--text2);font-size:14px;line-height:1.6">Nenhum resultado para "<b>${q}</b>"<br><span style="font-size:12px;color:var(--text3)">Tente termos mais simples ou use o código de barras 📷</span></div>`;
     }
@@ -2388,7 +2458,7 @@ async function fetchOnlineFoods(q){
     clearTimeout(timer);
     const local=searchLocalFoods(q);
     document.getElementById('food-results').innerHTML=
-      (local.length?`<div class="food-cat-header">📋 Banco local</div>`+local.map(f=>foodResultHTML(f,false)).join(''):'')
+      (local.length?`<div class="food-cat-header">🇧🇷 TACO — Base Brasileira</div>`+local.map(f=>foodResultHTML(f,false)).join(''):'')
       +`<div style="padding:12px 16px;font-size:12px;color:var(--text2)">🌐 Resultados online indisponíveis no momento</div>`;
   }
 }
