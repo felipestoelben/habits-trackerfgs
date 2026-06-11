@@ -308,6 +308,55 @@ h1,h2,h3,h4{font-weight:500}
 }
 .empty-cta:active{opacity:.8;transform:scale(.95)}
 
+/* ── Login / splash ── */
+#screen-login{
+  position:absolute;inset:0;z-index:2000;
+  background:var(--bg-primary);color:var(--text-primary);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:32px 24px calc(env(safe-area-inset-bottom,0px)+24px);
+  overflow-y:auto;
+}
+.login-wrap{width:100%;max-width:360px;display:flex;flex-direction:column;align-items:center}
+.login-brand{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:32px}
+.login-logo{
+  width:64px;height:64px;border-radius:18px;background:var(--accent);
+  display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;
+}
+.login-logo svg{width:32px;height:32px}
+.login-title{font-size:28px;font-weight:600;letter-spacing:2px}
+.login-sub{font-size:14px;color:var(--text-secondary);text-align:center}
+.login-card{width:100%;background:var(--bg-card);border-radius:var(--r-lg);box-shadow:var(--shadow-sm);padding:20px}
+.login-tabs{display:flex;gap:4px;background:var(--bg-secondary);border-radius:99px;padding:4px;margin-bottom:18px}
+.login-tab{flex:1;padding:9px 0;border:none;border-radius:99px;background:transparent;font-size:14px;font-weight:500;color:var(--text-secondary);cursor:pointer;transition:background .15s,color .15s;font-family:inherit}
+.login-tab.active{background:var(--bg-card);color:var(--text-primary);box-shadow:var(--shadow-sm)}
+.login-error{background:rgba(192,57,43,.08);color:var(--red);border-radius:var(--r-sm);padding:10px 12px;font-size:13px;margin-bottom:14px;line-height:1.4}
+.login-field{margin-bottom:14px}
+.login-field label{display:block;font-size:12px;font-weight:500;color:var(--text-secondary);margin-bottom:6px}
+.login-field input{width:100%;padding:12px 14px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--bg-primary);font-size:15px;font-family:inherit;color:var(--text-primary)}
+.login-field input:focus{outline:none;border-color:var(--accent)}
+.login-submit{
+  width:100%;padding:13px;border-radius:var(--r-md);border:none;
+  background:#1A1A1A;color:#F8F6F1;font-size:15px;font-weight:500;cursor:pointer;
+  transition:opacity .15s;margin-top:4px;font-family:inherit;
+}
+.login-submit:active{opacity:.8}
+.login-submit:disabled{opacity:.5;cursor:default}
+.login-divider{display:flex;align-items:center;gap:10px;margin:18px 0;color:var(--text-tertiary);font-size:12px}
+.login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.login-social{
+  width:100%;padding:12px;border-radius:var(--r-md);border:1px solid var(--border);
+  background:var(--bg-card);color:var(--text-primary);font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;
+  display:flex;align-items:center;justify-content:center;gap:10px;transition:opacity .15s;margin-bottom:10px;
+}
+.login-social:active{opacity:.7}
+.login-social:last-of-type{margin-bottom:0}
+.login-social svg{width:18px;height:18px;flex-shrink:0;display:block}
+.login-skip{
+  margin-top:24px;background:none;border:none;color:var(--text-secondary);
+  font-size:13px;text-decoration:underline;cursor:pointer;font-family:inherit;
+}
+.login-skip:active{opacity:.6}
+
 /* ── Detail screen ── */
 .detail-hdr{
   padding:calc(env(safe-area-inset-top,0px)+14px) 16px 14px;
@@ -1232,6 +1281,44 @@ h1,h2,h3,h4{font-weight:500}
 <body>
 <div class="app-shell">
 
+<!-- ══ LOGIN / SPLASH ══ -->
+<div id="screen-login">
+  <div class="login-wrap">
+    <div class="login-brand">
+      <div class="login-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6M2 10v4M20 9v6M22 10v4M7 7v10M17 7v10M7 12h10"/></svg></div>
+      <div class="login-title">GYM Z</div>
+      <div class="login-sub">Hábitos, dieta e treino em um só lugar</div>
+    </div>
+    <div class="login-card">
+      <div class="login-tabs">
+        <button class="login-tab active" id="login-tab-in" onclick="setLoginMode('in')">Entrar</button>
+        <button class="login-tab" id="login-tab-up" onclick="setLoginMode('up')">Criar conta</button>
+      </div>
+      <div class="login-error" id="login-error" style="display:none"></div>
+      <div class="login-field">
+        <label for="login-email">E-mail</label>
+        <input type="email" id="login-email" placeholder="seu@email.com" autocomplete="email" inputmode="email" onkeydown="if(event.key==='Enter')handleEmailAuth()">
+      </div>
+      <div class="login-field">
+        <label for="login-password">Senha</label>
+        <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')handleEmailAuth()">
+      </div>
+      <button class="login-submit" id="login-submit-btn" onclick="handleEmailAuth()">Entrar</button>
+      <div class="login-divider"><span>ou</span></div>
+      <button class="login-social" onclick="handleGoogleSignIn()">
+        <svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5h-1.9V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.1 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.1 29.6 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.5 0 10.5-2.1 14.3-5.6l-6.6-5.6C29.7 34.6 27 35.5 24 35.5c-5.2 0-9.6-3.3-11.3-7.9l-6.6 5.1C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.2 4.2-4.1 5.6l6.6 5.6C40.6 36.6 44 30.9 44 24c0-1.3-.1-2.7-.4-3.5z"/></svg>
+        Entrar com Google
+      </button>
+      <button class="login-social" onclick="handleAppleSignIn()">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.365 1.43c0 1.14-.413 2.025-1.244 2.728-.832.703-1.83 1.092-2.96.992-.143-1.166.395-2.142 1.226-2.845.842-.703 1.806-1.057 2.978-.875zm3.65 17.59c-.582 1.346-1.292 2.667-2.418 3.95-1.075 1.232-2.144 2.456-3.851 2.487-1.674.03-2.213-.987-4.13-.987-1.92 0-2.518.957-4.123.997-1.633.04-2.873-1.34-3.957-2.567-2.155-2.477-3.81-7-1.598-10.06 1.094-1.5 3.04-2.45 5.158-2.48 1.583-.03 3.077.998 4.044 1.001.97 0 2.78-1.232 4.69-1.05.798.034 3.04.323 4.477 2.426-3.94 2.345-3.296 7.057.708 6.283z"/></svg>
+        Entrar com Apple
+      </button>
+    </div>
+    <button class="login-skip" onclick="skipLogin()">Continuar sem conta</button>
+  </div>
+</div>
+<script>if(localStorage.getItem('skipLogin')==='1')document.getElementById('screen-login').style.display='none';</script>
+
 <!-- Sidebar -->
 <div id="sidebar-backdrop" onclick="closeSidebar()"></div>
 <div id="sidebar">
@@ -1760,11 +1847,84 @@ const firebaseConfig={apiKey:"AIzaSyDr6t6yt2PcPuy9cQSWdHOnfo4EgGSyFxA",authDomai
 firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth(), db=firebase.firestore();
 let fbUser=null;
-auth.onAuthStateChanged(user=>{fbUser=user;updateSyncBtn();if(user)loadFromCloud()});
-auth.getRedirectResult().then(r=>{if(r&&r.user)loadFromCloud()}).catch(console.error);
+auth.onAuthStateChanged(user=>{
+  fbUser=user;updateSyncBtn();
+  if(user){localStorage.removeItem('skipLogin');hideLoginScreen();loadFromCloud();}
+  else if(localStorage.getItem('skipLogin')==='1')hideLoginScreen();
+  else showLoginScreen();
+});
+auth.getRedirectResult().then(r=>{if(r&&r.user)loadFromCloud()}).catch(reportAuthError);
 function handleSyncBtn(){
-  if(fbUser){if(confirm(`Conta: ${fbUser.displayName}\n\nDeseja sair?`))auth.signOut();}
-  else{const p=new firebase.auth.GoogleAuthProvider();auth.signInWithPopup(p).catch(e=>{if(e.code==='auth/popup-blocked'||e.code==='auth/cancelled-popup-request')auth.signInWithRedirect(p);else console.error(e);});}
+  if(fbUser){if(confirm(`Conta: ${fbUser.displayName}\n\nDeseja sair?`)){localStorage.removeItem('skipLogin');auth.signOut();}}
+  else handleGoogleSignIn();
+}
+function popupFallback(p,e){
+  if(e.code==='auth/popup-blocked'||e.code==='auth/cancelled-popup-request'||e.code==='auth/popup-closed-by-user')auth.signInWithRedirect(p);
+  else reportAuthError(e);
+}
+function handleGoogleSignIn(){
+  const p=new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(p).catch(e=>popupFallback(p,e));
+}
+function handleAppleSignIn(){
+  const p=new firebase.auth.OAuthProvider('apple.com');
+  p.addScope('email');p.addScope('name');
+  auth.signInWithPopup(p).catch(e=>popupFallback(p,e));
+}
+
+// ── Login screen ───────────────────────────────────────
+let loginMode='in';
+const AUTH_ERROR_MESSAGES={
+  'auth/invalid-email':'E-mail inválido.',
+  'auth/user-not-found':'Usuário não encontrado.',
+  'auth/wrong-password':'Senha incorreta.',
+  'auth/invalid-credential':'E-mail ou senha incorretos.',
+  'auth/email-already-in-use':'Este e-mail já está cadastrado.',
+  'auth/weak-password':'A senha deve ter pelo menos 6 caracteres.',
+  'auth/operation-not-allowed':'Este método de login não está habilitado.',
+  'auth/popup-closed-by-user':'Login cancelado.',
+  'auth/network-request-failed':'Falha de conexão. Verifique sua internet.',
+};
+function authErrorMsg(e){return AUTH_ERROR_MESSAGES[e.code]||'Ocorreu um erro. Tente novamente.'}
+function reportAuthError(e){
+  if(!e)return;
+  console.error(e);
+  const msg=authErrorMsg(e),scr=document.getElementById('screen-login');
+  if(scr&&scr.style.display!=='none')showLoginError(msg);else alert(msg);
+}
+function showLoginScreen(){
+  const scr=document.getElementById('screen-login');
+  scr.style.display='flex';
+  document.getElementById('login-error').style.display='none';
+}
+function hideLoginScreen(){document.getElementById('screen-login').style.display='none'}
+function skipLogin(){localStorage.setItem('skipLogin','1');hideLoginScreen()}
+function setLoginMode(mode){
+  loginMode=mode;
+  document.getElementById('login-tab-in').classList.toggle('active',mode==='in');
+  document.getElementById('login-tab-up').classList.toggle('active',mode==='up');
+  document.getElementById('login-submit-btn').textContent=mode==='in'?'Entrar':'Criar conta';
+  document.getElementById('login-error').style.display='none';
+}
+function showLoginError(msg){
+  const el=document.getElementById('login-error');
+  el.textContent=msg;el.style.display='block';
+}
+async function handleEmailAuth(){
+  const email=document.getElementById('login-email').value.trim();
+  const password=document.getElementById('login-password').value;
+  if(!email||!password){showLoginError('Preencha e-mail e senha.');return;}
+  const btn=document.getElementById('login-submit-btn');
+  btn.disabled=true;btn.textContent='Aguarde…';
+  document.getElementById('login-error').style.display='none';
+  try{
+    if(loginMode==='in')await auth.signInWithEmailAndPassword(email,password);
+    else await auth.createUserWithEmailAndPassword(email,password);
+  }catch(e){
+    showLoginError(authErrorMsg(e));
+  }finally{
+    btn.disabled=false;btn.textContent=loginMode==='in'?'Entrar':'Criar conta';
+  }
 }
 const ICON_CLOUD='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.4 1.5A4 4 0 0 0 6.5 19h11Z"/></svg>';
 const ICON_USER='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>';
