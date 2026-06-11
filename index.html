@@ -7,64 +7,40 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Habits">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#6366F1">
+<meta name="theme-color" content="#F8F6F1">
 <link rel="manifest" href="manifest.json">
 <title>Habits & Diet</title>
-<script>
-  (function(){
-    const s = localStorage.getItem('theme');
-    const dark = s ? s==='dark' : window.matchMedia('(prefers-color-scheme:dark)').matches;
-    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-  })();
-</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:#F2F2F7; --surface:#FFF; --surface2:#F2F2F7; --surface3:#E5E5EA;
-  --text:#1C1C1E; --text2:#6C6C70; --text3:#AEAEB2; --sep:#E5E5EA;
-  --accent:#6366F1; --accent-rgb:99,102,241; --accent-lt:rgba(99,102,241,.12);
-  --green:#34C759; --red:#FF3B30; --orange:#F97316;
-  --shadow-sm:0 1px 4px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
-  --shadow-md:0 4px 18px rgba(0,0,0,.09),0 2px 6px rgba(0,0,0,.05);
-  --r-sm:10px; --r-md:16px; --r-lg:20px; --r-xl:28px;
-}
-@media(prefers-color-scheme:dark){
-  :root:not([data-theme="light"]){
-    --bg:#000; --surface:#1C1C1E; --surface2:#2C2C2E; --surface3:#3A3A3C;
-    --text:#FFF; --text2:#8E8E93; --text3:#48484A; --sep:#38383A;
-    --accent:#818CF8; --accent-rgb:129,140,248; --accent-lt:rgba(129,140,248,.15);
-    --green:#30D158;
-    --shadow-sm:0 1px 4px rgba(0,0,0,.35); --shadow-md:0 4px 18px rgba(0,0,0,.45);
-  }
-}
-[data-theme="dark"]{
-  --bg:#000; --surface:#1C1C1E; --surface2:#2C2C2E; --surface3:#3A3A3C;
-  --text:#FFF; --text2:#8E8E93; --text3:#48484A; --sep:#38383A;
-  --accent:#818CF8; --accent-rgb:129,140,248; --accent-lt:rgba(129,140,248,.15);
-  --green:#30D158;
-  --shadow-sm:0 1px 4px rgba(0,0,0,.35); --shadow-md:0 4px 18px rgba(0,0,0,.45);
-}
-[data-theme="light"]{
-  --bg:#F2F2F7; --surface:#FFF; --surface2:#F2F2F7; --surface3:#E5E5EA;
-  --text:#1C1C1E; --text2:#6C6C70; --text3:#AEAEB2; --sep:#E5E5EA;
-  --accent:#6366F1; --accent-rgb:99,102,241; --accent-lt:rgba(99,102,241,.12);
-  --green:#34C759; --red:#FF3B30;
-  --shadow-sm:0 1px 4px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
-  --shadow-md:0 4px 18px rgba(0,0,0,.09),0 2px 6px rgba(0,0,0,.05);
+  --bg-primary:#F8F6F1; --bg-secondary:#F0EDE6; --bg-card:#FFFFFF;
+  --text-primary:#1A1A1A; --text-secondary:#6B6560; --text-tertiary:#A8A29B;
+  --accent:#C85A3A; --accent-rgb:200,90,58; --accent-lt:rgba(200,90,58,.10);
+  --accent-muted:#8B7355; --border:#DDD9D0; --check-done:#C85A3A;
+  --green:#7A8B6F; --red:#C0392B; --orange:#C85A3A;
+  --shadow-sm:0 0 0 1px var(--border); --shadow-md:0 0 0 1px var(--border);
+  --r-sm:8px; --r-md:12px; --r-lg:12px; --r-xl:20px;
+  /* legacy aliases (kept so existing component styles cascade to the new palette) */
+  --bg:var(--bg-primary); --surface:var(--bg-card); --surface2:var(--bg-secondary); --surface3:var(--border);
+  --text:var(--text-primary); --text2:var(--text-secondary); --text3:var(--text-tertiary); --sep:var(--border);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 html{overscroll-behavior:none;height:100%;height:-webkit-fill-available}
 body{
-  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,sans-serif;
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  font-weight:400;line-height:1.6;
   background:var(--bg);color:var(--text);
   min-height:100vh;min-height:-webkit-fill-available;
   height:100svh;height:100dvh;
   overflow:hidden;overscroll-behavior:none;
   -webkit-font-smoothing:antialiased;
 }
+h1,h2,h3,h4{font-weight:500}
 /* Tablet: phone frame (500–799px) */
 @media(min-width:500px){
-  body{background:#C7C7D4;display:flex;align-items:center;justify-content:center}
-  [data-theme="dark"] body{background:#0A0A0C}
+  body{background:#E4E0D6;display:flex;align-items:center;justify-content:center}
 }
 @media(min-width:500px) and (max-width:799px){
   .app-shell{
@@ -83,8 +59,7 @@ body{
 }
 /* Desktop: two-column layout (800px+) — DEVE vir após .app-shell base */
 @media(min-width:800px){
-  body{background:#DDDDE8}
-  [data-theme="dark"] body{background:#050508}
+  body{background:#E4E0D6}
   .app-shell{
     max-width:1140px;width:calc(100% - 48px);
     height:calc(100dvh - 48px);
@@ -102,9 +77,11 @@ body{
   #sidebar-backdrop{display:none!important}
   .sidebar-toggle{display:none!important}
   .tab-bar{display:none!important}
-  #screen-habits,#screen-diet,#screen-sub,#screen-workout{padding-bottom:24px}
-  .progress-hero{max-width:640px;margin:16px auto 0;width:calc(100% - 32px)}
-  .date-strip-wrap{max-width:672px;margin:0 auto}
+  #screen-habits,#screen-diet,#screen-sub,#screen-workout,#screen-more{padding-bottom:24px}
+  .streak-banner{max-width:640px;margin:16px auto 0;width:calc(100% - 32px)}
+  .progress-hero{max-width:640px;margin:10px auto 0;width:calc(100% - 32px)}
+  .week-cal-wrap{max-width:640px;margin:18px auto 0;width:calc(100% - 32px)}
+  .week-progress-section{max-width:640px;margin:18px auto 0;width:calc(100% - 32px)}
   .habit-list{max-width:640px;margin:0 auto;width:calc(100% - 32px)}
   .diet-summary{max-width:640px;margin:14px auto 0;width:calc(100% - 32px)}
   .meals-wrap{max-width:640px;margin:16px auto 0;width:calc(100% - 32px)}
@@ -112,7 +89,7 @@ body{
   .sub-autocomplete{max-width:640px;margin:0 auto 4px}
   .sub-food-count{max-width:640px;margin:0 auto}
   .content-area{overflow:hidden;display:flex;flex-direction:column}
-  #screen-habits,#screen-diet,#screen-sub,#screen-workout{flex:1;overflow-y:auto}
+  #screen-habits,#screen-diet,#screen-sub,#screen-workout,#screen-more{flex:1;overflow-y:auto}
   .header-greeting{font-size:30px}
   .diet-header-title{font-size:26px}
   .sub-header-title{font-size:26px}
@@ -144,7 +121,7 @@ body{
   background:var(--surface);z-index:400;
   transform:translateX(-100%);transition:transform .32s cubic-bezier(.32,0,.2,1);
   display:flex;flex-direction:column;
-  box-shadow:4px 0 32px rgba(0,0,0,.18);
+  box-shadow:1px 0 0 var(--border);
   padding-top:env(safe-area-inset-top,0px);
 }
 #sidebar.open{transform:translateX(0)}
@@ -152,23 +129,25 @@ body{
   display:flex;align-items:center;gap:12px;
   padding:24px 20px 20px;border-bottom:1px solid var(--sep);
 }
-.sidebar-logo-icon{font-size:28px;line-height:1}
-.sidebar-logo-text{font-size:18px;font-weight:800;letter-spacing:-.3px}
-.sidebar-logo-sub{font-size:11px;color:var(--text2);font-weight:500;margin-top:1px}
+.sidebar-logo-icon{width:28px;height:28px;flex-shrink:0;color:var(--accent);display:flex;align-items:center;justify-content:center}
+.sidebar-logo-icon svg{width:24px;height:24px;display:block}
+.sidebar-logo-text{font-size:18px;font-weight:500;letter-spacing:-.3px}
+.sidebar-logo-sub{font-size:11px;color:var(--text2);font-weight:400;margin-top:1px}
 .sidebar-nav{flex:1;padding:12px 10px}
 .nav-item{
   display:flex;align-items:center;gap:14px;width:100%;
   padding:13px 14px;border-radius:var(--r-md);border:none;
-  background:transparent;color:var(--text2);font-size:15px;font-weight:600;
+  background:transparent;color:var(--text2);font-size:15px;font-weight:500;
   cursor:pointer;transition:background .15s,color .15s;text-align:left;
   margin-bottom:4px;
 }
 .nav-item:active{opacity:.7}
 .nav-item.active{background:var(--accent-lt);color:var(--accent)}
-.nav-item .nav-icon{font-size:20px;width:28px;text-align:center}
+.nav-item .nav-icon{width:28px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.nav-item .nav-icon svg{width:20px;height:20px;display:block}
 .sidebar-footer{padding:16px 20px;border-top:1px solid var(--sep)}
-.sidebar-user{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text2);font-weight:500}
-.sidebar-user-avatar{width:32px;height:32px;border-radius:50%;background:var(--sep);display:flex;align-items:center;justify-content:center;font-size:14px}
+.sidebar-user{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text2);font-weight:400}
+.sidebar-user-avatar{width:32px;height:32px;border-radius:50%;background:var(--sep);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--text-secondary);overflow:hidden}
 
 /* ── Common icon buttons ── */
 .icon-btn{
@@ -178,12 +157,12 @@ body{
   user-select:none;flex-shrink:0;
 }
 .icon-btn:active{transform:scale(.84);opacity:.65;box-shadow:none}
+.icon-btn svg{width:18px;height:18px;display:block}
 .add-btn{
   width:44px;height:44px;border-radius:50%;border:none;
-  background:linear-gradient(135deg,#818CF8 0%,#6366F1 50%,#4F46E5 100%);
+  background:var(--accent);
   color:#fff;font-size:22px;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
-  box-shadow:0 6px 20px rgba(var(--accent-rgb),.52),0 2px 6px rgba(var(--accent-rgb),.3);
   transition:transform .12s,opacity .12s;user-select:none;
 }
 .add-btn:active{transform:scale(.86);opacity:.85}
@@ -196,93 +175,86 @@ body{
 .main-header{
   padding:calc(max(env(safe-area-inset-top,0px),20px) + 12px) 20px 14px;
   position:sticky;top:0;z-index:20;
-  background:rgba(242,242,247,.88);
+  background:rgba(248,246,241,.88);
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border-bottom:1px solid rgba(0,0,0,.05);
+  border-bottom:1px solid var(--border);
 }
-[data-theme="dark"] .main-header{background:rgba(0,0,0,.78)}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .main-header{background:rgba(0,0,0,.78)}}
 .header-row{display:flex;align-items:flex-start;justify-content:space-between}
-.header-greeting{font-size:27px;font-weight:900;letter-spacing:-.6px;line-height:1.15}
+.header-greeting{font-size:24px;font-weight:500;letter-spacing:-.3px;line-height:1.3}
 .header-date{font-size:12px;color:var(--text2);margin-top:4px;font-weight:500;letter-spacing:.1px}
 .header-actions{display:flex;gap:7px;align-items:center}
 
 /* Hero progress card */
 .progress-hero{
   margin:14px 16px 0;
-  background:linear-gradient(135deg,#6366F1 0%,#4F46E5 55%,#3730A3 100%);
-  border:none;
+  background:var(--bg-card);
+  border:1px solid var(--border);
   border-radius:var(--r-xl);padding:20px 20px;
-  box-shadow:0 12px 38px rgba(79,70,229,.48),0 4px 12px rgba(79,70,229,.24);
   display:flex;align-items:center;gap:18px;
   position:relative;overflow:hidden;
 }
-.progress-hero::before{
-  content:'';position:absolute;right:-12px;top:-22px;
-  width:108px;height:108px;border-radius:50%;
-  background:rgba(255,255,255,.1);pointer-events:none;
-}
-.progress-hero::after{
-  content:'';position:absolute;right:28px;bottom:-26px;
-  width:72px;height:72px;border-radius:50%;
-  background:rgba(255,255,255,.07);pointer-events:none;
-}
-.progress-hero .hero-pct{color:#fff}
-.progress-hero .hero-pct-lbl{color:rgba(255,255,255,.75)}
-.progress-hero .hero-title{color:#fff}
-.progress-hero .hero-sub{color:rgba(255,255,255,.82)}
-.progress-hero .hero-track{background:rgba(255,255,255,.22)}
-.progress-hero .hero-fill{background:#fff}
 .hero-ring-wrap{
   flex-shrink:0;position:relative;width:72px;height:72px;
-  background:rgba(255,255,255,.1);border-radius:50%;
+  background:var(--bg-secondary);border-radius:50%;
 }
 .hero-ring-wrap svg{display:block}
 .hero-ring-text{
   position:absolute;inset:0;display:flex;flex-direction:column;
   align-items:center;justify-content:center;pointer-events:none;
 }
-.hero-pct{font-size:28px;font-weight:900;letter-spacing:-.8px;line-height:1;color:var(--accent)}
-.hero-pct-lbl{font-size:9px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-top:2px}
+.hero-pct{font-size:28px;font-weight:600;letter-spacing:-.8px;line-height:1;color:var(--accent)}
+.hero-pct-lbl{font-size:11px;font-weight:500;color:var(--text2);letter-spacing:.2px;margin-top:2px}
 .hero-info{flex:1;min-width:0}
-.hero-title{font-size:17px;font-weight:800;letter-spacing:-.3px}
-.hero-sub{font-size:13px;color:var(--text2);margin-top:3px;font-weight:500}
+.hero-title{font-size:17px;font-weight:500;letter-spacing:-.2px}
+.hero-sub{font-size:13px;color:var(--text2);margin-top:3px;font-weight:400}
 .hero-track{
   margin-top:14px;height:6px;border-radius:99px;
-  background:rgba(var(--accent-rgb),.15);overflow:hidden;
+  background:var(--border);overflow:hidden;
 }
-.hero-fill{height:100%;border-radius:99px;transition:width .8s cubic-bezier(.34,1.4,.64,1)}
+.hero-fill{height:100%;border-radius:99px;background:var(--accent);transition:width .8s cubic-bezier(.34,1.4,.64,1)}
 
-/* Date column headers */
-.date-strip-wrap{display:flex;align-items:flex-end;padding:12px 18px 6px}
-.ds-label{font-size:11px;font-weight:800;color:var(--text2);flex:1;text-transform:uppercase;letter-spacing:.5px}
-.ds-cols{display:flex;width:130px;flex-shrink:0;gap:3px}
-.ds-col{flex:1;text-align:center;line-height:1.2}
-.ds-col .dn{font-size:12px;font-weight:600;color:var(--text2)}
-.ds-col .dw{font-size:8px;color:var(--text3);text-transform:uppercase;letter-spacing:.2px}
-.ds-col.today .dn{color:var(--accent);font-weight:800}
-.ds-col.today .dw{color:var(--accent)}
+/* Streak banner */
+.streak-banner{
+  margin:14px 16px 0;display:flex;align-items:center;gap:8px;
+  font-size:13px;color:var(--text-secondary);font-weight:500;
+}
+.streak-banner svg{width:16px;height:16px;color:var(--accent);flex-shrink:0}
+.streak-banner-num{color:var(--text-primary);font-weight:600;font-size:14px}
+
+/* Weekly mini calendar */
+.week-cal-wrap{margin:18px 16px 0}
+.week-cal-row{display:flex;justify-content:space-between;gap:6px}
+.week-cal-day{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1}
+.week-cal-lbl{font-size:11px;font-weight:500;color:var(--text-secondary);letter-spacing:.2px}
+.week-cal-dot{
+  width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:600;color:var(--text-secondary);
+  transition:background .2s,border-color .2s,color .2s;
+}
+.week-cal-dot svg{width:14px;height:14px;display:block}
+.week-cal-dot.done{background:var(--accent);border-color:var(--accent);color:#fff}
+.week-cal-dot.today{border-color:var(--accent);color:var(--accent)}
+.week-cal-dot.future{opacity:.45}
+
+/* Weekly progress */
+.week-progress-section{margin:18px 16px 0}
+.week-progress-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.week-progress-title{font-size:13px;font-weight:500;color:var(--text-secondary);letter-spacing:.2px}
+.week-progress-pct{font-size:13px;font-weight:600;color:var(--text-primary)}
+.week-progress-track{height:6px;border-radius:99px;background:var(--border);overflow:hidden}
+.week-progress-fill{height:100%;border-radius:99px;background:var(--accent);transition:width .8s cubic-bezier(.34,1.4,.64,1)}
 
 /* Habit cards */
 .habit-list{margin:0 16px;display:flex;flex-direction:column;gap:7px}
 .habit-card{
-  display:flex;align-items:center;gap:10px;
-  padding:11px 12px 11px 0;
-  background:var(--surface);border-radius:var(--r-lg);
-  box-shadow:0 2px 10px rgba(0,0,0,.07),0 1px 3px rgba(0,0,0,.04);
+  display:flex;align-items:center;gap:12px;
+  padding:13px 14px;
+  background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-lg);
   position:relative;overflow:hidden;
-  transition:transform .12s,box-shadow .12s,opacity .2s;
+  transition:transform .12s,opacity .2s;
 }
-.habit-card:active{transform:scale(.985);box-shadow:0 1px 3px rgba(0,0,0,.04)}
-.habit-card::before{
-  content:'';position:absolute;left:0;top:0;bottom:0;width:4px;
-  background:var(--hc,var(--accent));border-radius:0 3px 3px 0;
-}
-.habit-card::after{
-  content:'';position:absolute;left:0;top:0;bottom:0;width:80px;
-  background:linear-gradient(90deg,var(--hc,var(--accent)) 0%,transparent 100%);
-  opacity:.08;pointer-events:none;
-}
+.habit-card:active{transform:scale(.985)}
 .habit-card.done{opacity:.62}
 .habit-card.done .habit-name-text{
   text-decoration:line-through;
@@ -290,59 +262,49 @@ body{
   color:var(--text2)!important;
 }
 .habit-card:active{transform:scale(.985)}
-.habit-chk{
-  margin-left:12px;width:30px;height:30px;border-radius:50%;
-  border:2.5px solid var(--hc,var(--accent));background:transparent;
-  cursor:pointer;flex-shrink:0;padding:0;
-  display:flex;align-items:center;justify-content:center;
-  font-size:15px;font-weight:900;color:transparent;
-  transition:background .2s,border-color .2s,color .2s,transform .1s;
+.habit-icon{
+  width:40px;height:40px;border-radius:var(--r-md);flex-shrink:0;
+  background:var(--bg-secondary);
+  display:flex;align-items:center;justify-content:center;font-size:19px;
 }
-.habit-chk:active{transform:scale(.78)}
+.habit-chk{
+  width:26px;height:26px;border-radius:50%;flex-shrink:0;
+  border:2px solid var(--border);background:transparent;
+  cursor:pointer;padding:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .2s,border-color .2s,transform .1s;
+}
+.habit-chk:active{transform:scale(.8)}
+.habit-chk svg{width:14px;height:14px;display:block}
 .habit-card.done .habit-chk{
-  background:var(--hc,var(--accent));
-  border-color:var(--hc,var(--accent));
+  background:var(--check-done);
+  border-color:var(--check-done);
   color:#fff;
 }
 .habit-body{flex:1;min-width:0;cursor:pointer;user-select:none;padding-right:4px}
 .habit-name-text{
-  font-size:15px;font-weight:700;letter-spacing:-.15px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;
+  font-size:15px;font-weight:500;letter-spacing:-.1px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4;
 }
-.habit-streak{
-  display:inline-flex;align-items:center;gap:3px;
-  font-size:10.5px;font-weight:700;margin-top:4px;
-  padding:3px 9px 3px 6px;border-radius:99px;
+.habit-streak-sub{
+  display:flex;align-items:center;gap:4px;
+  font-size:13px;color:var(--text-secondary);margin-top:2px;
 }
-.streak-hot{color:#F97316;background:rgba(249,115,22,.13)}
-.streak-cold{color:var(--text3);background:var(--surface2)}
-
-/* 5-day history column */
-.habit-days{display:flex;width:130px;gap:3px;flex-shrink:0;cursor:pointer}
-.hday{
-  flex:1;height:28px;border-radius:7px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:9px;font-weight:800;
-}
-.hday.done-hday{color:#fff}
-.hday.miss-hday{background:var(--surface2);color:var(--text3)}
-.hday.today-hday{background:transparent;border:2px solid}
-.hday.future-hday{opacity:0}
+.habit-streak-sub svg{flex-shrink:0;width:13px;height:13px}
 
 /* Empty state */
 .empty-state{
   padding:56px 24px;display:flex;flex-direction:column;align-items:center;gap:10px;
-  background:var(--surface);border-radius:var(--r-xl);
-  box-shadow:0 2px 10px rgba(0,0,0,.07);
+  background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-xl);
 }
-.empty-icon{font-size:56px;line-height:1}
-.empty-title{font-size:18px;font-weight:800;letter-spacing:-.2px}
-.empty-sub{font-size:14px;color:var(--text2);text-align:center;max-width:230px;line-height:1.55}
+.empty-icon{line-height:1;color:var(--text-secondary)}
+.empty-title{font-size:18px;font-weight:500;letter-spacing:-.1px}
+.empty-sub{font-size:14px;color:var(--text2);text-align:center;max-width:230px;line-height:1.6}
 .empty-cta{
-  margin-top:8px;padding:13px 36px;border-radius:99px;border:none;
-  background:linear-gradient(135deg,#818CF8 0%,#6366F1 50%,#4F46E5 100%);
-  color:#fff;font-size:15px;font-weight:700;cursor:pointer;
-  box-shadow:0 5px 18px rgba(var(--accent-rgb),.45);transition:opacity .15s,transform .12s;
+  margin-top:8px;padding:13px 36px;border-radius:var(--r-md);border:none;
+  background:#1A1A1A;
+  color:#F8F6F1;font-size:15px;font-weight:500;cursor:pointer;
+  transition:opacity .15s,transform .12s;
 }
 .empty-cta:active{opacity:.8;transform:scale(.95)}
 
@@ -359,48 +321,50 @@ body{
   display:flex;align-items:center;justify-content:center;transition:opacity .15s;flex-shrink:0;
 }
 .back-btn:active{opacity:.6}
-.detail-hdr h2{font-size:17px;font-weight:700;flex:1;text-align:center;margin:0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.detail-hdr h2{font-size:17px;font-weight:500;flex:1;text-align:center;margin:0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .edit-pill-btn{
   padding:7px 16px;border-radius:99px;border:none;background:var(--accent-lt);
-  color:var(--accent);font-size:14px;font-weight:700;cursor:pointer;transition:opacity .15s;flex-shrink:0;
+  color:var(--accent);font-size:14px;font-weight:500;cursor:pointer;transition:opacity .15s;flex-shrink:0;
 }
 .edit-pill-btn:active{opacity:.7}
 .detail-freq{
   display:flex;align-items:center;justify-content:center;gap:24px;
   padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--sep);
 }
-.freq-item{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--text2)}
+.freq-item{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:400;color:var(--text2)}
+.freq-item svg{width:14px;height:14px;flex-shrink:0}
 .detail-body{padding:16px}
-.detail-section-title{font-size:11px;font-weight:800;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin:20px 0 8px 4px}
+.detail-section-title{font-size:13px;font-weight:500;color:var(--text2);letter-spacing:.2px;margin:20px 0 8px 4px}
 .detail-section{background:var(--surface);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow-sm)}
 .overview-row{display:flex;align-items:center;padding:20px 16px;gap:16px}
 .overview-ring{flex-shrink:0}
 .overview-stats{display:flex;flex:1}
 .stat-col{flex:1;text-align:center}
-.stat-val{font-size:22px;font-weight:900;letter-spacing:-.4px}
-.stat-lbl{font-size:10px;color:var(--text2);margin-top:3px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.stat-val{font-size:22px;font-weight:600;letter-spacing:-.2px}
+.stat-lbl{font-size:12px;color:var(--text2);margin-top:3px;font-weight:400;letter-spacing:.2px}
 .cal-nav{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 8px;border-bottom:1px solid var(--sep)}
 .cal-nav-btn{width:30px;height:30px;border-radius:50%;border:none;background:var(--surface2);color:var(--text2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity .15s}
 .cal-nav-btn:active{opacity:.6}
-.cal-month-label{font-size:15px;font-weight:700}
+.cal-month-label{font-size:15px;font-weight:500}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);padding:8px 10px 14px;gap:2px}
-.cal-hdr{text-align:center;font-size:10px;font-weight:700;color:var(--text2);padding:4px 0 6px;text-transform:uppercase;letter-spacing:.3px}
+.cal-hdr{text-align:center;font-size:11px;font-weight:500;color:var(--text2);padding:4px 0 6px;letter-spacing:.2px}
 .cal-cell{display:flex;align-items:center;justify-content:center;padding:2px 0}
 .cal-day{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500}
-.cal-day.done{color:#fff;font-weight:700}
-.cal-day.today{font-weight:800}
+.cal-day.done{color:#fff;font-weight:600}
+.cal-day.today{font-weight:600}
 .cal-day.future{color:var(--text3)}
 .chart-toggle{display:flex;gap:6px;padding:12px 14px 10px;border-bottom:1px solid var(--sep)}
-.toggle-btn{padding:6px 18px;border-radius:99px;border:none;font-size:13px;font-weight:700;cursor:pointer;background:var(--surface2);color:var(--text2);transition:background .15s,color .15s}
+.toggle-btn{padding:6px 18px;border-radius:99px;border:none;font-size:13px;font-weight:500;cursor:pointer;background:var(--surface2);color:var(--text2);transition:background .15s,color .15s}
 .toggle-btn.active{background:var(--accent);color:#fff}
 .chart-wrap{padding:10px 12px 14px}
 .detail-delete{
   display:flex;align-items:center;justify-content:center;gap:8px;
   width:100%;padding:16px;border:none;background:var(--surface);border-radius:var(--r-lg);
-  color:var(--red);font-size:16px;font-weight:700;cursor:pointer;
+  color:var(--red);font-size:16px;font-weight:500;cursor:pointer;
   margin-top:12px;margin-bottom:4px;box-shadow:var(--shadow-sm);transition:opacity .15s;
 }
 .detail-delete:active{opacity:.6}
+.detail-delete svg{width:18px;height:18px;flex-shrink:0}
 
 /* ── Edit / Add ── */
 .edit-hdr{
@@ -408,23 +372,23 @@ body{
   padding:calc(env(safe-area-inset-top,0px)+14px) 16px 14px;
   border-bottom:1px solid var(--sep);position:sticky;top:0;background:var(--bg);z-index:10;
 }
-.edit-cancel{background:none;border:none;font-size:16px;color:var(--text2);cursor:pointer;padding:4px 0;font-weight:500;transition:opacity .15s}
+.edit-cancel{background:none;border:none;font-size:16px;color:var(--text2);cursor:pointer;padding:4px 0;font-weight:400;transition:opacity .15s}
 .edit-cancel:active{opacity:.6}
 .edit-save{
-  padding:8px 20px;border-radius:99px;border:none;
-  background:linear-gradient(135deg,#818CF8 0%,#6366F1 60%,#4F46E5 100%);
-  color:#fff;font-size:15px;font-weight:700;cursor:pointer;
-  box-shadow:0 3px 12px rgba(var(--accent-rgb),.4);transition:opacity .15s;
+  padding:9px 22px;border-radius:10px;border:none;
+  background:#1A1A1A;
+  color:#F8F6F1;font-size:15px;font-weight:500;cursor:pointer;
+  transition:opacity .15s;
 }
 .edit-save:active{opacity:.8}
-.edit-hdr h2{font-size:17px;font-weight:700}
+.edit-hdr h2{font-size:17px;font-weight:500}
 .edit-body{padding:0 16px}
-.edit-section-title{font-size:11px;font-weight:800;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin:20px 0 8px 4px}
+.edit-section-title{font-size:13px;font-weight:500;color:var(--text2);letter-spacing:.2px;margin:20px 0 8px 4px}
 .edit-card{background:var(--surface);border-radius:var(--r-md);overflow:hidden;box-shadow:var(--shadow-sm)}
 .name-row{display:flex;align-items:center;padding-right:14px}
-.name-input{flex:1;padding:14px 12px 14px 16px;border:none;background:transparent;font-size:16px;color:var(--text);font-family:inherit;outline:none;font-weight:500}
+.name-input{flex:1;padding:14px 12px 14px 16px;border:none;background:transparent;font-size:16px;color:var(--text);font-family:inherit;outline:none;font-weight:400}
 .name-input::placeholder{color:var(--text3)}
-.color-dot-btn{width:28px;height:28px;border-radius:50%;border:2.5px solid rgba(255,255,255,.4);cursor:pointer;flex-shrink:0;transition:transform .15s;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.color-dot-btn{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);cursor:pointer;flex-shrink:0;transition:transform .15s}
 .color-dot-btn:active{transform:scale(.86)}
 .sep-line{height:1px;background:var(--sep);margin:0 16px}
 .reg-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px}
@@ -456,14 +420,12 @@ body{
 .diet-header{
   padding:calc(max(env(safe-area-inset-top,0px),20px) + 10px) 16px 12px;
   position:sticky;top:0;z-index:20;
-  background:rgba(242,242,247,.88);
+  background:rgba(248,246,241,.88);
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border-bottom:1px solid rgba(0,0,0,.05);
+  border-bottom:1px solid var(--border);
 }
-[data-theme="dark"] .diet-header{background:rgba(0,0,0,.78)}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .diet-header{background:rgba(0,0,0,.78)}}
 .diet-header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.diet-header-title{font-size:22px;font-weight:900;letter-spacing:-.5px}
+.diet-header-title{font-size:22px;font-weight:500;letter-spacing:-.3px}
 .diet-date-nav{display:flex;align-items:center;gap:0;background:var(--surface);border-radius:99px;box-shadow:var(--shadow-sm);overflow:hidden}
 .diet-date-btn{
   width:38px;height:38px;border:none;background:transparent;color:var(--text2);
@@ -472,37 +434,21 @@ body{
 }
 .diet-date-btn:active{background:var(--sep)}
 .diet-date-btn:disabled{opacity:.25;cursor:default}
-.diet-date-label{font-size:14px;font-weight:800;padding:0 12px;min-width:76px;text-align:center;letter-spacing:-.1px}
+.diet-date-label{font-size:14px;font-weight:500;padding:0 12px;min-width:76px;text-align:center;letter-spacing:-.1px}
 
 /* Calorie summary card */
 .diet-summary{margin:14px 16px 0;display:flex;flex-direction:column;gap:12px}
 .calorie-card{
-  background:linear-gradient(135deg,#1e1b4b 0%,#312e81 55%,#4338ca 100%);
+  background:var(--bg-card);border:1px solid var(--border);
   border-radius:var(--r-xl);padding:18px 20px;
-  box-shadow:0 12px 38px rgba(67,56,202,.48),0 4px 12px rgba(67,56,202,.22);
   position:relative;overflow:hidden;
 }
-.calorie-card::before{
-  content:'';position:absolute;right:-14px;top:-22px;
-  width:108px;height:108px;border-radius:50%;
-  background:rgba(255,255,255,.07);pointer-events:none;
-}
-.calorie-card .calorie-card-title{color:rgba(255,255,255,.7)!important}
-.calorie-card .goal-edit-btn{background:rgba(255,255,255,.16)!important;color:#fff!important;border:1px solid rgba(255,255,255,.2)!important}
-.calorie-card .cal-f-val{color:#fff!important}
-.calorie-card .cal-f-lbl{color:rgba(255,255,255,.62)!important}
-.calorie-card .cal-f-op{color:rgba(255,255,255,.4)!important}
-.calorie-card .cal-f-result .cal-f-val{color:#fff!important;font-size:30px!important;font-weight:900!important}
-.calorie-card .cal-f-result.danger .cal-f-val{color:#fca5a5!important}
-.calorie-card .calorie-track{background:rgba(255,255,255,.18)!important}
-.calorie-card .calorie-track-fill{background:rgba(255,255,255,.88)!important}
-.calorie-card .calorie-track-fill.danger{background:#f87171!important}
-.calorie-card-title{font-size:11px;font-weight:800;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
-.goal-edit-btn{font-size:11px;font-weight:700;color:var(--accent);border:none;background:var(--accent-lt);padding:3px 10px;border-radius:99px;cursor:pointer}
+.calorie-card-title{font-size:13px;font-weight:500;color:var(--text2);letter-spacing:.2px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.goal-edit-btn{font-size:12px;font-weight:500;color:var(--accent);border:none;background:var(--accent-lt);padding:4px 11px;border-radius:99px;cursor:pointer}
 .calorie-formula{display:flex;align-items:flex-end;justify-content:space-between;gap:4px}
 .cal-f-item{flex:1;text-align:center}
-.cal-f-val{font-size:22px;font-weight:900;letter-spacing:-.4px;line-height:1}
-.cal-f-lbl{font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-top:3px}
+.cal-f-val{font-size:22px;font-weight:600;letter-spacing:-.2px;line-height:1}
+.cal-f-lbl{font-size:11px;font-weight:400;color:var(--text2);letter-spacing:.2px;margin-top:3px}
 .cal-f-op{font-size:18px;font-weight:300;color:var(--text3);padding-bottom:18px;flex-shrink:0}
 .cal-f-result .cal-f-val{color:var(--accent);font-size:26px}
 .cal-f-result.danger .cal-f-val{color:var(--red)}
@@ -513,8 +459,8 @@ body{
 /* Macro pills */
 .macro-row{display:flex;gap:8px}
 .macro-pill{flex:1;background:var(--surface);border-radius:var(--r-lg);padding:14px 12px 12px;box-shadow:var(--shadow-sm)}
-.macro-pill-label{font-size:10px;font-weight:800;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
-.macro-pill-val{font-size:19px;font-weight:900;letter-spacing:-.5px}
+.macro-pill-label{font-size:11px;font-weight:500;color:var(--text2);letter-spacing:.2px;margin-bottom:6px}
+.macro-pill-val{font-size:19px;font-weight:600;letter-spacing:-.3px}
 .macro-pill-bar{height:4px;border-radius:99px;background:var(--sep);margin-top:9px;overflow:hidden}
 .macro-pill-bar-fill{height:100%;border-radius:99px;transition:width .7s cubic-bezier(.34,1.2,.64,1)}
 
@@ -528,11 +474,10 @@ body{
 .meal-icon-wrap{
   width:40px;height:40px;border-radius:12px;
   display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;
-  box-shadow:0 2px 8px rgba(0,0,0,.1);
 }
 .meal-title-wrap{flex:1}
-.meal-name-text{font-size:15px;font-weight:700}
-.meal-kcal-text{font-size:12px;font-weight:600;color:var(--text2);margin-top:1px}
+.meal-name-text{font-size:15px;font-weight:500}
+.meal-kcal-text{font-size:12px;font-weight:400;color:var(--text2);margin-top:1px}
 .meal-chevron{font-size:16px;color:var(--text3);transition:transform .2s}
 .meal-food-list{padding:4px 0}
 .meal-food-item{
@@ -541,11 +486,11 @@ body{
 .meal-food-item+.meal-food-item{border-top:1px solid var(--sep)}
 .food-item-emoji{font-size:20px;flex-shrink:0}
 .food-item-info{flex:1;min-width:0}
-.food-item-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.food-item-sub{font-size:11px;color:var(--text2);margin-top:1px;font-weight:500}
-.food-item-kcal{font-size:14px;font-weight:700;flex-shrink:0}
+.food-item-name{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.food-item-sub{font-size:11px;color:var(--text2);margin-top:1px;font-weight:400}
+.food-item-kcal{font-size:14px;font-weight:600;flex-shrink:0}
 .food-item-del{
-  width:28px;height:28px;border-radius:50%;border:none;background:rgba(255,59,48,.1);
+  width:28px;height:28px;border-radius:50%;border:none;background:rgba(192,57,43,.1);
   color:var(--red);font-size:14px;cursor:pointer;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;transition:opacity .15s;
 }
@@ -553,7 +498,7 @@ body{
 .meal-add-btn{
   display:flex;align-items:center;gap:8px;width:100%;
   padding:14px 16px;border:none;background:transparent;
-  color:var(--accent);font-size:14px;font-weight:700;cursor:pointer;
+  color:var(--accent);font-size:14px;font-weight:500;cursor:pointer;
   transition:background .12s,opacity .12s;
 }
 .meal-add-btn:active{background:var(--accent-lt);opacity:.8}
@@ -570,9 +515,9 @@ body{
 .workout-empty{padding:28px 16px;text-align:center;color:var(--text2);font-size:13px;font-weight:500;line-height:1.5}
 .workout-set-row{display:flex;gap:8px;margin:8px 0 4px}
 .workout-set-item{flex:1;text-align:center;background:var(--surface);border-radius:var(--r-md);padding:14px 8px;box-shadow:var(--shadow-sm)}
-.workout-set-input{width:100%;border:none;background:transparent;text-align:center;font-size:22px;font-weight:800;color:var(--text);font-family:inherit;outline:none}
+.workout-set-input{width:100%;border:none;background:transparent;text-align:center;font-size:22px;font-weight:600;color:var(--text);font-family:inherit;outline:none}
 .workout-set-input::-webkit-outer-spin-button,.workout-set-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-.workout-set-lbl{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+.workout-set-lbl{font-size:11px;font-weight:400;color:var(--text2);letter-spacing:.2px;margin-top:4px}
 .wk-autocomplete{
   margin:-6px 0 12px;background:var(--surface);border-radius:var(--r-md);
   box-shadow:var(--shadow-sm);overflow:hidden;display:none;
@@ -605,7 +550,7 @@ body{
   transition:background .12s,opacity .12s;
 }
 .food-overlay-back:active{opacity:.6;background:var(--sep)}
-.food-overlay-title{font-size:17px;font-weight:800;letter-spacing:-.2px}
+.food-overlay-title{font-size:17px;font-weight:500;letter-spacing:-.2px}
 .food-search-bar{
   display:flex;align-items:center;gap:10px;
   background:var(--surface2);border-radius:var(--r-md);
@@ -618,7 +563,8 @@ body{
   box-shadow:0 0 0 3px var(--accent-lt);
   background:var(--surface);
 }
-.food-search-icon{font-size:16px;color:var(--text2);flex-shrink:0}
+.food-search-icon{font-size:16px;color:var(--text2);flex-shrink:0;display:flex}
+.food-search-icon svg{width:16px;height:16px;display:block}
 .food-search-input{
   flex:1;border:none;background:transparent;font-size:16px;
   color:var(--text);font-family:inherit;outline:none;
@@ -626,8 +572,8 @@ body{
 .food-search-input::placeholder{color:var(--text3)}
 .food-results{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .food-cat-header{
-  font-size:11px;font-weight:800;color:var(--text2);text-transform:uppercase;
-  letter-spacing:.6px;padding:16px 16px 8px;
+  font-size:12px;font-weight:500;color:var(--text2);
+  letter-spacing:.2px;padding:16px 16px 8px;
   position:sticky;top:0;z-index:1;background:var(--bg);
   border-bottom:1px solid var(--sep);
 }
@@ -643,33 +589,33 @@ body{
   font-size:22px;flex-shrink:0;
 }
 .food-result-info{flex:1;min-width:0}
-.food-result-name{font-size:14.5px;font-weight:700;line-height:1.3;letter-spacing:-.1px}
-.food-result-sub{font-size:11.5px;color:var(--text2);margin-top:3px;font-weight:500}
+.food-result-name{font-size:14.5px;font-weight:500;line-height:1.3;letter-spacing:-.1px}
+.food-result-sub{font-size:11.5px;color:var(--text2);margin-top:3px;font-weight:400}
 .food-result-kcal{display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0;gap:1px}
-.food-result-kcal-val{font-size:17px;font-weight:900;color:var(--text);letter-spacing:-.3px}
-.food-result-kcal-lbl{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.3px}
+.food-result-kcal-val{font-size:17px;font-weight:600;color:var(--text);letter-spacing:-.2px}
+.food-result-kcal-lbl{font-size:11px;font-weight:400;color:var(--text2);letter-spacing:.2px}
 /* empty state */
 .food-empty-state{
   display:flex;flex-direction:column;align-items:center;
   padding:44px 24px 32px;text-align:center;
 }
-.food-empty-icon{font-size:60px;margin-bottom:16px;line-height:1}
-.food-empty-title{font-size:19px;font-weight:800;margin-bottom:6px;letter-spacing:-.3px}
-.food-empty-sub{font-size:13.5px;color:var(--text2);margin-bottom:24px;line-height:1.55;max-width:220px}
+.food-empty-icon{display:flex;justify-content:center;color:var(--text3);margin-bottom:16px}
+.food-empty-icon svg{width:48px;height:48px;display:block}
+.food-empty-title{font-size:19px;font-weight:500;margin-bottom:6px;letter-spacing:-.2px}
+.food-empty-sub{font-size:13.5px;color:var(--text2);margin-bottom:24px;line-height:1.6;max-width:220px}
 .food-quick-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:320px}
 .food-quick-chip{
   display:inline-flex;align-items:center;gap:6px;
   padding:9px 16px;border-radius:99px;
-  background:var(--surface);border:1.5px solid var(--sep);
-  font-size:13.5px;font-weight:700;color:var(--text);
-  cursor:pointer;transition:background .15s,transform .12s,border-color .15s,box-shadow .15s;
+  background:var(--surface);border:1px solid var(--border);
+  font-size:13.5px;font-weight:500;color:var(--text);
+  cursor:pointer;transition:background .15s,transform .12s,border-color .15s;
   -webkit-tap-highlight-color:transparent;
-  box-shadow:var(--shadow-sm);
 }
 .food-quick-chip:active{background:var(--accent-lt);border-color:var(--accent);transform:scale(.93)}
 .food-online-tag{
-  font-size:10px;font-weight:700;color:var(--green);
-  background:rgba(34,197,94,.12);padding:2px 7px;border-radius:99px;margin-left:6px;vertical-align:middle;
+  font-size:10px;font-weight:500;color:var(--green);
+  background:rgba(122,139,111,.14);padding:2px 7px;border-radius:99px;margin-left:6px;vertical-align:middle;
 }
 .food-loading{
   display:flex;align-items:center;gap:10px;
@@ -693,6 +639,7 @@ body{
   transition:background .15s,transform .14s cubic-bezier(.34,1.5,.64,1),opacity .12s;
 }
 .scan-btn:active{transform:scale(.82);opacity:.75}
+.scan-btn svg,.voice-mic-btn svg{width:17px;height:17px;display:block}
 #barcode-overlay{
   position:absolute;inset:0;z-index:200;background:#000;
   display:none;flex-direction:column;
@@ -712,12 +659,13 @@ body{
   -webkit-tap-highlight-color:transparent;touch-action:manipulation;
 }
 .barcode-close-btn:active{opacity:.7;transform:scale(.9)}
+.barcode-close-btn svg{width:20px;height:20px;display:block}
 .barcode-hdr-title-fixed{
   position:absolute;
   top:calc(env(safe-area-inset-top,0px)+22px);
   left:0;right:0;
   z-index:29;
-  text-align:center;color:#fff;font-size:16px;font-weight:700;
+  text-align:center;color:#fff;font-size:16px;font-weight:500;
   pointer-events:none;
   text-shadow:0 1px 6px rgba(0,0,0,.6);
 }
@@ -739,7 +687,7 @@ body{
 .barcode-aim::after{bottom:-2px;right:-2px;border-width:0 3px 3px 0;border-radius:0 0 6px 0}
 .barcode-laser{
   position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);
-  height:2px;background:linear-gradient(90deg,transparent,#6366F1,transparent);
+  height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);
   animation:laser 1.8s ease-in-out infinite;
 }
 @keyframes laser{0%,100%{top:15%}50%{top:85%}}
@@ -758,18 +706,18 @@ body{
 .barcode-manual-input::placeholder{color:rgba(255,255,255,.45)}
 .barcode-manual-btn{
   background:var(--accent);color:#fff;border:none;border-radius:10px;
-  padding:10px 14px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;
+  padding:10px 14px;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;
 }
 .barcode-fallback-msg{
   color:rgba(255,255,255,.7);font-size:12px;text-align:center;margin-top:8px;
 }
 /* source badge */
 .food-source-badge{
-  font-size:9px;font-weight:800;padding:2px 5px;border-radius:4px;margin-left:4px;
+  font-size:9px;font-weight:600;padding:2px 5px;border-radius:4px;margin-left:4px;
   vertical-align:middle;letter-spacing:.3px;
 }
 .src-taco{background:rgba(34,197,94,.15);color:#16a34a}
-.src-off{background:rgba(99,102,241,.12);color:var(--accent)}
+.src-off{background:var(--accent-lt);color:var(--accent)}
 .src-usda{background:rgba(245,158,11,.12);color:#d97706}
 
 /* ── Voice ── */
@@ -781,7 +729,7 @@ body{
   transition:background .15s,transform .14s cubic-bezier(.34,1.5,.64,1),opacity .12s;
 }
 .voice-mic-btn:active{transform:scale(.82);opacity:.75}
-.voice-mic-btn.recording{background:rgba(239,68,68,.15);color:#EF4444;animation:mic-pulse .8s ease-in-out infinite}
+.voice-mic-btn.recording{background:rgba(192,57,43,.15);color:var(--red);animation:mic-pulse .8s ease-in-out infinite}
 @keyframes mic-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
 #voice-view{
   display:none;flex-direction:column;
@@ -806,12 +754,12 @@ body{
 @keyframes vring{0%{transform:scale(.6);opacity:.7}100%{transform:scale(1);opacity:0}}
 .voice-mic-circle{
   width:64px;height:64px;border-radius:50%;
-  background:linear-gradient(135deg,#818CF8,#6366F1);
+  background:var(--accent);color:#fff;
   display:flex;align-items:center;justify-content:center;
-  font-size:28px;z-index:1;
-  box-shadow:0 6px 20px rgba(var(--accent-rgb),.45);
+  z-index:1;
 }
-.voice-hint{font-size:17px;font-weight:700;text-align:center;letter-spacing:-.2px}
+.voice-mic-circle svg{width:28px;height:28px;display:block}
+.voice-hint{font-size:17px;font-weight:500;text-align:center;letter-spacing:-.2px}
 .voice-hint-sub{font-size:13px;color:var(--text2);text-align:center;margin-top:6px;line-height:1.5}
 .voice-transcript-box{
   background:var(--surface);border-radius:var(--r-lg);padding:14px 16px;
@@ -820,12 +768,14 @@ body{
 .voice-transcript-text{font-size:15px;line-height:1.5;color:var(--text);font-style:italic}
 .voice-stop-btn{
   margin-top:24px;padding:14px;border-radius:var(--r-lg);border:none;
-  background:rgba(239,68,68,.12);color:#EF4444;
-  font-size:15px;font-weight:700;cursor:pointer;width:100%;
+  background:rgba(192,57,43,.12);color:var(--red);
+  font-size:15px;font-weight:500;cursor:pointer;width:100%;
+  display:flex;align-items:center;justify-content:center;gap:6px;
   transition:background .15s;
 }
-.voice-stop-btn:active{background:rgba(239,68,68,.2)}
-.voice-results-title{font-size:17px;font-weight:800;margin-bottom:6px;padding-top:8px}
+.voice-stop-btn:active{background:rgba(192,57,43,.2)}
+.voice-stop-btn svg{width:14px;height:14px}
+.voice-results-title{font-size:17px;font-weight:500;margin-bottom:6px;padding-top:8px}
 .voice-transcript-quote{
   font-size:13px;color:var(--text2);font-style:italic;
   margin-bottom:16px;line-height:1.4;
@@ -837,16 +787,16 @@ body{
 }
 .voice-item-emoji{font-size:26px;flex-shrink:0}
 .voice-item-info{flex:1;min-width:0}
-.voice-item-name{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.voice-item-macros{font-size:12px;color:var(--text2);margin-top:2px;font-weight:500}
+.voice-item-name{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.voice-item-macros{font-size:12px;color:var(--text2);margin-top:2px;font-weight:400}
 .voice-item-qty-edit{
-  font-size:13px;font-weight:700;color:var(--accent);
+  font-size:13px;font-weight:600;color:var(--accent);
   background:var(--accent-lt);padding:4px 10px;border-radius:99px;
   border:none;cursor:pointer;flex-shrink:0;
 }
 .voice-item-remove{
   width:26px;height:26px;border-radius:50%;border:none;
-  background:rgba(239,68,68,.1);color:#EF4444;font-size:14px;
+  background:rgba(192,57,43,.1);color:var(--red);font-size:14px;
   cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;
 }
 .voice-no-match{
@@ -855,28 +805,30 @@ body{
 .voice-retry-btn{
   width:100%;margin-top:10px;padding:13px;border-radius:var(--r-lg);border:none;
   background:var(--surface2);color:var(--text2);
-  font-size:14px;font-weight:700;cursor:pointer;
+  font-size:14px;font-weight:500;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:6px;
   transition:background .15s;
 }
 .voice-retry-btn:active{background:var(--sep)}
+.voice-retry-btn svg{width:15px;height:15px}
 
 /* ── Quantity view (inside food overlay) ── */
 #food-qty-view{display:none;flex:1;flex-direction:column;padding:0 0 16px;overflow-y:auto}
 #food-qty-view.open{display:flex}
 .qty-food-emoji{font-size:52px;text-align:center;margin:20px 16px 8px}
-.qty-food-name{font-size:20px;font-weight:800;text-align:center;letter-spacing:-.3px;margin:0 16px 4px}
-.qty-per-100{font-size:13px;color:var(--text2);text-align:center;font-weight:500;margin:0 16px 24px}
-.qty-input-label{font-size:12px;font-weight:800;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin:0 16px 8px}
+.qty-food-name{font-size:20px;font-weight:500;text-align:center;letter-spacing:-.3px;margin:0 16px 4px}
+.qty-per-100{font-size:13px;color:var(--text2);text-align:center;font-weight:400;margin:0 16px 24px}
+.qty-input-label{font-size:12px;font-weight:500;color:var(--text2);letter-spacing:.2px;margin:0 16px 8px}
 .qty-input-row{display:flex;align-items:center;gap:12px;margin:0 16px 20px}
 .qty-input{
   flex:1;padding:16px;border-radius:var(--r-md);border:2px solid var(--sep);
-  background:var(--surface);font-size:28px;font-weight:800;color:var(--text);
+  background:var(--surface);font-size:28px;font-weight:600;color:var(--text);
   text-align:center;outline:none;font-family:inherit;
   transition:border-color .15s;
 }
 .qty-input:focus{border-color:var(--accent)}
 .qty-unit-badge{
-  font-size:16px;font-weight:700;color:var(--text2);
+  font-size:16px;font-weight:600;color:var(--text2);
   background:var(--surface);padding:12px 18px;border-radius:var(--r-md);
   border:2px solid var(--sep);flex-shrink:0;
 }
@@ -884,16 +836,15 @@ body{
   background:var(--surface);border-radius:var(--r-lg);padding:16px;
   margin:0 16px 24px;box-shadow:var(--shadow-sm);
 }
-.qty-preview-title{font-size:11px;font-weight:800;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px}
+.qty-preview-title{font-size:11px;font-weight:500;color:var(--text2);letter-spacing:.2px;margin-bottom:12px}
 .qty-macro-row{display:flex;justify-content:space-around}
 .qty-macro-item{text-align:center}
-.qty-macro-val{font-size:18px;font-weight:900;letter-spacing:-.3px}
-.qty-macro-lbl{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
+.qty-macro-val{font-size:18px;font-weight:600;letter-spacing:-.3px}
+.qty-macro-lbl{font-size:10px;font-weight:400;color:var(--text2);letter-spacing:.4px;margin-top:2px}
 .qty-add-btn{
-  padding:16px;border-radius:var(--r-lg);border:none;
-  background:linear-gradient(135deg,#818CF8 0%,#6366F1 60%,#4F46E5 100%);
-  color:#fff;font-size:16px;font-weight:700;cursor:pointer;
-  box-shadow:0 4px 16px rgba(var(--accent-rgb),.4);
+  padding:16px;border-radius:10px;border:none;
+  background:#1A1A1A;
+  color:#F8F6F1;font-size:16px;font-weight:500;cursor:pointer;
   transition:opacity .15s,transform .12s;
   margin:auto 16px 0;
 }
@@ -905,8 +856,8 @@ body{
 /* ── Privacy banner ── */
 #privacy-banner{
   position:absolute;top:0;left:0;right:0;z-index:10;
-  background:rgba(var(--accent-rgb),.9);color:#fff;
-  font-size:12px;font-weight:700;text-align:center;
+  background:var(--accent);color:#fff;
+  font-size:12px;font-weight:500;text-align:center;
   padding:6px 0;letter-spacing:.3px;
   transform:translateY(-100%);transition:transform .25s;
   pointer-events:none;
@@ -928,7 +879,7 @@ body{
 }
 #meal-cfg-sheet.open{transform:translateY(0)}
 .cfg-handle{width:36px;height:4px;border-radius:99px;background:var(--sep);margin:12px auto 0}
-.cfg-title{font-size:17px;font-weight:800;padding:14px 20px 10px}
+.cfg-title{font-size:17px;font-weight:500;padding:14px 20px 10px}
 .cfg-meal-row-wrap{transition:transform .12s}
 .cfg-meal-row-wrap.dragging{transition:none;opacity:.82;z-index:5;position:relative;background:var(--surface2);border-radius:var(--r-md)}
 .cfg-meal-row-wrap+.cfg-meal-row-wrap .cfg-meal-row{border-top:1px solid var(--sep)}
@@ -940,6 +891,7 @@ body{
   user-select:none;-webkit-user-select:none;opacity:.7;
 }
 .cfg-drag-handle:active{opacity:1;cursor:grabbing}
+.cfg-drag-handle svg{width:16px;height:16px;display:block}
 .cfg-drag-hint{font-size:11px;color:var(--text3);text-align:center;padding:6px 16px 2px;font-weight:500}
 .cfg-emoji-btn{
   width:40px;height:40px;border-radius:12px;border:none;
@@ -950,29 +902,28 @@ body{
 .cfg-emoji-btn:active{background:var(--sep)}
 .cfg-name-input{
   flex:1;border:none;background:var(--surface2);border-radius:10px;
-  padding:9px 12px;font-size:15px;font-weight:600;color:var(--text);
+  padding:9px 12px;font-size:15px;font-weight:500;color:var(--text);
   font-family:inherit;outline:none;transition:background .15s;
 }
 .cfg-name-input:focus{background:var(--accent-lt)}
 .cfg-del-btn{
   width:32px;height:32px;border-radius:50%;border:none;
-  background:rgba(239,68,68,.1);color:#EF4444;font-size:16px;
+  background:rgba(192,57,43,.1);color:var(--red);font-size:16px;
   cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;
 }
 .cfg-add-meal-btn{
   display:flex;align-items:center;gap:10px;padding:14px 16px;
   border:none;background:transparent;color:var(--accent);
-  font-size:15px;font-weight:700;cursor:pointer;width:100%;
+  font-size:15px;font-weight:500;cursor:pointer;width:100%;
 }
 .cfg-add-meal-btn .plus-circle{
   width:28px;height:28px;border-radius:50%;background:var(--accent-lt);
   display:flex;align-items:center;justify-content:center;font-size:16px;
 }
 .cfg-done-btn{
-  margin:4px 16px 16px;padding:14px;border-radius:var(--r-lg);border:none;
-  background:linear-gradient(135deg,#818CF8,#6366F1,#4F46E5);
-  color:#fff;font-size:15px;font-weight:700;cursor:pointer;width:calc(100% - 32px);
-  box-shadow:0 3px 12px rgba(var(--accent-rgb),.4);
+  margin:4px 16px 16px;padding:14px;border-radius:10px;border:none;
+  background:#1A1A1A;
+  color:#F8F6F1;font-size:15px;font-weight:500;cursor:pointer;width:calc(100% - 32px);
 }
 /* Meal header config btn */
 .meal-cfg-btn{
@@ -990,6 +941,7 @@ body{
   display:flex;align-items:center;justify-content:center;transition:opacity .15s;
 }
 .food-item-edit:active{opacity:.6}
+.food-item-edit svg{width:13px;height:13px;display:block}
 /* Emoji mini picker inside cfg */
 .cfg-emoji-picker{
   display:none;padding:10px 16px 0;flex-wrap:wrap;gap:4px;
@@ -1036,14 +988,12 @@ body{
 .sub-header{
   padding:calc(max(env(safe-area-inset-top,0px),20px) + 12px) 16px 0;
   position:sticky;top:0;z-index:20;
-  background:rgba(242,242,247,.92);
+  background:rgba(248,246,241,.88);
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border-bottom:1px solid rgba(0,0,0,.06);
+  border-bottom:1px solid var(--border);
 }
-[data-theme="dark"] .sub-header{background:rgba(0,0,0,.88)}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .sub-header{background:rgba(0,0,0,.88)}}
 .sub-header-top-row{display:flex;align-items:center;gap:10px;margin-bottom:2px}
-.sub-header-title{font-size:24px;font-weight:900;letter-spacing:-.5px}
+.sub-header-title{font-size:24px;font-weight:500;letter-spacing:-.5px}
 .sub-header-sub{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:2px}
 .sub-search-wrap{padding:10px 0 12px}
 .sub-search-bar{
@@ -1058,7 +1008,8 @@ body{
   box-shadow:0 0 0 3px var(--accent-lt);
   background:var(--surface);
 }
-.sub-search-icon{font-size:15px;color:var(--text3)}
+.sub-search-icon{font-size:15px;color:var(--text3);display:flex}
+.sub-search-icon svg{width:16px;height:16px;display:block}
 .sub-search-input{
   flex:1;border:none;background:transparent;
   font-size:15px;padding:13px 0;outline:none;color:var(--text);
@@ -1077,7 +1028,7 @@ body{
 .sub-ac-item:active{background:var(--accent-lt)}
 .sub-ac-emoji{font-size:20px;width:28px;text-align:center}
 .sub-ac-info{flex:1;min-width:0}
-.sub-ac-name{font-size:14px;font-weight:600;color:var(--text)}
+.sub-ac-name{font-size:14px;font-weight:500;color:var(--text)}
 .sub-ac-meta{font-size:11.5px;color:var(--text2);margin-top:1px}
 /* Category chips */
 .sub-cats-strip{
@@ -1089,20 +1040,18 @@ body{
   flex-shrink:0;display:flex;align-items:center;gap:6px;
   padding:8px 16px;border-radius:99px;
   border:1.5px solid var(--sep);background:var(--surface);
-  font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;white-space:nowrap;
+  font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;white-space:nowrap;
   transition:background .18s,border-color .18s,color .18s,transform .12s,box-shadow .18s;
-  box-shadow:var(--shadow-sm);
 }
 .sub-cat-chip.active{
   background:var(--accent);border-color:var(--accent);color:#fff;
-  box-shadow:0 4px 14px rgba(var(--accent-rgb),.38);
   transform:scale(1.04);
 }
 .sub-cat-chip:active{transform:scale(.93);opacity:.8}
 /* Food list on landing */
 .sub-food-count{
-  font-size:11px;font-weight:800;color:var(--text2);
-  text-transform:uppercase;letter-spacing:.6px;
+  font-size:11px;font-weight:500;color:var(--text2);
+  letter-spacing:.2px;
   padding:4px 16px 8px;
 }
 .sub-food-list-wrap{margin:0 16px 16px;overflow:hidden;border-radius:var(--r-lg);box-shadow:var(--shadow-sm)}
@@ -1115,7 +1064,7 @@ body{
 .sub-food-row:active{background:var(--accent-lt)}
 .sub-food-row-emoji{font-size:22px;width:32px;text-align:center;flex-shrink:0}
 .sub-food-row-info{flex:1;min-width:0}
-.sub-food-row-name{font-size:14px;font-weight:600;color:var(--text)}
+.sub-food-row-name{font-size:14px;font-weight:500;color:var(--text)}
 .sub-food-row-meta{font-size:11.5px;color:var(--text2);margin-top:2px}
 .sub-food-row-arr{color:var(--text3);font-size:16px}
 /* Detail view */
@@ -1131,45 +1080,45 @@ body{
 }
 .sub-detail-emoji{font-size:34px;flex-shrink:0}
 .sub-detail-info{flex:1;min-width:0}
-.sub-detail-name{font-size:16px;font-weight:800;color:var(--text);line-height:1.2}
+.sub-detail-name{font-size:16px;font-weight:500;color:var(--text);line-height:1.2}
 .sub-detail-badge{
   display:inline-flex;align-items:center;
   margin-top:5px;padding:3px 10px;border-radius:99px;
-  font-size:11px;font-weight:700;color:#fff;
+  font-size:11px;font-weight:500;color:#fff;
 }
 /* Qty card */
 .sub-qty-card{
   margin:12px 16px;background:var(--surface);
   border-radius:var(--r-md);border:1.5px solid var(--sep);padding:12px 14px;
 }
-.sub-qty-card-label{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px}
+.sub-qty-card-label{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:8px}
 .sub-qty-card-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .sub-qty-main-input{
   border:2px solid var(--accent);border-radius:var(--r-sm);
   background:var(--accent-lt);color:var(--accent);
-  font-size:18px;font-weight:800;
+  font-size:18px;font-weight:600;
   width:90px;padding:7px 10px;text-align:center;outline:none;
 }
 .sub-qty-unit-seg{display:flex;gap:4px}
 .sub-qty-unit-btn{
   border:1.5px solid var(--sep);background:var(--surface2);
   border-radius:var(--r-sm);color:var(--text2);
-  font-size:12px;font-weight:700;padding:6px 10px;cursor:pointer;
+  font-size:12px;font-weight:500;padding:6px 10px;cursor:pointer;
 }
 .sub-qty-unit-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
 .sub-qty-kcal-display{
-  flex:1;text-align:right;font-size:13px;font-weight:700;
+  flex:1;text-align:right;font-size:13px;font-weight:500;
   color:var(--text2);white-space:nowrap;min-width:80px;
 }
 /* Sort row */
 .sub-list-section{padding:4px 16px 8px}
-.sub-list-hint{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px}
+.sub-list-hint{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:8px}
 .sub-sort-row{display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
 .sub-sort-row::-webkit-scrollbar{display:none}
 .sub-sort-btn{
   flex-shrink:0;border:1.5px solid var(--sep);background:var(--surface2);
   border-radius:99px;color:var(--text2);
-  font-size:11px;font-weight:700;padding:5px 13px;cursor:pointer;white-space:nowrap;
+  font-size:11px;font-weight:500;padding:5px 13px;cursor:pointer;white-space:nowrap;
 }
 .sub-sort-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
 /* Result items */
@@ -1187,29 +1136,23 @@ body{
   font-size:24px;flex-shrink:0;
 }
 .sub-result-info{flex:1;min-width:0}
-.sub-result-name{font-size:14px;font-weight:700;color:var(--text)}
+.sub-result-name{font-size:14px;font-weight:500;color:var(--text)}
 .sub-result-sub{font-size:11.5px;color:var(--text2);margin-top:2px}
 .sub-result-qty-wrap{display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0;gap:1px}
-.sub-result-qty{font-size:20px;font-weight:900;letter-spacing:-.5px;white-space:nowrap;color:var(--accent)}
-.sub-result-qty-lbl{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
+.sub-result-qty{font-size:20px;font-weight:600;letter-spacing:-.5px;white-space:nowrap;color:var(--accent)}
+.sub-result-qty-lbl{font-size:9px;font-weight:400;color:var(--text3);letter-spacing:.5px}
 .sub-no-results{text-align:center;padding:40px 20px;color:var(--text2);font-size:14px}
 
 /* ── Calorie card hero (redesigned hierarchy) ── */
 .cal-hero-remaining{text-align:center;margin:8px 0 14px}
-.cal-hero-val{font-size:52px;font-weight:900;letter-spacing:-2.5px;line-height:1;color:var(--accent)}
-.cal-hero-lbl{font-size:12px;font-weight:700;color:var(--text2);margin-top:5px;text-transform:uppercase;letter-spacing:.5px}
+.cal-hero-val{font-size:52px;font-weight:600;letter-spacing:-2px;line-height:1;color:var(--accent)}
+.cal-hero-lbl{font-size:13px;font-weight:400;color:var(--text2);margin-top:5px;letter-spacing:.2px}
 .cal-hero-remaining.danger .cal-hero-val{color:var(--red)}
 .cal-sub-row{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:16px}
 .cal-sub-item{text-align:center}
-.cal-sub-val{font-size:17px;font-weight:800;letter-spacing:-.3px}
-.cal-sub-lbl{font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
+.cal-sub-val{font-size:17px;font-weight:600;letter-spacing:-.2px}
+.cal-sub-lbl{font-size:11px;font-weight:400;color:var(--text2);letter-spacing:.2px;margin-top:2px}
 .cal-sub-sep{font-size:14px;color:var(--text3);padding:0 6px;padding-bottom:14px}
-.calorie-card .cal-hero-val{color:#fff!important}
-.calorie-card .cal-hero-remaining.danger .cal-hero-val{color:#fca5a5!important}
-.calorie-card .cal-hero-lbl{color:rgba(255,255,255,.68)!important}
-.calorie-card .cal-sub-val{color:#fff!important}
-.calorie-card .cal-sub-lbl{color:rgba(255,255,255,.58)!important}
-.calorie-card .cal-sub-sep{color:rgba(255,255,255,.35)!important}
 
 /* ── Voice item entrance animation ── */
 @keyframes voice-item-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
@@ -1222,6 +1165,34 @@ body{
 /* ── Barcode overlay: fix title/button overlap on small screens ── */
 .barcode-hdr-title-fixed{padding:0 72px}
 
+/* ── More screen ── */
+#screen-more{
+  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  overscroll-behavior-y:contain;padding-bottom:32px;
+}
+.more-section{margin:16px 16px 0}
+.more-list{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
+.more-item{
+  display:flex;align-items:center;gap:12px;width:100%;
+  padding:14px 16px;border:none;background:transparent;
+  border-bottom:1px solid var(--border);cursor:pointer;text-align:left;
+  font-family:inherit;color:var(--text-primary);
+  transition:background .12s;
+}
+.more-item:last-child{border-bottom:none}
+.more-item:active{background:var(--bg-secondary)}
+.more-item-icon{
+  width:36px;height:36px;border-radius:var(--r-md);flex-shrink:0;
+  background:var(--bg-secondary);color:var(--text-secondary);
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+}
+.more-item-icon svg{width:18px;height:18px;display:block}
+.more-item-body{flex:1;min-width:0}
+.more-item-title{display:block;font-size:15px;font-weight:500;letter-spacing:-.1px}
+.more-item-sub{display:block;font-size:12.5px;color:var(--text-secondary);margin-top:2px;line-height:1.4}
+.more-item-arrow{color:var(--text-tertiary);flex-shrink:0;display:flex}
+.more-item-arrow svg{width:18px;height:18px;display:block}
+
 /* ── Bottom Tab Bar ── */
 .tab-bar{
   flex-shrink:0;width:100%;z-index:15;
@@ -1229,7 +1200,6 @@ body{
   padding-bottom:max(env(safe-area-inset-bottom,0px),0px);
   background:var(--surface);
   border-top:1px solid var(--sep);
-  box-shadow:0 -4px 24px rgba(0,0,0,.08);
   display:flex;align-items:center;padding-top:4px;
 }
 .tab-item{
@@ -1246,6 +1216,7 @@ body{
   transition:transform .22s cubic-bezier(.34,1.5,.64,1);
   position:relative;z-index:1;
 }
+.tab-icon svg{width:22px;height:22px;display:block}
 .tab-item.active .tab-icon{transform:scale(1.14)}
 .tab-icon-pill{
   position:absolute;top:4px;left:50%;transform:translateX(-50%);
@@ -1255,7 +1226,7 @@ body{
   opacity:0;transform:translateX(-50%) scale(.7);
 }
 .tab-item.active .tab-icon-pill{opacity:1;transform:translateX(-50%) scale(1)}
-.tab-label{font-size:10px;font-weight:700;letter-spacing:.2px;position:relative;z-index:1}
+.tab-label{font-size:10px;font-weight:500;letter-spacing:.2px;position:relative;z-index:1}
 </style>
 </head>
 <body>
@@ -1265,7 +1236,7 @@ body{
 <div id="sidebar-backdrop" onclick="closeSidebar()"></div>
 <div id="sidebar">
   <div class="sidebar-top">
-    <div class="sidebar-logo-icon">🎯</div>
+    <div class="sidebar-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
     <div>
       <div class="sidebar-logo-text">Habits & Diet</div>
       <div class="sidebar-logo-sub">Tracker pessoal</div>
@@ -1273,53 +1244,54 @@ body{
   </div>
   <nav class="sidebar-nav">
     <button class="nav-item active" id="nav-habits" onclick="showScreen('habits')">
-      <span class="nav-icon">🎯</span><span>Hábitos</span>
+      <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 12l2.5 2.5L16 9"/></svg></span><span>Hábitos</span>
     </button>
     <button class="nav-item" id="nav-diet" onclick="showScreen('diet')">
-      <span class="nav-icon">🥗</span><span>Dieta</span>
+      <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c3.5-2 6-6 6-10.5a6 6 0 0 0-12 0C6 15 8.5 19 12 21Z"/><path d="M12 7V4c0-1 .8-2 2-2"/></svg></span><span>Dieta</span>
     </button>
     <button class="nav-item" id="nav-sub" onclick="showScreen('sub')">
-      <span class="nav-icon">🔄</span><span>Substituições</span>
+      <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></span><span>Substituições</span>
     </button>
     <button class="nav-item" id="nav-workout" onclick="showScreen('workout')">
-      <span class="nav-icon">🏋️</span><span>Treinos</span>
+      <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6M2 10v4M20 9v6M22 10v4M7 7v10M17 7v10M7 12h10"/></svg></span><span>Treinos</span>
     </button>
     <div style="height:1px;background:var(--sep);margin:8px 4px"></div>
-    <button class="nav-item" id="sidebar-theme-btn" onclick="toggleTheme()">
-      <span class="nav-icon" id="theme-icon">🌙</span><span>Alternar tema</span>
-    </button>
     <button class="nav-item" id="sidebar-sync-btn" onclick="handleSyncBtn()">
-      <span class="nav-icon" id="sync-icon">☁️</span><span id="sync-label">Entrar com Google</span>
+      <span class="nav-icon" id="sync-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.4 1.5A4 4 0 0 0 6.5 19h11Z"/></svg></span><span id="sync-label">Entrar com Google</span>
     </button>
   </nav>
   <div class="sidebar-footer">
     <div class="sidebar-user" id="sidebar-user">
-      <div class="sidebar-user-avatar" id="sidebar-avatar">☁️</div>
+      <div class="sidebar-user-avatar" id="sidebar-avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><path d="M17.5 19a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.4 1.5A4 4 0 0 0 6.5 19h11Z"/></svg></div>
       <span id="sidebar-name">Não conectado</span>
     </div>
   </div>
 </div>
 
 <div class="content-area">
-<div id="privacy-banner">🙈 Modo privacidade ativado</div>
+<div id="privacy-banner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;vertical-align:-2px;margin-right:4px"><path d="M3 3l18 18"/><path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"/><path d="M9.9 4.2A10.4 10.4 0 0 1 12 4c7 0 11 7 11 7a18.5 18.5 0 0 1-3.1 3.8M6.6 6.6C3.8 8.3 2 11 2 11s4 7 11 7a10.4 10.4 0 0 0 4.1-.85"/></svg>Modo privacidade ativado</div>
 
 <!-- ══ HABITS SCREEN ══ -->
 <div id="screen-habits">
   <div class="main-header">
     <div class="header-row">
       <div style="display:flex;align-items:flex-start;gap:10px">
-        <button class="icon-btn sidebar-toggle" style="margin-top:4px" onclick="toggleSidebar()">☰</button>
+        <button class="icon-btn sidebar-toggle" style="margin-top:4px" onclick="toggleSidebar()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
         <div>
-          <div class="header-greeting" id="header-greeting">Olá! 👋</div>
+          <div class="header-greeting" id="header-greeting">Olá</div>
           <div class="header-date" id="header-date"></div>
         </div>
       </div>
       <div class="header-actions">
-        <button class="icon-btn" id="privacy-btn" onclick="togglePrivacy()" title="Ocultar dados">👁️</button>
-        <button class="icon-btn" onclick="refreshData()" title="Atualizar">↻</button>
+        <button class="icon-btn" id="privacy-btn" onclick="togglePrivacy()" title="Ocultar dados"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        <button class="icon-btn" onclick="refreshData()" title="Atualizar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></button>
         <button class="add-btn" onclick="openAdd()">＋</button>
       </div>
     </div>
+  </div>
+  <div class="streak-banner" id="streak-banner">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c1 4-4 6-4 10a4 4 0 0 0 8 0c0-1-.5-2-1-2 .5 2-1 3-2 1-.5-1 .5-2 .5-4 0-2-1-3-1.5-5Z"/></svg>
+    <span><span class="streak-banner-num" id="streak-days">0</span> dias seguidos</span>
   </div>
   <div class="progress-hero">
     <div class="hero-ring-wrap">
@@ -1335,9 +1307,15 @@ body{
       <div class="hero-track"><div class="hero-fill" id="bar" style="width:0%"></div></div>
     </div>
   </div>
-  <div class="date-strip-wrap">
-    <div class="ds-label">Últimos 5 dias</div>
-    <div class="ds-cols" id="ds-cols"></div>
+  <div class="week-cal-wrap">
+    <div class="week-cal-row" id="week-cal-row"></div>
+  </div>
+  <div class="week-progress-section">
+    <div class="week-progress-hdr">
+      <span class="week-progress-title">Esta semana</span>
+      <span class="week-progress-pct" id="week-progress-pct">0%</span>
+    </div>
+    <div class="week-progress-track"><div class="week-progress-fill" id="week-progress-fill" style="width:0%"></div></div>
   </div>
   <div class="habit-list" id="list"></div>
 </div>
@@ -1347,16 +1325,16 @@ body{
   <div class="diet-header">
     <div class="diet-header-top">
       <div style="display:flex;align-items:center;gap:10px">
-        <button class="icon-btn sidebar-toggle" onclick="toggleSidebar()">☰</button>
+        <button class="icon-btn sidebar-toggle" onclick="toggleSidebar()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
         <div>
           <div class="diet-header-title">Dieta</div>
           <div class="diet-header-sub" id="diet-header-sub">Hoje</div>
         </div>
       </div>
       <div style="display:flex;gap:8px">
-        <button class="icon-btn" id="diet-privacy-btn" onclick="togglePrivacy()" title="Ocultar dados">👁️</button>
-        <button class="icon-btn" onclick="refreshData()" title="Atualizar">↻</button>
-        <button class="icon-btn" onclick="openMealConfig()" title="Configurar refeições">⚙️</button>
+        <button class="icon-btn" id="diet-privacy-btn" onclick="togglePrivacy()" title="Ocultar dados"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        <button class="icon-btn" onclick="refreshData()" title="Atualizar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></button>
+        <button class="icon-btn" onclick="openMealConfig()" title="Configurar refeições"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15 1.65 1.65 0 0 0 3 13.18H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
       </div>
     </div>
     <div class="diet-date-nav">
@@ -1374,7 +1352,7 @@ body{
   <!-- Sticky header + search -->
   <div class="sub-header">
     <div class="sub-header-top-row">
-      <button class="icon-btn sidebar-toggle" onclick="toggleSidebar()">☰</button>
+      <button class="icon-btn sidebar-toggle" onclick="toggleSidebar()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
       <div>
         <div class="sub-header-title">Substituições</div>
         <div class="sub-header-sub">Encontre equivalentes calóricos</div>
@@ -1382,7 +1360,7 @@ body{
     </div>
     <div class="sub-search-wrap">
       <div class="sub-search-bar">
-        <span class="sub-search-icon">🔍</span>
+        <span class="sub-search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span>
         <input class="sub-search-input" id="sub-search-input" type="text"
           placeholder="o que você quer trocar? (arroz, frango…)" oninput="filterSubFoods()" autocomplete="off">
       </div>
@@ -1427,15 +1405,15 @@ body{
   <div class="diet-header">
     <div class="diet-header-top">
       <div style="display:flex;align-items:center;gap:10px">
-        <button class="icon-btn sidebar-toggle" onclick="toggleSidebar()">☰</button>
+        <button class="icon-btn sidebar-toggle" onclick="toggleSidebar()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
         <div>
           <div class="diet-header-title">Treinos</div>
           <div class="diet-header-sub" id="workout-header-sub">Hoje</div>
         </div>
       </div>
       <div style="display:flex;gap:8px">
-        <button class="icon-btn" id="workout-privacy-btn" onclick="togglePrivacy()" title="Ocultar dados">👁️</button>
-        <button class="icon-btn" onclick="refreshData()" title="Atualizar">↻</button>
+        <button class="icon-btn" id="workout-privacy-btn" onclick="togglePrivacy()" title="Ocultar dados"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        <button class="icon-btn" onclick="refreshData()" title="Atualizar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></button>
       </div>
     </div>
     <div class="diet-date-nav">
@@ -1447,6 +1425,56 @@ body{
   <div class="meals-wrap" id="workout-list-wrap"></div>
 </div>
 
+<!-- ══ MORE SCREEN ══ -->
+<div id="screen-more" style="display:none">
+  <div class="diet-header">
+    <div class="diet-header-top">
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="icon-btn sidebar-toggle" onclick="toggleSidebar()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+        <div>
+          <div class="diet-header-title">Mais</div>
+          <div class="diet-header-sub">Extras e configurações</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="more-section">
+    <div class="more-list">
+      <button class="more-item" onclick="showScreen('sub')">
+        <span class="more-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></span>
+        <span class="more-item-body">
+          <span class="more-item-title">Substituições</span>
+          <span class="more-item-sub">Encontre equivalentes calóricos</span>
+        </span>
+        <span class="more-item-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
+      </button>
+    </div>
+  </div>
+  <div class="more-section">
+    <div class="more-list">
+      <div class="more-item" style="cursor:default">
+        <span class="more-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg></span>
+        <span class="more-item-body">
+          <span class="more-item-title">Modo privacidade</span>
+          <span class="more-item-sub">Oculta valores na tela</span>
+        </span>
+        <label class="ios-toggle"><input type="checkbox" id="more-privacy-toggle" onchange="togglePrivacy()"><span class="ios-track"></span></label>
+      </div>
+    </div>
+  </div>
+  <div class="more-section">
+    <div class="more-list">
+      <button class="more-item" id="more-sync-btn" onclick="handleSyncBtn()">
+        <span class="more-item-icon" id="more-sync-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.4 1.5A4 4 0 0 0 6.5 19h11Z"/></svg></span>
+        <span class="more-item-body">
+          <span class="more-item-title" id="more-sync-label">Entrar com Google</span>
+          <span class="more-item-sub" id="more-sync-sub">Sincronize seus dados entre dispositivos</span>
+        </span>
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- ══ HABIT DETAIL ══ -->
 <div class="overlay" id="screen-detail">
   <div class="detail-hdr">
@@ -1455,8 +1483,8 @@ body{
     <button class="edit-pill-btn" onclick="openEdit(currentHabitId)">Editar</button>
   </div>
   <div class="detail-freq">
-    <div class="freq-item">🔄 <span>Todos os dias</span></div>
-    <div class="freq-item">⏰ <span id="detail-time">--:--</span></div>
+    <div class="freq-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg> <span>Todos os dias</span></div>
+    <div class="freq-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg> <span id="detail-time">--:--</span></div>
   </div>
   <div class="detail-body">
     <div class="detail-section-title">Visão Geral</div>
@@ -1480,7 +1508,7 @@ body{
       </div>
       <div class="chart-wrap" id="detail-chart"></div>
     </div>
-    <button class="detail-delete" onclick="confirmDelete()">🗑 Deletar hábito</button>
+    <button class="detail-delete" onclick="confirmDelete()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg> Deletar hábito</button>
   </div>
 </div>
 
@@ -1588,13 +1616,13 @@ body{
       <div class="food-overlay-top">
         <button class="food-overlay-back" onclick="closeFoodOverlay()">‹</button>
         <div class="food-overlay-title" id="food-overlay-title">Adicionar alimento</div>
-        <button class="icon-btn" onclick="closeFoodOverlay();toggleSidebar()" style="margin-left:auto;flex-shrink:0">☰</button>
+        <button class="icon-btn" onclick="closeFoodOverlay();toggleSidebar()" style="margin-left:auto;flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
       </div>
       <div class="food-search-bar">
-        <span class="food-search-icon">🔍</span>
+        <span class="food-search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span>
         <input class="food-search-input" id="food-search-input" type="text" placeholder="Buscar alimento…" oninput="filterFoods()" autocomplete="off">
-        <button class="scan-btn" onclick="openBarcodeScanner()" title="Ler código de barras">📷</button>
-        <button class="voice-mic-btn" id="voice-mic-btn" onclick="openVoiceView()" title="Registrar por voz">🎙️</button>
+        <button class="scan-btn" onclick="openBarcodeScanner()" title="Ler código de barras"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2Z"/><circle cx="12" cy="13" r="4"/></svg></button>
+        <button class="voice-mic-btn" id="voice-mic-btn" onclick="openVoiceView()" title="Registrar por voz"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 11a7 7 0 0 1-14 0"/><path d="M12 18v4"/></svg></button>
       </div>
     </div>
     <div class="food-results" id="food-results"></div>
@@ -1603,7 +1631,7 @@ body{
   <div id="food-qty-view">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px;flex-shrink:0;padding:calc(env(safe-area-inset-top,0px)+16px) 16px 14px;background:var(--surface);border-bottom:1px solid var(--sep);box-shadow:var(--shadow-sm);">
       <button class="food-overlay-back" onclick="backToSearch()">‹</button>
-      <div style="font-size:17px;font-weight:800;letter-spacing:-.2px">Quantidade</div>
+      <div style="font-size:17px;font-weight:500;letter-spacing:-.2px">Quantidade</div>
     </div>
     <div class="qty-food-emoji" id="qty-emoji"></div>
     <div class="qty-food-name" id="qty-name"></div>
@@ -1628,7 +1656,7 @@ body{
   <div id="voice-view">
     <div class="voice-view-hdr">
       <button class="food-overlay-back" onclick="closeVoiceView()">‹</button>
-      <div style="font-size:17px;font-weight:700">Registrar por voz</div>
+      <div style="font-size:17px;font-weight:500">Registrar por voz</div>
       <div style="width:36px"></div>
     </div>
     <!-- Recording state -->
@@ -1637,14 +1665,14 @@ body{
         <div class="voice-ring r3"></div>
         <div class="voice-ring r2"></div>
         <div class="voice-ring r1"></div>
-        <div class="voice-mic-circle">🎙️</div>
+        <div class="voice-mic-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 11a7 7 0 0 1-14 0"/><path d="M12 18v4"/></svg></div>
       </div>
       <div class="voice-hint">Fale sua refeição completa</div>
       <div class="voice-hint-sub">Ex: "200ml de leite, 30g de whey e 2 ovos"</div>
       <div class="voice-transcript-box" id="voice-transcript-box" style="display:none">
         <div class="voice-transcript-text" id="voice-transcript-text"></div>
       </div>
-      <button class="voice-stop-btn" id="voice-stop-btn" onclick="stopVoice()">⏹ Parar</button>
+      <button class="voice-stop-btn" id="voice-stop-btn" onclick="stopVoice()"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg> Parar</button>
     </div>
     <!-- Results state -->
     <div id="voice-results-state" style="display:none">
@@ -1652,19 +1680,18 @@ body{
       <div class="voice-transcript-quote" id="voice-quote"></div>
       <div id="voice-items-list"></div>
       <div class="voice-no-match" id="voice-no-match" style="display:none">
-        <div style="font-size:36px">🤔</div>
-        <div style="font-size:15px;font-weight:700;margin-top:8px">Não identifiquei alimentos</div>
+        <div style="font-size:15px;font-weight:500;margin-top:8px">Não identifiquei alimentos</div>
         <div style="font-size:13px;color:var(--text2);margin-top:4px">Tente falar com mais clareza ou use a busca</div>
       </div>
       <button class="qty-add-btn" id="voice-confirm-btn" onclick="confirmVoiceItems()" style="margin-top:16px">Adicionar à refeição</button>
-      <button class="voice-retry-btn" onclick="retryVoice()">🎙️ Gravar novamente</button>
+      <button class="voice-retry-btn" onclick="retryVoice()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 11a7 7 0 0 1-14 0"/><path d="M12 18v4"/></svg> Gravar novamente</button>
     </div>
   </div>
 </div>
 
 <!-- ══ BARCODE SCANNER ══ -->
 <div id="barcode-overlay">
-  <button class="barcode-close-btn" onclick="closeBarcodeScanner()">✕</button>
+  <button class="barcode-close-btn" onclick="closeBarcodeScanner()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg></button>
   <video id="barcode-video" autoplay playsinline muted></video>
   <div class="barcode-hdr-title-fixed">Ler código de barras</div>
   <div class="barcode-aim-wrap">
@@ -1699,23 +1726,23 @@ body{
 <div class="tab-bar" id="tab-bar">
   <button class="tab-item active" id="tab-habits" onclick="showScreen('habits')">
     <div class="tab-icon-pill"></div>
-    <div class="tab-icon">🎯</div>
+    <div class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 12l2.5 2.5L16 9"/></svg></div>
     <div class="tab-label">Hábitos</div>
   </button>
   <button class="tab-item" id="tab-diet" onclick="showScreen('diet')">
     <div class="tab-icon-pill"></div>
-    <div class="tab-icon">🥗</div>
+    <div class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c3.5-2 6-6 6-10.5a6 6 0 0 0-12 0C6 15 8.5 19 12 21Z"/><path d="M12 7V4c0-1 .8-2 2-2"/></svg></div>
     <div class="tab-label">Dieta</div>
-  </button>
-  <button class="tab-item" id="tab-sub" onclick="showScreen('sub')">
-    <div class="tab-icon-pill"></div>
-    <div class="tab-icon">🔄</div>
-    <div class="tab-label">Trocas</div>
   </button>
   <button class="tab-item" id="tab-workout" onclick="showScreen('workout')">
     <div class="tab-icon-pill"></div>
-    <div class="tab-icon">🏋️</div>
+    <div class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6M2 10v4M20 9v6M22 10v4M7 7v10M17 7v10M7 12h10"/></svg></div>
     <div class="tab-label">Treinos</div>
+  </button>
+  <button class="tab-item" id="tab-more" onclick="showScreen('more')">
+    <div class="tab-icon-pill"></div>
+    <div class="tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div>
+    <div class="tab-label">Mais</div>
   </button>
 </div>
 
@@ -1737,13 +1764,22 @@ function handleSyncBtn(){
   if(fbUser){if(confirm(`Conta: ${fbUser.displayName}\n\nDeseja sair?`))auth.signOut();}
   else{const p=new firebase.auth.GoogleAuthProvider();auth.signInWithPopup(p).catch(e=>{if(e.code==='auth/popup-blocked'||e.code==='auth/cancelled-popup-request')auth.signInWithRedirect(p);else console.error(e);});}
 }
+const ICON_CLOUD='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.4 1.5A4 4 0 0 0 6.5 19h11Z"/></svg>';
+const ICON_USER='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>';
 function updateSyncBtn(){
+  const icon=fbUser&&fbUser.photoURL?`<img src="${fbUser.photoURL}" style="width:24px;height:24px;border-radius:50%;pointer-events:none">`:(fbUser?ICON_USER:ICON_CLOUD);
+  const label=fbUser?'Sair da conta':'Entrar com Google';
+  const sub=fbUser?(fbUser.displayName||'Conectado'):'Sincronize seus dados entre dispositivos';
   const si=document.getElementById('sync-icon'),sl=document.getElementById('sync-label');
-  if(si)si.innerHTML=fbUser&&fbUser.photoURL?`<img src="${fbUser.photoURL}" style="width:24px;height:24px;border-radius:50%;pointer-events:none">`:(fbUser?'👤':'☁️');
-  if(sl)sl.textContent=fbUser?'Sair da conta':'Entrar com Google';
+  if(si)si.innerHTML=icon;
+  if(sl)sl.textContent=label;
   const av=document.getElementById('sidebar-avatar'),nm=document.getElementById('sidebar-name');
-  if(av)av.innerHTML=fbUser&&fbUser.photoURL?`<img src="${fbUser.photoURL}" style="width:32px;height:32px;border-radius:50%">`:(fbUser?'👤':'☁️');
+  if(av)av.innerHTML=fbUser&&fbUser.photoURL?`<img src="${fbUser.photoURL}" style="width:32px;height:32px;border-radius:50%">`:(fbUser?ICON_USER:ICON_CLOUD);
   if(nm)nm.textContent=fbUser?fbUser.displayName||'Conectado':'Não conectado';
+  const msi=document.getElementById('more-sync-icon'),msl=document.getElementById('more-sync-label'),mss=document.getElementById('more-sync-sub');
+  if(msi)msi.innerHTML=icon;
+  if(msl)msl.textContent=label;
+  if(mss)mss.textContent=sub;
 }
 async function loadFromCloud(){if(!fbUser)return;try{const s=await db.collection('users').doc(fbUser.uid).get();if(s.exists){const d=s.data();if(d.habits)localStorage.setItem('habits',JSON.stringify(d.habits));if(d.comp)localStorage.setItem('comp',JSON.stringify(d.comp));if(d.diet)localStorage.setItem('diet',JSON.stringify(d.diet));if(d.dietGoal)localStorage.setItem('dietGoal',String(d.dietGoal));if(d.dietMeals)localStorage.setItem('dietMeals',JSON.stringify(d.dietMeals));if(d.workouts)localStorage.setItem('workouts',JSON.stringify(d.workouts));render();if(activeScreen==='diet')renderDiet();if(activeScreen==='workout')renderWorkout();}else pushToCloud();}catch(e){console.warn(e);}}
 async function pushToCloud(){if(!fbUser)return;try{await db.collection('users').doc(fbUser.uid).set({habits:getHabits(),comp:getComp(),diet:getDiet(),dietGoal:getGoal(),dietMeals:getDietMeals(),workouts:getWorkouts(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});}catch(e){console.warn(e);}}
@@ -2028,13 +2064,22 @@ let editingEntry=null,cfgMealsEditing=[];
 let privacyMode=false;
 function mask(t){return privacyMode?'••••••':t}
 function maskN(n){return privacyMode?'••':n}
+const ICON_EYE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>';
+const ICON_EYE_OFF='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18"/><path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"/><path d="M9.9 4.2A10.4 10.4 0 0 1 12 4c7 0 11 7 11 7a18.5 18.5 0 0 1-3.1 3.8M6.6 6.6C3.8 8.3 2 11 2 11s4 7 11 7a10.4 10.4 0 0 0 4.1-.85"/></svg>';
 function togglePrivacy(){
   privacyMode=!privacyMode;
-  const icon=privacyMode?'🙈':'👁️';
-  ['privacy-btn','diet-privacy-btn','workout-privacy-btn'].forEach(id=>{const b=document.getElementById(id);if(b)b.textContent=icon;});
+  const icon=privacyMode?ICON_EYE_OFF:ICON_EYE;
+  ['privacy-btn','diet-privacy-btn','workout-privacy-btn'].forEach(id=>{const b=document.getElementById(id);if(b)b.innerHTML=icon;});
   const banner=document.getElementById('privacy-banner');
   if(banner)banner.classList.toggle('visible',privacyMode);
+  const mp=document.getElementById('more-privacy-toggle');
+  if(mp)mp.checked=privacyMode;
   if(activeScreen==='diet')renderDiet();else if(activeScreen==='workout')renderWorkout();else render();
+}
+function renderMore(){
+  const mp=document.getElementById('more-privacy-toggle');
+  if(mp)mp.checked=privacyMode;
+  updateSyncBtn();
 }
 function refreshData(){
   document.querySelectorAll('[onclick="refreshData()"]').forEach(b=>{
@@ -2119,17 +2164,17 @@ function renderDiet(){
       <div class="calorie-track"><div class="calorie-track-fill${over?' danger':''}" style="width:${privacyMode?0:pct}%"></div></div>
     </div>
     <div class="macro-row">
-      <div class="macro-pill" style="background:linear-gradient(145deg,rgba(239,68,68,.1) 0%,var(--surface) 65%)">
+      <div class="macro-pill">
         <div class="macro-pill-label">Proteína</div>
         <div class="macro-pill-val" style="color:#EF4444">${maskN(totals.prot)}g</div>
         <div class="macro-pill-bar"><div class="macro-pill-bar-fill" style="width:${privacyMode?0:Math.min(100,totals.prot/gProt*100)}%;background:#EF4444"></div></div>
       </div>
-      <div class="macro-pill" style="background:linear-gradient(145deg,rgba(245,158,11,.1) 0%,var(--surface) 65%)">
+      <div class="macro-pill">
         <div class="macro-pill-label">Carboidrato</div>
         <div class="macro-pill-val" style="color:#F59E0B">${maskN(totals.carb)}g</div>
         <div class="macro-pill-bar"><div class="macro-pill-bar-fill" style="width:${privacyMode?0:Math.min(100,totals.carb/gCarb*100)}%;background:#F59E0B"></div></div>
       </div>
-      <div class="macro-pill" style="background:linear-gradient(145deg,rgba(139,92,246,.1) 0%,var(--surface) 65%)">
+      <div class="macro-pill">
         <div class="macro-pill-label">Gordura</div>
         <div class="macro-pill-val" style="color:#8B5CF6">${maskN(totals.fat)}g</div>
         <div class="macro-pill-bar"><div class="macro-pill-bar-fill" style="width:${privacyMode?0:Math.min(100,totals.fat/gFat*100)}%;background:#8B5CF6"></div></div>
@@ -2149,12 +2194,12 @@ function renderDiet(){
           <div class="food-item-sub">${maskN(e.qty)}${e.unit} · P:${maskN(e.prot)}g C:${maskN(e.carb)}g G:${maskN(e.fat)}g</div>
         </div>
         <div class="food-item-kcal">${maskN(e.kcal)} kcal</div>
-        <button class="food-item-edit" onclick="editFoodEntry('${m.id}','${e.eid}')">✏️</button>
+        <button class="food-item-edit" onclick="editFoodEntry('${m.id}','${e.eid}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
         <button class="food-item-del" onclick="removeFoodEntry('${m.id}','${e.eid}')">×</button>
       </div>`).join('');
     return `
       <div class="meal-card">
-        <div class="meal-header" style="background:linear-gradient(135deg,${m.bg} 0%,transparent 70%)">
+        <div class="meal-header" style="background:${m.bg}">
           <div class="meal-icon-wrap" style="background:${m.bg}"><span>${m.emoji}</span></div>
           <div class="meal-title-wrap">
             <div class="meal-name-text">${mask(m.name)}</div>
@@ -2227,11 +2272,11 @@ function closeMealConfig(){
   renderDiet();
 }
 function renderMealConfig(){
-  const hint=cfgMealsEditing.length>1?`<div class="cfg-drag-hint">Segure ⠿ e arraste para reordenar</div>`:'';
+  const hint=cfgMealsEditing.length>1?`<div class="cfg-drag-hint">Segure e arraste para reordenar</div>`:'';
   document.getElementById('cfg-meals-list').innerHTML=hint+cfgMealsEditing.map(m=>`
     <div class="cfg-meal-row-wrap">
       <div class="cfg-meal-row" id="cfg-row-${m.id}">
-        <div class="cfg-drag-handle">⠿</div>
+        <div class="cfg-drag-handle"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg></div>
         <button class="cfg-emoji-btn" onclick="toggleEmojiPicker('${m.id}')">${m.emoji}</button>
         <input class="cfg-name-input" data-id="${m.id}" value="${m.name}" placeholder="Nome da refeição" onchange="updateMealName('${m.id}',this.value)">
         ${cfgMealsEditing.length>1?`<button class="cfg-del-btn" onclick="deleteMealConfig('${m.id}')">−</button>`:''}
@@ -2445,7 +2490,7 @@ function filterFoods(){
     ];
     document.getElementById('food-results').innerHTML=
       `<div class="food-empty-state">
-        <div class="food-empty-icon">🍽️</div>
+        <div class="food-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div>
         <div class="food-empty-title">O que você vai comer?</div>
         <div class="food-empty-sub">Digite o nome ou escolha uma sugestão</div>
         <div class="food-quick-chips">${chips.map(c=>`<button class="food-quick-chip" onclick="quickFoodSearch('${c.l}')">${c.e} ${c.l}</button>`).join('')}</div>
@@ -2598,7 +2643,7 @@ async function fetchOnlineFoods(q){
     if(offOnly.length)html+=`<div class="food-cat-header">🌐 Produtos (Open Food Facts)</div>`+offOnly.slice(0,10).map(f=>foodResultHTML(f,true)).join('');
     if(usdaOnly.length)html+=`<div class="food-cat-header">🇺🇸 USDA (sem resultado BR)</div>`+usdaOnly.slice(0,5).map(f=>foodResultHTML(f,true)).join('');
     if(!html){
-      html=`<div style="padding:40px 24px;text-align:center;color:var(--text2);font-size:14px;line-height:1.6">Nenhum resultado para "<b>${q}</b>"<br><span style="font-size:12px;color:var(--text3)">Tente termos mais simples ou use o código de barras 📷</span></div>`;
+      html=`<div style="padding:40px 24px;text-align:center;color:var(--text2);font-size:14px;line-height:1.6">Nenhum resultado para "<b>${q}</b>"<br><span style="font-size:12px;color:var(--text3)">Tente termos mais simples ou use o código de barras</span></div>`;
     }
     document.getElementById('food-results').innerHTML=html;
   }catch(e){
@@ -2802,8 +2847,8 @@ async function lookupBarcode(ean){
   document.getElementById('food-overlay').classList.add('open');
   document.getElementById('food-results').innerHTML=
     `<div style="padding:24px 16px;text-align:center">
-      <div style="font-size:36px;margin-bottom:8px">🔍</div>
-      <div style="font-size:14px;font-weight:700;color:var(--text)">Código não encontrado</div>
+      <div style="display:flex;justify-content:center;color:var(--text3);margin-bottom:8px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="32" height="32"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div>
+      <div style="font-size:14px;font-weight:500;color:var(--text)">Código não encontrado</div>
       <div style="font-size:12px;color:var(--text2);margin-top:6px">EAN: ${ean}<br>Busque pelo nome do produto acima</div>
     </div>`;
 }
@@ -3190,7 +3235,7 @@ function renderWorkout(){
         <div class="food-item-name">${mask(e.name)}</div>
         <div class="food-item-sub">${maskN(e.weight)}kg · ${maskN(e.sets)}x${maskN(e.reps)}</div>
       </div>
-      <button class="food-item-edit" onclick="openWorkoutEdit('${e.id}')">✏️</button>
+      <button class="food-item-edit" onclick="openWorkoutEdit('${e.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
       <button class="food-item-del" onclick="deleteWorkoutEntry('${e.id}')">×</button>
     </div>`).join('');
   document.getElementById('workout-list-wrap').innerHTML=`
@@ -3319,7 +3364,7 @@ function renderWorkoutDetail(){
   document.getElementById('wk-stat-max').textContent=maskN(maxW)+'kg';
   document.getElementById('wk-stat-last').textContent=maskN(lastW)+'kg';
   document.getElementById('wk-stat-count').textContent=maskN(entries.length);
-  document.getElementById('workout-detail-chart').innerHTML=exerciseChartHTML(entries,'#6366F1');
+  document.getElementById('workout-detail-chart').innerHTML=exerciseChartHTML(entries,'#C85A3A');
   const hist=entries.slice().reverse().slice(0,30);
   document.getElementById('workout-detail-history').innerHTML=hist.length?hist.map(e=>{
     const d=new Date(e.date+'T12:00:00');
@@ -3370,29 +3415,22 @@ function showScreen(name){
   document.getElementById('screen-diet').style.display=name==='diet'?'':'none';
   document.getElementById('screen-sub').style.display=name==='sub'?'':'none';
   document.getElementById('screen-workout').style.display=name==='workout'?'':'none';
+  document.getElementById('screen-more').style.display=name==='more'?'':'none';
   document.getElementById('nav-habits').classList.toggle('active',name==='habits');
   document.getElementById('nav-diet').classList.toggle('active',name==='diet');
   document.getElementById('nav-sub').classList.toggle('active',name==='sub');
   document.getElementById('nav-workout').classList.toggle('active',name==='workout');
   document.getElementById('tab-habits').classList.toggle('active',name==='habits');
   document.getElementById('tab-diet').classList.toggle('active',name==='diet');
-  document.getElementById('tab-sub').classList.toggle('active',name==='sub');
   document.getElementById('tab-workout').classList.toggle('active',name==='workout');
+  document.getElementById('tab-more').classList.toggle('active',name==='more'||name==='sub');
   closeSidebar();
   if(name==='diet'){dietDate=today2();renderDiet();}
   if(name==='habits')render();
   if(name==='sub')initSubLanding();
   if(name==='workout'){workoutDate=today2();renderWorkout();}
+  if(name==='more')renderMore();
 }
-
-// ── Theme ──────────────────────────────────────────────
-function isDarkNow(){const s=localStorage.getItem('theme');return s?s==='dark':window.matchMedia('(prefers-color-scheme:dark)').matches}
-function applyTheme(dark){
-  document.documentElement.setAttribute('data-theme',dark?'dark':'light');
-  const ti=document.getElementById('theme-icon');if(ti)ti.textContent=dark?'☀️':'🌙';
-}
-function toggleTheme(){const dark=!isDarkNow();localStorage.setItem('theme',dark?'dark':'light');applyTheme(dark)}
-applyTheme(isDarkNow());
 
 // ── Habits storage ─────────────────────────────────────
 function getHabits(){return JSON.parse(localStorage.getItem('habits')||'null')||DEFAULT_HABITS}
@@ -3402,16 +3440,17 @@ function saveComp(c){localStorage.setItem('comp',JSON.stringify(c));pushToCloud(
 function uid(){return 'h'+Date.now().toString(36)}
 function dateKey(d){if(!d)d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function today(){return dateKey()}
-function last5(){return Array.from({length:5},(_,i)=>{const d=new Date();d.setDate(d.getDate()-(4-i));return dateKey(d)})}
 
 // ── Habit calcs ────────────────────────────────────────
 function calcStreak(id,comp){const t=today(),d=new Date();if(!(comp[t]||[]).includes(id))d.setDate(d.getDate()-1);let n=0;while(n<3650){const k=dateKey(d);if((comp[k]||[]).includes(id)){n++;d.setDate(d.getDate()-1);}else break;}return n}
+function calcOverallStreak(comp,habits){if(!habits.length)return 0;const t=today();let d=new Date();if((comp[t]||[]).length!==habits.length)d.setDate(d.getDate()-1);let n=0;while(n<3650){const k=dateKey(d);if((comp[k]||[]).length===habits.length){n++;d.setDate(d.getDate()-1);}else break;}return n}
+function weekDates(){const now=new Date(),dow=(now.getDay()+6)%7,monday=new Date(now);monday.setDate(now.getDate()-dow);return Array.from({length:7},(_,i)=>{const d=new Date(monday);d.setDate(monday.getDate()+i);return dateKey(d)})}
 function calcScore(id,comp){const t=today(),now=new Date(),allDates=Object.keys(comp).filter(d=>d<=t).sort();let totalDays=1,totalDone=0;if(allDates.length){const start=new Date(allDates[0]);totalDays=Math.max(1,Math.round((now-start)/86400000)+1);for(const[day,ids]of Object.entries(comp))if(day<=t&&ids.includes(id))totalDone++;}const dom=now.getDate(),yr=now.getFullYear(),mo=now.getMonth();let mDone=0;for(let i=1;i<=dom;i++){const k=`${yr}-${String(mo+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;if((comp[k]||[]).includes(id))mDone++;}const doy=Math.round((now-new Date(yr,0,1))/86400000)+1;let yDone=0;for(let i=0;i<doy;i++){const d2=new Date(yr,0,1+i);const k=dateKey(d2);if(k<=t&&(comp[k]||[]).includes(id))yDone++;}return{score:Math.round(totalDone/totalDays*100),month:Math.round(mDone/dom*100),year:Math.round(yDone/doy*100)}}
 function monthPct(id,comp){const now=new Date(),dom=now.getDate();let done=0;for(let i=1;i<=dom;i++){const k=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;if((comp[k]||[]).includes(id))done++;}return dom>0?done/dom:0}
 
 // ── SVG ────────────────────────────────────────────────
 function miniRing(id,comp,color){const S=30,r=12,cx=15,cy=15,circ=+(2*Math.PI*r).toFixed(2),pct=monthPct(id,comp),off=+(circ*(1-pct)).toFixed(2),isDone=(comp[today()]||[]).includes(id);const arc=pct>0?`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="2.5" stroke-dasharray="${circ}" stroke-dashoffset="${off}" stroke-linecap="round" transform="rotate(-90 ${cx} ${cy})"/>`:'';const center=isDone?`<text x="${cx}" y="${cy+4}" text-anchor="middle" font-size="11" font-weight="800" fill="${color}">✓</text>`:'';return`<svg width="${S}" height="${S}" viewBox="0 0 ${S} ${S}"><circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--sep)" stroke-width="2.5"/>${arc}${center}</svg>`}
-function heroRing(pct){const S=70,r=28,cx=35,cy=35,circ=+(2*Math.PI*r).toFixed(2),off=+(circ*(1-pct/100)).toFixed(2);const arc=pct>0?`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(255,255,255,.93)" stroke-width="5.5" stroke-dasharray="${circ}" stroke-dashoffset="${off}" stroke-linecap="round" transform="rotate(-90 ${cx} ${cy})"/>`:'';return`<svg width="${S}" height="${S}" viewBox="0 0 ${S} ${S}"><circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="5.5"/>${arc}</svg>`}
+function heroRing(pct){const S=70,r=28,cx=35,cy=35,circ=+(2*Math.PI*r).toFixed(2),off=+(circ*(1-pct/100)).toFixed(2);const arc=pct>0?`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--accent)" stroke-width="5.5" stroke-dasharray="${circ}" stroke-dashoffset="${off}" stroke-linecap="round" transform="rotate(-90 ${cx} ${cy})"/>`:'';return`<svg width="${S}" height="${S}" viewBox="0 0 ${S} ${S}"><circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--border)" stroke-width="5.5"/>${arc}</svg>`}
 function bigRing(pct,color){const S=78,r=30,cx=39,cy=39,circ=+(2*Math.PI*r).toFixed(2),off=+(circ*(1-pct/100)).toFixed(2);const arc=pct>0?`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="5" stroke-dasharray="${circ}" stroke-dashoffset="${off}" stroke-linecap="round" transform="rotate(-90 ${cx} ${cy})"/>`:'';return`<svg width="${S}" height="${S}" viewBox="0 0 ${S} ${S}"><circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--sep)" stroke-width="5"/>${arc}<text x="${cx}" y="${cy+6}" text-anchor="middle" font-size="14" font-weight="800" fill="${color}">${pct}%</text></svg>`}
 function chartHTML(id,comp,color,view){const W=320,H=110,pL=28,pR=8,pT=8,pB=22,cW=W-pL-pR,cH=H-pT-pB,x=f=>pL+f*cW,y=v=>pT+(1-v/100)*cH;let pts=[];if(view==='month'){for(let i=0;i<30;i++){const d=new Date();d.setDate(d.getDate()-(29-i));pts.push({f:i/29,v:(comp[dateKey(d)]||[]).includes(id)?100:0});}}else{for(let i=0;i<12;i++){const d=new Date();d.setMonth(d.getMonth()-(11-i));const yr=d.getFullYear(),mo=d.getMonth(),dim=new Date(yr,mo+1,0).getDate(),last=i===11?new Date().getDate():dim;let done=0;for(let day=1;day<=last;day++){const k=`${yr}-${String(mo+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;if((comp[k]||[]).includes(id))done++;}pts.push({f:i/11,v:Math.round(done/last*100)});}}const poly=pts.map(p=>`${x(p.f).toFixed(1)},${y(p.v).toFixed(1)}`).join(' '),area=`${x(0).toFixed(1)},${(pT+cH).toFixed(1)} ${poly} ${x(1).toFixed(1)},${(pT+cH).toFixed(1)}`,grid=[0,50,100].map(v=>`<line x1="${pL}" y1="${y(v).toFixed(1)}" x2="${pL+cW}" y2="${y(v).toFixed(1)}" stroke="var(--sep)" stroke-width="0.5"/><text x="${pL-3}" y="${(y(v)+4).toFixed(1)}" text-anchor="end" font-size="8" fill="var(--text2)">${v}</text>`).join(''),ticks=view==='month'?[0,7,14,21,29].map(i=>{const d=new Date();d.setDate(d.getDate()-(29-i));return`<text x="${x(i/29).toFixed(1)}" y="${H-4}" text-anchor="middle" font-size="8" fill="var(--text2)">${d.getDate()}/${d.getMonth()+1}</text>`;}).join(''):[0,3,6,9,11].map(i=>{const d=new Date();d.setMonth(d.getMonth()-(11-i));return`<text x="${x(i/11).toFixed(1)}" y="${H-4}" text-anchor="middle" font-size="8" fill="var(--text2)">${MONTHS_S[d.getMonth()]}</text>`;}).join(''),dots=pts.map(p=>`<circle cx="${x(p.f).toFixed(1)}" cy="${y(p.v).toFixed(1)}" r="2.5" fill="${color}"/>`).join('');return`<svg width="100%" viewBox="0 0 ${W} ${H}" style="display:block">${grid}<polygon points="${area}" fill="${color}20"/><polyline points="${poly}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>${dots}${ticks}</svg>`}
 function calendarHTML(id,comp,color,yr,mo){const t=today(),firstDow=(new Date(yr,mo,1).getDay()+6)%7,dim=new Date(yr,mo+1,0).getDate();let cells='';for(let i=0;i<firstDow;i++)cells+=`<div class="cal-cell"></div>`;for(let d=1;d<=dim;d++){const k=`${yr}-${String(mo+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`,done=(comp[k]||[]).includes(id),isT=k===t,isFut=k>t;let cls='cal-day',sty='';if(done){cls+=' done';sty=`background:${color}`}else if(isT){cls+=' today';sty=`border:2.5px solid ${color};color:${color}`}else if(isFut){cls+=' future'}cells+=`<div class="cal-cell"><div class="${cls}" style="${sty}">${d}</div></div>`;}return`<div class="cal-nav"><button class="cal-nav-btn" onclick="navMonth(-1)">‹</button><span class="cal-month-label">${MONTHS[mo]} ${yr}</span><button class="cal-nav-btn" onclick="navMonth(1)">›</button></div><div class="cal-grid">${WDAYS_MON.map(d=>`<div class="cal-hdr">${d}</div>`).join('')}${cells}</div>`}
@@ -3439,11 +3478,12 @@ function saveHabit(){const name=document.getElementById('edit-name').value.trim(
 function toggle(id,e){e.stopPropagation();const c=getComp(),d=today();c[d]=c[d]||[];const i=c[d].indexOf(id);i>=0?c[d].splice(i,1):c[d].push(id);saveComp(c);render();if(currentHabitId===id)renderDetail()}
 
 // ── Main render ────────────────────────────────────────
-function setGreeting(){const h=new Date().getHours(),greet=h<12?'Bom dia! ☀️':h<18?'Boa tarde! 🌤':'Boa noite! 🌙';document.getElementById('header-greeting').textContent=greet;const now=new Date();document.getElementById('header-date').textContent=`${WDAYS[now.getDay()]}, ${now.getDate()} de ${MONTHS[now.getMonth()]}`}
+function setGreeting(){const h=new Date().getHours(),greet=h<12?'Bom dia':h<18?'Boa tarde':'Boa noite';document.getElementById('header-greeting').textContent=greet;const now=new Date();document.getElementById('header-date').textContent=`${WDAYS[now.getDay()]}, ${now.getDate()} de ${MONTHS[now.getMonth()]}`}
+const ICON_CHECK_SM='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4L19 8"/></svg>';
+const ICON_FLAME_SM='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c1 4-4 6-4 10a4 4 0 0 0 8 0c0-1-.5-2-1-2 .5 2-1 3-2 1-.5-1 .5-2 .5-4 0-2-1-3-1.5-5Z"/></svg>';
 function render(){
   setGreeting();
-  const habits=getHabits(),comp=getComp(),t=today(),days=last5();
-  document.getElementById('ds-cols').innerHTML=days.map(d=>{const dt=new Date(d+'T12:00:00'),isT=d===t;return`<div class="ds-col${isT?' today':''}"><div class="dn">${dt.getDate()}</div><div class="dw">${WDAYS[dt.getDay()]}</div></div>`;}).join('');
+  const habits=getHabits(),comp=getComp(),t=today();
   const done=(comp[t]||[]).length,total=habits.length,pct=total?Math.round(done/total*100):0,allDone=total>0&&done===total;
   document.getElementById('hero-ring').innerHTML=heroRing(pct);
   document.getElementById('hero-pct-text').textContent=pct+'%';
@@ -3451,10 +3491,29 @@ function render(){
   document.getElementById('bar').style.background='';
   document.getElementById('bar').style.width=total?(done/total*100)+'%':'0%';
   if(total===0){document.getElementById('hero-title').textContent='Nenhum hábito ainda';document.getElementById('hero-sub').textContent='Toque em + para começar';}
-  else if(allDone){document.getElementById('hero-title').textContent='Perfeito! 🎉';document.getElementById('hero-sub').textContent=`${total} de ${total} concluídos`;}
+  else if(allDone){document.getElementById('hero-title').textContent='Perfeito!';document.getElementById('hero-sub').textContent=`${total} de ${total} concluídos`;}
   else{document.getElementById('hero-title').textContent=`${done} de ${total} concluídos`;document.getElementById('hero-sub').textContent=done===0?'Vamos começar o dia!':`${total-done} restante${total-done===1?'':'s'}`;}
-  if(habits.length===0){document.getElementById('list').innerHTML=`<div class="empty-state"><div class="empty-icon">🎯</div><div class="empty-title">Sem hábitos ainda</div><div class="empty-sub">Crie seu primeiro hábito e comece a construir uma rotina incrível.</div><button class="empty-cta" onclick="openAdd()">Criar hábito</button></div>`;}
-  else{document.getElementById('list').innerHTML=habits.map(h=>{const isDone=(comp[t]||[]).includes(h.id),streak=calcStreak(h.id,comp),streakHtml=streak>0?`<div class="habit-streak ${streak>=3?'streak-hot':'streak-cold'}">🔥 ${streak} ${streak===1?'dia':'dias'}</div>`:'',dayDots=days.map(d=>{if(d>t)return`<div class="hday future-hday"></div>`;const ok=(comp[d]||[]).includes(h.id);if(ok)return`<div class="hday done-hday" style="background:${h.color}">✓</div>`;if(d===t)return`<div class="hday today-hday" style="border-color:${h.color}"></div>`;return`<div class="hday miss-hday">×</div>`;}).join('');return`<div class="habit-card${isDone?' done':''}" style="--hc:${h.color}"><button class="habit-chk" onclick="toggle('${h.id}',event)">${isDone?'✓':''}</button><div class="habit-body" onclick="openDetail('${h.id}')"><div class="habit-name-text">${privacyMode?'★':h.emoji} ${mask(h.name)}</div>${privacyMode?'':streakHtml}</div><div class="habit-days" onclick="openDetail('${h.id}')">${dayDots}</div></div>`;}).join('');}
+
+  document.getElementById('streak-banner').style.display=total>0?'flex':'none';
+  document.getElementById('streak-days').textContent=calcOverallStreak(comp,habits);
+
+  const wDates=weekDates(),wLabels=['S','T','Q','Q','S','S','D'];
+  document.getElementById('week-cal-row').innerHTML=wDates.map((d,i)=>{
+    const isToday=d===t,isFuture=d>t,dayDone=total>0&&(comp[d]||[]).length===total;
+    let cls='week-cal-dot';
+    if(dayDone)cls+=' done';else if(isToday)cls+=' today';else if(isFuture)cls+=' future';
+    return`<div class="week-cal-day"><div class="week-cal-lbl">${wLabels[i]}</div><div class="${cls}">${dayDone?ICON_CHECK_SM:''}</div></div>`;
+  }).join('');
+  const elapsed=wDates.filter(d=>d<=t),weekDone=elapsed.reduce((s,d)=>s+(comp[d]||[]).length,0),weekTotal=total*elapsed.length,weekPct=weekTotal>0?Math.round(weekDone/weekTotal*100):0;
+  document.getElementById('week-progress-pct').textContent=weekPct+'%';
+  document.getElementById('week-progress-fill').style.width=weekPct+'%';
+
+  if(habits.length===0){document.getElementById('list').innerHTML=`<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:48px;height:48px"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M8 12l2.5 2.5L16 9"/></svg></div><div class="empty-title">Sem hábitos ainda</div><div class="empty-sub">Crie seu primeiro hábito e comece a construir uma rotina incrível.</div><button class="empty-cta" onclick="openAdd()">Criar hábito</button></div>`;}
+  else{document.getElementById('list').innerHTML=habits.map(h=>{
+    const isDone=(comp[t]||[]).includes(h.id),streak=calcStreak(h.id,comp);
+    const streakHtml=streak>0?`<div class="habit-streak-sub">${ICON_FLAME_SM}${streak} ${streak===1?'dia':'dias'}</div>`:'';
+    return`<div class="habit-card${isDone?' done':''}"><div class="habit-icon">${privacyMode?'★':h.emoji}</div><div class="habit-body" onclick="openDetail('${h.id}')"><div class="habit-name-text">${mask(h.name)}</div>${privacyMode?'':streakHtml}</div><button class="habit-chk" onclick="toggle('${h.id}',event)">${isDone?ICON_CHECK_SM:''}</button></div>`;
+  }).join('');}
 }
 
 render();
