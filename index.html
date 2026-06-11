@@ -102,7 +102,7 @@ body{
   #sidebar-backdrop{display:none!important}
   .sidebar-toggle{display:none!important}
   .tab-bar{display:none!important}
-  #screen-habits,#screen-diet,#screen-sub{padding-bottom:24px}
+  #screen-habits,#screen-diet,#screen-sub,#screen-workout{padding-bottom:24px}
   .progress-hero{max-width:640px;margin:16px auto 0;width:calc(100% - 32px)}
   .date-strip-wrap{max-width:672px;margin:0 auto}
   .habit-list{max-width:640px;margin:0 auto;width:calc(100% - 32px)}
@@ -112,7 +112,7 @@ body{
   .sub-autocomplete{max-width:640px;margin:0 auto 4px}
   .sub-food-count{max-width:640px;margin:0 auto}
   .content-area{overflow:hidden;display:flex;flex-direction:column}
-  #screen-habits,#screen-diet,#screen-sub{flex:1;overflow-y:auto}
+  #screen-habits,#screen-diet,#screen-sub,#screen-workout{flex:1;overflow-y:auto}
   .header-greeting{font-size:30px}
   .diet-header-title{font-size:26px}
   .sub-header-title{font-size:26px}
@@ -129,6 +129,8 @@ body{
 .overlay.open{transform:translateX(0)}
 #screen-detail{z-index:50}
 #screen-edit{z-index:100}
+#screen-workout-detail{z-index:50}
+#screen-workout-edit{z-index:100}
 
 /* ── Sidebar ── */
 #sidebar-backdrop{
@@ -559,6 +561,27 @@ body{
   width:24px;height:24px;border-radius:50%;background:var(--accent-lt);
   display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;
 }
+
+/* ── WORKOUT SCREEN ── */
+#screen-workout{
+  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  overscroll-behavior-y:contain;padding-bottom:32px;
+}
+.workout-empty{padding:28px 16px;text-align:center;color:var(--text2);font-size:13px;font-weight:500;line-height:1.5}
+.workout-set-row{display:flex;gap:8px;margin:8px 0 4px}
+.workout-set-item{flex:1;text-align:center;background:var(--surface);border-radius:var(--r-md);padding:14px 8px;box-shadow:var(--shadow-sm)}
+.workout-set-input{width:100%;border:none;background:transparent;text-align:center;font-size:22px;font-weight:800;color:var(--text);font-family:inherit;outline:none}
+.workout-set-input::-webkit-outer-spin-button,.workout-set-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.workout-set-lbl{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+.wk-autocomplete{
+  margin:-6px 0 12px;background:var(--surface);border-radius:var(--r-md);
+  box-shadow:var(--shadow-sm);overflow:hidden;display:none;
+}
+.wk-ac-item{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--sep);cursor:pointer}
+.wk-ac-item:last-child{border-bottom:none}
+.wk-ac-item:active{background:var(--accent-lt)}
+.wk-ac-emoji{font-size:20px;width:28px;text-align:center;flex-shrink:0}
+.wk-ac-name{font-size:14px;font-weight:600;color:var(--text)}
 
 /* ── Food search overlay ── */
 #food-overlay{
@@ -1258,6 +1281,9 @@ body{
     <button class="nav-item" id="nav-sub" onclick="showScreen('sub')">
       <span class="nav-icon">🔄</span><span>Substituições</span>
     </button>
+    <button class="nav-item" id="nav-workout" onclick="showScreen('workout')">
+      <span class="nav-icon">🏋️</span><span>Treinos</span>
+    </button>
     <div style="height:1px;background:var(--sep);margin:8px 4px"></div>
     <button class="nav-item" id="sidebar-theme-btn" onclick="toggleTheme()">
       <span class="nav-icon" id="theme-icon">🌙</span><span>Alternar tema</span>
@@ -1396,6 +1422,31 @@ body{
   </div>
 </div>
 
+<!-- ══ WORKOUT SCREEN ══ -->
+<div id="screen-workout" style="display:none">
+  <div class="diet-header">
+    <div class="diet-header-top">
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="icon-btn sidebar-toggle" onclick="toggleSidebar()">☰</button>
+        <div>
+          <div class="diet-header-title">Treinos</div>
+          <div class="diet-header-sub" id="workout-header-sub">Hoje</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="icon-btn" id="workout-privacy-btn" onclick="togglePrivacy()" title="Ocultar dados">👁️</button>
+        <button class="icon-btn" onclick="refreshData()" title="Atualizar">↻</button>
+      </div>
+    </div>
+    <div class="diet-date-nav">
+      <button class="diet-date-btn" onclick="workoutPrevDay()">‹</button>
+      <div class="diet-date-label" id="workout-date-label">Hoje</div>
+      <button class="diet-date-btn" id="workout-next-btn" onclick="workoutNextDay()">›</button>
+    </div>
+  </div>
+  <div class="meals-wrap" id="workout-list-wrap"></div>
+</div>
+
 <!-- ══ HABIT DETAIL ══ -->
 <div class="overlay" id="screen-detail">
   <div class="detail-hdr">
@@ -1465,6 +1516,67 @@ body{
         <label class="ios-toggle"><input type="checkbox" id="edit-remind" onchange="updateDot()"><span class="ios-track"></span></label>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ══ WORKOUT ADD/EDIT ══ -->
+<div class="overlay" id="screen-workout-edit">
+  <div class="edit-hdr">
+    <button class="edit-cancel" onclick="closeWorkoutEdit()">Cancelar</button>
+    <h2 id="workout-edit-title">Novo Exercício</h2>
+    <button class="edit-save" onclick="saveWorkoutEntry()">Salvar</button>
+  </div>
+  <div class="edit-body">
+    <div class="edit-section-title">Exercício</div>
+    <div class="edit-card">
+      <div class="name-row">
+        <input class="name-input" id="workout-name-input" type="text" maxlength="40" placeholder="Ex: Supino reto" oninput="filterWorkoutExercises()" autocomplete="off">
+        <div style="font-size:24px" id="workout-emoji-preview">🏋️</div>
+      </div>
+    </div>
+    <div class="wk-autocomplete" id="wk-autocomplete"></div>
+    <div class="edit-section-title">Carga &amp; repetições</div>
+    <div class="workout-set-row">
+      <div class="workout-set-item">
+        <input class="workout-set-input" id="workout-weight-input" type="number" inputmode="decimal" min="0" step="0.5" placeholder="0">
+        <div class="workout-set-lbl">kg</div>
+      </div>
+      <div class="workout-set-item">
+        <input class="workout-set-input" id="workout-reps-input" type="number" inputmode="numeric" min="0" placeholder="0">
+        <div class="workout-set-lbl">reps</div>
+      </div>
+      <div class="workout-set-item">
+        <input class="workout-set-input" id="workout-sets-input" type="number" inputmode="numeric" min="0" placeholder="0">
+        <div class="workout-set-lbl">séries</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ WORKOUT EVOLUTION ══ -->
+<div class="overlay" id="screen-workout-detail">
+  <div class="detail-hdr">
+    <button class="back-btn" onclick="closeWorkoutDetail()">‹</button>
+    <h2 id="workout-detail-title"></h2>
+    <div style="width:36px;flex-shrink:0"></div>
+  </div>
+  <div class="detail-body">
+    <div class="detail-section-title">Recordes</div>
+    <div class="detail-section">
+      <div class="overview-row" style="padding:18px 16px">
+        <div class="overview-stats">
+          <div class="stat-col"><div class="stat-val" id="wk-stat-max">0kg</div><div class="stat-lbl">Máximo</div></div>
+          <div class="stat-col"><div class="stat-val" id="wk-stat-last">0kg</div><div class="stat-lbl">Último</div></div>
+          <div class="stat-col"><div class="stat-val" id="wk-stat-count">0</div><div class="stat-lbl">Registros</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="detail-section-title">Evolução de carga</div>
+    <div class="detail-section">
+      <div class="chart-wrap" id="workout-detail-chart"></div>
+    </div>
+    <div class="detail-section-title">Histórico</div>
+    <div class="detail-section" id="workout-detail-history"></div>
   </div>
 </div>
 
@@ -1600,6 +1712,11 @@ body{
     <div class="tab-icon">🔄</div>
     <div class="tab-label">Trocas</div>
   </button>
+  <button class="tab-item" id="tab-workout" onclick="showScreen('workout')">
+    <div class="tab-icon-pill"></div>
+    <div class="tab-icon">🏋️</div>
+    <div class="tab-label">Treinos</div>
+  </button>
 </div>
 
 </div><!-- .content-area -->
@@ -1628,8 +1745,8 @@ function updateSyncBtn(){
   if(av)av.innerHTML=fbUser&&fbUser.photoURL?`<img src="${fbUser.photoURL}" style="width:32px;height:32px;border-radius:50%">`:(fbUser?'👤':'☁️');
   if(nm)nm.textContent=fbUser?fbUser.displayName||'Conectado':'Não conectado';
 }
-async function loadFromCloud(){if(!fbUser)return;try{const s=await db.collection('users').doc(fbUser.uid).get();if(s.exists){const d=s.data();if(d.habits)localStorage.setItem('habits',JSON.stringify(d.habits));if(d.comp)localStorage.setItem('comp',JSON.stringify(d.comp));if(d.diet)localStorage.setItem('diet',JSON.stringify(d.diet));if(d.dietGoal)localStorage.setItem('dietGoal',String(d.dietGoal));if(d.dietMeals)localStorage.setItem('dietMeals',JSON.stringify(d.dietMeals));render();if(activeScreen==='diet')renderDiet();}else pushToCloud();}catch(e){console.warn(e);}}
-async function pushToCloud(){if(!fbUser)return;try{await db.collection('users').doc(fbUser.uid).set({habits:getHabits(),comp:getComp(),diet:getDiet(),dietGoal:getGoal(),dietMeals:getDietMeals(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});}catch(e){console.warn(e);}}
+async function loadFromCloud(){if(!fbUser)return;try{const s=await db.collection('users').doc(fbUser.uid).get();if(s.exists){const d=s.data();if(d.habits)localStorage.setItem('habits',JSON.stringify(d.habits));if(d.comp)localStorage.setItem('comp',JSON.stringify(d.comp));if(d.diet)localStorage.setItem('diet',JSON.stringify(d.diet));if(d.dietGoal)localStorage.setItem('dietGoal',String(d.dietGoal));if(d.dietMeals)localStorage.setItem('dietMeals',JSON.stringify(d.dietMeals));if(d.workouts)localStorage.setItem('workouts',JSON.stringify(d.workouts));render();if(activeScreen==='diet')renderDiet();if(activeScreen==='workout')renderWorkout();}else pushToCloud();}catch(e){console.warn(e);}}
+async function pushToCloud(){if(!fbUser)return;try{await db.collection('users').doc(fbUser.uid).set({habits:getHabits(),comp:getComp(),diet:getDiet(),dietGoal:getGoal(),dietMeals:getDietMeals(),workouts:getWorkouts(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});}catch(e){console.warn(e);}}
 
 // ── Food DB ────────────────────────────────────────────
 // Fonte: TACO (Tabela Brasileira de Composição de Alimentos) — valores por 100g ou unidade
@@ -1914,10 +2031,10 @@ function maskN(n){return privacyMode?'••':n}
 function togglePrivacy(){
   privacyMode=!privacyMode;
   const icon=privacyMode?'🙈':'👁️';
-  ['privacy-btn','diet-privacy-btn'].forEach(id=>{const b=document.getElementById(id);if(b)b.textContent=icon;});
+  ['privacy-btn','diet-privacy-btn','workout-privacy-btn'].forEach(id=>{const b=document.getElementById(id);if(b)b.textContent=icon;});
   const banner=document.getElementById('privacy-banner');
   if(banner)banner.classList.toggle('visible',privacyMode);
-  activeScreen==='diet'?renderDiet():render();
+  if(activeScreen==='diet')renderDiet();else if(activeScreen==='workout')renderWorkout();else render();
 }
 function refreshData(){
   document.querySelectorAll('[onclick="refreshData()"]').forEach(b=>{
@@ -3002,6 +3119,243 @@ function calcAndRenderSubs(){
     :`<div class="sub-no-results">Nenhuma substituição encontrada nesta categoria.</div>`;
 }
 
+// ── Workouts ───────────────────────────────────────────
+const COMMON_EXERCISES=[
+  {name:'Supino reto',emoji:'🏋️'},
+  {name:'Supino inclinado',emoji:'🏋️'},
+  {name:'Supino com halteres',emoji:'🏋️'},
+  {name:'Crucifixo',emoji:'🏋️'},
+  {name:'Crossover',emoji:'🏋️'},
+  {name:'Desenvolvimento militar',emoji:'💪'},
+  {name:'Desenvolvimento com halteres',emoji:'💪'},
+  {name:'Elevação lateral',emoji:'💪'},
+  {name:'Elevação frontal',emoji:'💪'},
+  {name:'Remada curvada',emoji:'🏋️'},
+  {name:'Remada cavalinho',emoji:'🏋️'},
+  {name:'Remada baixa',emoji:'🏋️'},
+  {name:'Puxada frontal',emoji:'🏋️'},
+  {name:'Puxada alta',emoji:'🏋️'},
+  {name:'Barra fixa',emoji:'🧗'},
+  {name:'Rosca direta',emoji:'💪'},
+  {name:'Rosca alternada',emoji:'💪'},
+  {name:'Rosca martelo',emoji:'💪'},
+  {name:'Rosca scott',emoji:'💪'},
+  {name:'Tríceps pulley',emoji:'💪'},
+  {name:'Tríceps testa',emoji:'💪'},
+  {name:'Tríceps corda',emoji:'💪'},
+  {name:'Tríceps francês',emoji:'💪'},
+  {name:'Agachamento livre',emoji:'🦵'},
+  {name:'Agachamento smith',emoji:'🦵'},
+  {name:'Agachamento hack',emoji:'🦵'},
+  {name:'Leg press',emoji:'🦵'},
+  {name:'Cadeira extensora',emoji:'🦵'},
+  {name:'Cadeira flexora',emoji:'🦵'},
+  {name:'Mesa flexora',emoji:'🦵'},
+  {name:'Levantamento terra',emoji:'🏋️'},
+  {name:'Stiff',emoji:'🦵'},
+  {name:'Afundo',emoji:'🦵'},
+  {name:'Cadeira adutora',emoji:'🦵'},
+  {name:'Cadeira abdutora',emoji:'🦵'},
+  {name:'Panturrilha em pé',emoji:'🦵'},
+  {name:'Panturrilha sentado',emoji:'🦵'},
+  {name:'Abdominal',emoji:'🔥'},
+  {name:'Prancha',emoji:'🔥'},
+  {name:'Esteira',emoji:'🏃'},
+  {name:'Bicicleta ergométrica',emoji:'🚴'},
+];
+let workoutDate=today2();
+let editingWorkoutId=null,wkSelectedEmoji='🏋️',workoutDetailName=null;
+
+function getWorkouts(){return JSON.parse(localStorage.getItem('workouts')||'{}')}
+function saveWorkouts(w){localStorage.setItem('workouts',JSON.stringify(w));pushToCloud()}
+
+function workoutPrevDay(){const d=new Date(workoutDate+'T12:00:00');d.setDate(d.getDate()-1);workoutDate=dateKey2(d);renderWorkout()}
+function workoutNextDay(){if(workoutDate>=today2())return;const d=new Date(workoutDate+'T12:00:00');d.setDate(d.getDate()+1);workoutDate=dateKey2(d);renderWorkout()}
+
+function renderWorkout(){
+  const t=today2(),isToday=workoutDate===t;
+  const yesterday=new Date();yesterday.setDate(yesterday.getDate()-1);
+  const isYesterday=workoutDate===dateKey2(yesterday);
+  let label=isToday?'Hoje':isYesterday?'Ontem':(()=>{const d=new Date(workoutDate+'T12:00:00');return d.getDate()+'/'+String(d.getMonth()+1).padStart(2,'0')})();
+  document.getElementById('workout-date-label').textContent=label;
+  const nb=document.getElementById('workout-next-btn');if(nb)nb.disabled=workoutDate>=t;
+  const sub=document.getElementById('workout-header-sub');
+  if(sub){const h=new Date().getHours();sub.textContent=isToday?(h<12?"Bom dia":(h<17?"Boa tarde":"Boa noite")):label;}
+
+  const entries=getWorkouts()[workoutDate]||[];
+  const rows=entries.map(e=>`
+    <div class="meal-food-item">
+      <div class="food-item-emoji" onclick="openWorkoutDetail('${encodeURIComponent(e.name)}')" style="cursor:pointer">${privacyMode?'🏋️':(e.emoji||'🏋️')}</div>
+      <div class="food-item-info" onclick="openWorkoutDetail('${encodeURIComponent(e.name)}')" style="cursor:pointer">
+        <div class="food-item-name">${mask(e.name)}</div>
+        <div class="food-item-sub">${maskN(e.weight)}kg · ${maskN(e.sets)}x${maskN(e.reps)}</div>
+      </div>
+      <button class="food-item-edit" onclick="openWorkoutEdit('${e.id}')">✏️</button>
+      <button class="food-item-del" onclick="deleteWorkoutEntry('${e.id}')">×</button>
+    </div>`).join('');
+  document.getElementById('workout-list-wrap').innerHTML=`
+    <div class="meal-card">
+      ${rows||'<div class="workout-empty">Nenhum exercício registrado neste dia.<br>Toque em + para adicionar.</div>'}
+      <button class="meal-add-btn" onclick="openWorkoutEdit()">
+        <div class="plus-circle">＋</div>
+        Adicionar exercício
+      </button>
+    </div>`;
+}
+
+function getAllExerciseNames(){
+  const map=new Map();
+  COMMON_EXERCISES.forEach(e=>map.set(normStr(e.name),e));
+  Object.values(getWorkouts()).flat().forEach(e=>{
+    const k=normStr(e.name);
+    if(!map.has(k))map.set(k,{name:e.name,emoji:e.emoji||'🏋️'});
+  });
+  return[...map.values()];
+}
+function filterWorkoutExercises(){
+  const q=document.getElementById('workout-name-input').value.trim();
+  const ac=document.getElementById('wk-autocomplete');
+  document.getElementById('workout-emoji-preview').textContent=wkSelectedEmoji;
+  if(!q){ac.style.display='none';ac.innerHTML='';return;}
+  const nq=normStr(q);
+  const matches=getAllExerciseNames().filter(e=>normStr(e.name).includes(nq)).slice(0,8);
+  if(!matches.length){ac.style.display='none';ac.innerHTML='';return;}
+  ac.innerHTML=matches.map(e=>`<div class="wk-ac-item" onclick="selectWorkoutExercise('${encodeURIComponent(e.name)}','${e.emoji}')"><div class="wk-ac-emoji">${e.emoji}</div><div class="wk-ac-name">${e.name}</div></div>`).join('');
+  ac.style.display='block';
+}
+function selectWorkoutExercise(encodedName,emoji){
+  document.getElementById('workout-name-input').value=decodeURIComponent(encodedName);
+  document.getElementById('workout-emoji-preview').textContent=emoji;
+  wkSelectedEmoji=emoji;
+  document.getElementById('wk-autocomplete').style.display='none';
+  document.getElementById('wk-autocomplete').innerHTML='';
+}
+
+function openWorkoutEdit(id){
+  editingWorkoutId=id||null;
+  document.getElementById('wk-autocomplete').style.display='none';
+  document.getElementById('wk-autocomplete').innerHTML='';
+  if(id){
+    const e=(getWorkouts()[workoutDate]||[]).find(x=>x.id===id);
+    if(!e)return;
+    document.getElementById('workout-edit-title').textContent='Editar Exercício';
+    document.getElementById('workout-name-input').value=e.name;
+    wkSelectedEmoji=e.emoji||'🏋️';
+    document.getElementById('workout-emoji-preview').textContent=wkSelectedEmoji;
+    document.getElementById('workout-weight-input').value=e.weight||'';
+    document.getElementById('workout-reps-input').value=e.reps||'';
+    document.getElementById('workout-sets-input').value=e.sets||'';
+  }else{
+    document.getElementById('workout-edit-title').textContent='Novo Exercício';
+    document.getElementById('workout-name-input').value='';
+    wkSelectedEmoji='🏋️';
+    document.getElementById('workout-emoji-preview').textContent=wkSelectedEmoji;
+    document.getElementById('workout-weight-input').value='';
+    document.getElementById('workout-reps-input').value='';
+    document.getElementById('workout-sets-input').value='';
+  }
+  document.getElementById('screen-workout-edit').classList.add('open');
+  document.getElementById('screen-workout-edit').scrollTop=0;
+  if(!id)setTimeout(()=>document.getElementById('workout-name-input').focus(),350);
+}
+function closeWorkoutEdit(){
+  document.getElementById('screen-workout-edit').classList.remove('open');
+  document.getElementById('wk-autocomplete').style.display='none';
+}
+function saveWorkoutEntry(){
+  const name=document.getElementById('workout-name-input').value.trim();
+  if(!name){document.getElementById('workout-name-input').focus();return;}
+  const weight=parseFloat(document.getElementById('workout-weight-input').value)||0;
+  const reps=parseInt(document.getElementById('workout-reps-input').value)||0;
+  const sets=parseInt(document.getElementById('workout-sets-input').value)||0;
+  let emoji=wkSelectedEmoji;
+  const known=COMMON_EXERCISES.find(ex=>normStr(ex.name)===normStr(name));
+  if(known)emoji=known.emoji;
+  const workouts=getWorkouts();
+  if(!workouts[workoutDate])workouts[workoutDate]=[];
+  if(editingWorkoutId){
+    const e=workouts[workoutDate].find(x=>x.id===editingWorkoutId);
+    if(e){e.name=name;e.emoji=emoji;e.weight=weight;e.reps=reps;e.sets=sets;}
+  }else{
+    workouts[workoutDate].push({id:uid(),name,emoji,weight,reps,sets});
+  }
+  saveWorkouts(workouts);
+  closeWorkoutEdit();
+  renderWorkout();
+}
+function deleteWorkoutEntry(id){
+  const workouts=getWorkouts();
+  const list=workouts[workoutDate]||[];
+  const idx=list.findIndex(x=>x.id===id);
+  if(idx<0)return;
+  if(!confirm('Remover este exercício?'))return;
+  list.splice(idx,1);
+  if(list.length===0)delete workouts[workoutDate];
+  saveWorkouts(workouts);
+  renderWorkout();
+}
+
+function openWorkoutDetail(encodedName){
+  workoutDetailName=decodeURIComponent(encodedName);
+  renderWorkoutDetail();
+  document.getElementById('screen-workout-detail').classList.add('open');
+  document.getElementById('screen-workout-detail').scrollTop=0;
+}
+function closeWorkoutDetail(){
+  document.getElementById('screen-workout-detail').classList.remove('open');
+  workoutDetailName=null;
+}
+function renderWorkoutDetail(){
+  const name=workoutDetailName;
+  document.getElementById('workout-detail-title').textContent=name;
+  const workouts=getWorkouts();
+  const entries=[];
+  Object.keys(workouts).sort().forEach(k=>{
+    (workouts[k]||[]).filter(e=>e.name===name).forEach(e=>entries.push({date:k,...e}));
+  });
+  const weights=entries.map(e=>e.weight);
+  const maxW=weights.length?Math.max(...weights):0;
+  const lastW=weights.length?entries[entries.length-1].weight:0;
+  document.getElementById('wk-stat-max').textContent=maskN(maxW)+'kg';
+  document.getElementById('wk-stat-last').textContent=maskN(lastW)+'kg';
+  document.getElementById('wk-stat-count').textContent=maskN(entries.length);
+  document.getElementById('workout-detail-chart').innerHTML=exerciseChartHTML(entries,'#6366F1');
+  const hist=entries.slice().reverse().slice(0,30);
+  document.getElementById('workout-detail-history').innerHTML=hist.length?hist.map(e=>{
+    const d=new Date(e.date+'T12:00:00');
+    const dl=d.getDate()+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();
+    return `<div class="meal-food-item">
+      <div class="food-item-emoji">${e.emoji||'🏋️'}</div>
+      <div class="food-item-info">
+        <div class="food-item-name">${dl}</div>
+        <div class="food-item-sub">${maskN(e.sets)}x${maskN(e.reps)} reps</div>
+      </div>
+      <div class="food-item-kcal">${maskN(e.weight)}kg</div>
+    </div>`;
+  }).join(''):'<div class="workout-empty">Sem histórico ainda.</div>';
+}
+function exerciseChartHTML(entries,color){
+  if(entries.length===0)return'<div class="workout-empty">Sem dados para exibir.</div>';
+  if(entries.length===1)return`<div class="workout-empty">Apenas 1 registro (${maskN(entries[0].weight)}kg).<br>Adicione mais para ver a evolução.</div>`;
+  const last=entries.slice(-12);
+  const W=320,H=110,pL=30,pR=10,pT=10,pB=22,cW=W-pL-pR,cH=H-pT-pB;
+  const weights=last.map(e=>e.weight);
+  let minV=Math.min(...weights),maxV=Math.max(...weights);
+  if(minV===maxV){minV=Math.max(0,minV-1);maxV+=1;}
+  const pad=(maxV-minV)*0.15;minV=Math.max(0,minV-pad);maxV+=pad;
+  const x=i=>pL+(last.length===1?cW/2:(i/(last.length-1))*cW),y=v=>pT+(1-(v-minV)/(maxV-minV))*cH;
+  const poly=last.map((e,i)=>`${x(i).toFixed(1)},${y(e.weight).toFixed(1)}`).join(' ');
+  const area=`${x(0).toFixed(1)},${(pT+cH).toFixed(1)} ${poly} ${x(last.length-1).toFixed(1)},${(pT+cH).toFixed(1)}`;
+  const grid=[minV,(minV+maxV)/2,maxV].map(v=>`<line x1="${pL}" y1="${y(v).toFixed(1)}" x2="${pL+cW}" y2="${y(v).toFixed(1)}" stroke="var(--sep)" stroke-width="0.5"/><text x="${pL-4}" y="${(y(v)+3).toFixed(1)}" text-anchor="end" font-size="8" fill="var(--text2)">${Math.round(v)}</text>`).join('');
+  const dots=last.map((e,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${y(e.weight).toFixed(1)}" r="2.5" fill="${color}"/>`).join('');
+  const ticks=last.map((e,i)=>{
+    if(last.length>6&&i%2!==0&&i!==last.length-1)return'';
+    const d=new Date(e.date+'T12:00:00');
+    return`<text x="${x(i).toFixed(1)}" y="${H-4}" text-anchor="middle" font-size="8" fill="var(--text2)">${d.getDate()}/${d.getMonth()+1}</text>`;
+  }).join('');
+  return`<svg width="100%" viewBox="0 0 ${W} ${H}" style="display:block">${grid}<polygon points="${area}" fill="${color}20"/><polyline points="${poly}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>${dots}${ticks}</svg>`;
+}
+
 // ── Sidebar + navigation ───────────────────────────────
 function toggleSidebar(){
   const open=document.getElementById('sidebar').classList.contains('open');
@@ -3015,16 +3369,20 @@ function showScreen(name){
   document.getElementById('screen-habits').style.display=name==='habits'?'':'none';
   document.getElementById('screen-diet').style.display=name==='diet'?'':'none';
   document.getElementById('screen-sub').style.display=name==='sub'?'':'none';
+  document.getElementById('screen-workout').style.display=name==='workout'?'':'none';
   document.getElementById('nav-habits').classList.toggle('active',name==='habits');
   document.getElementById('nav-diet').classList.toggle('active',name==='diet');
   document.getElementById('nav-sub').classList.toggle('active',name==='sub');
+  document.getElementById('nav-workout').classList.toggle('active',name==='workout');
   document.getElementById('tab-habits').classList.toggle('active',name==='habits');
   document.getElementById('tab-diet').classList.toggle('active',name==='diet');
   document.getElementById('tab-sub').classList.toggle('active',name==='sub');
+  document.getElementById('tab-workout').classList.toggle('active',name==='workout');
   closeSidebar();
   if(name==='diet'){dietDate=today2();renderDiet();}
   if(name==='habits')render();
   if(name==='sub')initSubLanding();
+  if(name==='workout'){workoutDate=today2();renderWorkout();}
 }
 
 // ── Theme ──────────────────────────────────────────────
