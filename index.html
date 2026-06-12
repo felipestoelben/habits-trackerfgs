@@ -3519,12 +3519,12 @@ function closeWorkoutDetail(){
 }
 function wkNavMonth(dir){workoutDetailMonth+=dir;if(workoutDetailMonth<0){workoutDetailMonth=11;workoutDetailYear--}if(workoutDetailMonth>11){workoutDetailMonth=0;workoutDetailYear++}renderWorkoutDetail()}
 function workoutCalendarHTML(name,color,yr,mo){
-  const t=today2(),workouts=getWorkouts();
+  const t=today2(),workouts=getWorkouts(),nName=normStr(name);
   const firstDow=(new Date(yr,mo,1).getDay()+6)%7,dim=new Date(yr,mo+1,0).getDate();
   let cells='';
   for(let i=0;i<firstDow;i++)cells+=`<div class="cal-cell"></div>`;
   for(let d=1;d<=dim;d++){
-    const k=`${yr}-${String(mo+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`,done=(workouts[k]||[]).some(e=>e.name===name),isT=k===t,isFut=k>t;
+    const k=`${yr}-${String(mo+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`,done=(workouts[k]||[]).some(e=>normStr(e.name)===nName),isT=k===t,isFut=k>t;
     let cls='cal-day',sty='';
     if(done){cls+=' done';sty=`background:${color}`}else if(isT){cls+=' today';sty=`border:2.5px solid ${color};color:${color}`}else if(isFut){cls+=' future'}
     cells+=`<div class="cal-cell"><div class="${cls}" style="${sty}">${d}</div></div>`;
@@ -3533,7 +3533,7 @@ function workoutCalendarHTML(name,color,yr,mo){
 }
 function openWorkoutEditFromDetail(){
   const name=workoutDetailName;
-  const entry=(getWorkouts()[workoutDate]||[]).find(x=>x.name===name);
+  const entry=(getWorkouts()[workoutDate]||[]).find(x=>normStr(x.name)===normStr(name));
   if(entry){openWorkoutEdit(entry.id);return;}
   openWorkoutEdit();
   document.getElementById('workout-name-input').value=name;
@@ -3544,10 +3544,10 @@ function openWorkoutEditFromDetail(){
 function renderWorkoutDetail(){
   const name=workoutDetailName;
   document.getElementById('workout-detail-title').textContent=name;
-  const workouts=getWorkouts();
+  const workouts=getWorkouts(),nName=normStr(name);
   const entries=[];
   Object.keys(workouts).sort().forEach(k=>{
-    (workouts[k]||[]).filter(e=>e.name===name).forEach(e=>entries.push({date:k,...e}));
+    (workouts[k]||[]).filter(e=>normStr(e.name)===nName).forEach(e=>entries.push({date:k,...e}));
   });
   const weights=entries.map(e=>e.weight);
   const maxW=weights.length?Math.max(...weights):0;
