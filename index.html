@@ -309,6 +309,35 @@ h1,h2,h3,h4{font-weight:500}
 .home-stat-card .stat-val{font-size:18px}
 .home-stat-card .stat-lbl{margin-top:0}
 
+/* ── CARDÁPIO (PLANO DE DIETA) ── */
+.mealplan-banner{display:flex;align-items:center;gap:12px;margin:14px 16px 0;padding:14px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-sm);cursor:pointer;transition:transform .12s}
+.mealplan-banner:active{transform:scale(.985)}
+.mealplan-banner-icon{width:40px;height:40px;border-radius:var(--r-md);background:var(--accent-lt);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
+.mealplan-banner-text{flex:1;min-width:0}
+.mealplan-banner-title{font-size:15px;font-weight:500}
+.mealplan-banner-sub{font-size:12px;color:var(--text2);margin-top:2px}
+.mealplan-banner-arrow{font-size:20px;color:var(--text3);flex-shrink:0}
+.mealplan-list{padding:12px 16px 16px;display:flex;flex-direction:column;gap:8px}
+.mealplan-card{display:flex;align-items:center;gap:12px;padding:13px 14px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-lg);cursor:pointer;transition:transform .12s}
+.mealplan-card:active{transform:scale(.985)}
+.mealplan-card-icon{width:40px;height:40px;border-radius:var(--r-md);background:var(--bg-secondary);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
+.mealplan-card-body{flex:1;min-width:0}
+.mealplan-card-name{font-size:15px;font-weight:500}
+.mealplan-card-sub{font-size:12px;color:var(--text2);margin-top:2px}
+.mealplan-card-kcal{font-size:13px;font-weight:500;color:var(--accent);flex-shrink:0;text-align:right}
+.mealplan-note{font-size:13px;color:var(--text-secondary);background:var(--bg-secondary);border-radius:var(--r-md);padding:12px 14px;margin-bottom:14px;line-height:1.5}
+.mealplan-option-hdr{font-size:13px;font-weight:600;color:var(--accent);margin:18px 0 8px;letter-spacing:.2px}
+.mealplan-option-hdr:first-child{margin-top:0}
+.mealplan-group-title{font-size:12px;font-weight:500;color:var(--text2);letter-spacing:.2px;margin:14px 0 6px}
+.mealplan-item{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--sep);font-size:14px}
+.mealplan-item:last-child{border-bottom:none}
+.mealplan-item-qty{color:var(--text-secondary);font-size:13px;flex-shrink:0;text-align:right}
+.textarea-input{width:100%;min-height:120px;padding:12px 14px;border:none;background:transparent;font-size:14px;color:var(--text);font-family:inherit;outline:none;resize:vertical;line-height:1.5;display:block;box-sizing:border-box}
+.textarea-input::placeholder{color:var(--text3)}
+.edit-hint{font-size:12px;color:var(--text3);margin:8px 4px 0;line-height:1.4}
+#screen-mealplan{z-index:50}
+#screen-mealplan-edit{z-index:100}
+
 /* Empty state */
 .empty-state{
   padding:56px 24px;display:flex;flex-direction:column;align-items:center;gap:10px;
@@ -1503,6 +1532,14 @@ h1,h2,h3,h4{font-weight:500}
       <button class="diet-date-btn" id="diet-next-btn" onclick="dietNextDay()">›</button>
     </div>
   </div>
+  <div class="mealplan-banner" onclick="openMealPlan()">
+    <div class="mealplan-banner-icon">📋</div>
+    <div class="mealplan-banner-text">
+      <div class="mealplan-banner-title">Cardápio do dia</div>
+      <div class="mealplan-banner-sub">Veja exatamente o que comer em cada refeição</div>
+    </div>
+    <div class="mealplan-banner-arrow">›</div>
+  </div>
   <div class="diet-summary" id="diet-summary"></div>
   <div class="meals-wrap" id="meals-wrap"></div>
 </div>
@@ -1770,6 +1807,58 @@ h1,h2,h3,h4{font-weight:500}
   </div>
 </div>
 
+<!-- ══ CARDÁPIO (PLANO DE DIETA) ══ -->
+<div class="overlay" id="screen-mealplan">
+  <div id="mealplan-list-view">
+    <div class="detail-hdr">
+      <button class="back-btn" onclick="closeMealPlan()">‹</button>
+      <h2>Cardápio</h2>
+      <button class="edit-pill-btn" onclick="openMealPlanEdit(null)">+ Nova</button>
+    </div>
+    <div class="mealplan-list" id="mealplan-list"></div>
+  </div>
+  <div id="mealplan-detail-view" style="display:none">
+    <div class="detail-hdr">
+      <button class="back-btn" onclick="closeMealPlanDetail()">‹</button>
+      <h2 id="mealplan-detail-title"></h2>
+      <button class="edit-pill-btn" onclick="openMealPlanEdit(currentMealPlanId)">Editar</button>
+    </div>
+    <div class="detail-body" id="mealplan-detail-body"></div>
+  </div>
+</div>
+
+<!-- ══ CARDÁPIO EDIT ══ -->
+<div class="overlay" id="screen-mealplan-edit">
+  <div class="edit-hdr">
+    <button class="edit-cancel" onclick="closeMealPlanEdit()">Cancelar</button>
+    <h2 id="mealplan-edit-title">Nova refeição</h2>
+    <button class="edit-save" onclick="saveMealPlanItem()">Salvar</button>
+  </div>
+  <div class="edit-body">
+    <div class="edit-section-title">Emoji e nome</div>
+    <div class="edit-card">
+      <div class="name-row">
+        <input class="name-input" id="mp-edit-emoji" type="text" maxlength="4" style="flex:0 0 50px;text-align:center;font-size:20px;padding-right:0" placeholder="🍽️">
+        <input class="name-input" id="mp-edit-name" type="text" maxlength="40" placeholder="Ex: Almoço">
+      </div>
+    </div>
+    <div class="edit-section-title">Horário</div>
+    <div class="edit-card"><input class="name-input" id="mp-edit-time" type="text" maxlength="12" placeholder="Ex: 12h00"></div>
+    <div class="edit-section-title">Calorias e macros (texto livre)</div>
+    <div class="edit-card">
+      <input class="name-input" id="mp-edit-kcal" type="text" maxlength="30" placeholder="Ex: ~540 kcal">
+      <div class="sep-line"></div>
+      <input class="name-input" id="mp-edit-macro" type="text" maxlength="60" placeholder="Ex: P: ~58g | C: ~45g | G: ~13g">
+    </div>
+    <div class="edit-section-title">Observação</div>
+    <div class="edit-card"><textarea class="textarea-input" id="mp-edit-note" maxlength="300" style="min-height:60px" placeholder="Ex: Escolher 1 proteína + 1 carboidrato..."></textarea></div>
+    <div class="edit-section-title">Conteúdo</div>
+    <div class="edit-card"><textarea class="textarea-input" id="mp-edit-body" placeholder="- Item — quantidade"></textarea></div>
+    <div class="edit-hint">Use <b>## Título</b> para um grupo de escolha, <b>### Opção</b> para alternativas completas (ex: Opção A / B) e <b>- Item — quantidade</b> para cada alimento, uma linha por item.</div>
+    <button class="detail-delete" id="mp-edit-delete-btn" onclick="deleteMealPlanItem()" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg> Excluir refeição</button>
+  </div>
+</div>
+
 <!-- ══ FOOD SEARCH OVERLAY ══ -->
 <div id="food-overlay">
   <!-- Search view -->
@@ -2021,8 +2110,8 @@ function updateSyncBtn(){
   if(msl)msl.textContent=label;
   if(mss)mss.textContent=sub;
 }
-async function loadFromCloud(){if(!fbUser)return;try{const s=await db.collection('users').doc(fbUser.uid).get();if(s.exists){const d=s.data();if(d.habits)localStorage.setItem('habits',JSON.stringify(d.habits));if(d.comp)localStorage.setItem('comp',JSON.stringify(d.comp));if(d.diet)localStorage.setItem('diet',JSON.stringify(d.diet));if(d.dietGoal)localStorage.setItem('dietGoal',String(d.dietGoal));if(d.dietMeals)localStorage.setItem('dietMeals',JSON.stringify(d.dietMeals));if(d.workouts)localStorage.setItem('workouts',JSON.stringify(d.workouts));render();renderHome();if(activeScreen==='diet')renderDiet();if(activeScreen==='workout')renderWorkout();}else pushToCloud();}catch(e){console.warn(e);}}
-async function pushToCloud(){if(!fbUser)return;try{await db.collection('users').doc(fbUser.uid).set({habits:getHabits(),comp:getComp(),diet:getDiet(),dietGoal:getGoal(),dietMeals:getDietMeals(),workouts:getWorkouts(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});}catch(e){console.warn(e);}}
+async function loadFromCloud(){if(!fbUser)return;try{const s=await db.collection('users').doc(fbUser.uid).get();if(s.exists){const d=s.data();if(d.habits)localStorage.setItem('habits',JSON.stringify(d.habits));if(d.comp)localStorage.setItem('comp',JSON.stringify(d.comp));if(d.diet)localStorage.setItem('diet',JSON.stringify(d.diet));if(d.dietGoal)localStorage.setItem('dietGoal',String(d.dietGoal));if(d.dietMeals)localStorage.setItem('dietMeals',JSON.stringify(d.dietMeals));if(d.workouts)localStorage.setItem('workouts',JSON.stringify(d.workouts));if(d.mealPlan)localStorage.setItem('mealPlan',JSON.stringify(d.mealPlan));render();renderHome();if(activeScreen==='diet')renderDiet();if(activeScreen==='workout')renderWorkout();}else pushToCloud();}catch(e){console.warn(e);}}
+async function pushToCloud(){if(!fbUser)return;try{await db.collection('users').doc(fbUser.uid).set({habits:getHabits(),comp:getComp(),diet:getDiet(),dietGoal:getGoal(),dietMeals:getDietMeals(),workouts:getWorkouts(),mealPlan:getMealPlan(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});}catch(e){console.warn(e);}}
 
 // ── Food DB ────────────────────────────────────────────
 // Fonte: TACO (Tabela Brasileira de Composição de Alimentos) — valores por 100g ou unidade
@@ -2339,6 +2428,122 @@ function getDiet(){return JSON.parse(localStorage.getItem('diet')||'{}')}
 function saveDiet(d){localStorage.setItem('diet',JSON.stringify(d));pushToCloud()}
 function getGoal(){return parseInt(localStorage.getItem('dietGoal')||'2000')}
 function saveGoal(g){localStorage.setItem('dietGoal',String(g));pushToCloud()}
+
+// ── Cardápio (plano de dieta) ──────────────────────────
+const DEFAULT_MEAL_PLAN=[
+  {id:'pos-treino',emoji:'🥤',name:'Pós-treino',time:'07h30',kcal:'184 kcal',macro:'P: 30,8g | C: 12,8g | G: 1,7g',note:'Somente dias de treino. Em dias sem treino, não fazer o pós-treino.',body:'- Whey protein — 30g\n- Leite desnatado — 200ml'},
+  {id:'cafe',emoji:'☕',name:'Café da manhã',time:'08h30',kcal:'~470 kcal',macro:'P: ~30g | C: ~48g | G: ~16g',note:'Escolher 1 pão + 1 proteína + 1 cobertura + 1 fruta. Café preto sem açúcar à vontade.',body:'## PÃO — escolha 1\n- Pão francês — 50g\n- Tapioca/goma hidratada — 60g\n- Pão integral — 60g (2 fatias)\n\n## PROTEÍNA (porção aumentada) — escolha 1\n- Ovo mexido ou frito — 3 unidades (150g)\n- Frango grelhado desfiado — 120g\n\n## COBERTURA — escolha 1\n- Queijo muçarela — 20g\n- Requeijão light — 40g\n\n## FRUTA — escolha 1\n- Banana — 100g\n- Maçã — 160g (1 média)\n- Laranja — 200g (1 grande)'},
+  {id:'almoco',emoji:'🍽️',name:'Almoço',time:'12h00',kcal:'~540 kcal',macro:'P: ~58g | C: ~45g | G: ~13g',note:'Escolher 1 proteína + 1 carboidrato. Adicionar feijão/lentilha, salada, legumes e azeite.',body:'## PROTEÍNA (porção aumentada) — escolha 1\n- Frango grelhado — 200g\n- Carne vermelha magra grelhada — 170g (patinho, alcatra, coxão mole)\n- Peixe grelhado — 230g (tilápia)\n\n## CARBOIDRATO — escolha 1\n- Arroz branco ou integral cozido — 120g\n- Batata cozida ou assada — 200g\n- Mandioca cozida — 120g\n\n## SEMPRE NO PRATO\n- Feijão ou lentilha cozidos — 60g\n- Legumes à vontade — brócolis, abobrinha, couve-flor, espinafre, berinjela\n- Salada à vontade — folhas, tomate, pepino, cebola, rúcula\n- Azeite de oliva — 8ml'},
+  {id:'lanche',emoji:'🥪',name:'Lanche da tarde',time:'15h30',kcal:'250-320 kcal',macro:'Ver opções',note:'Escolher Opção A (shake com iogurte) ou Opção B (sanduíche proteico).',body:'### OPÇÃO A — Shake com iogurte (~250 kcal | P: ~40g | C: ~20g | G: ~2g)\n- Whey protein — 40g (misturar no iogurte)\n- Iogurte desnatado natural — 170g (1 pote)\n\n## FRUTA — escolha 1\n- Morango — 100g\n- Banana — 60g\n- Uva verde — 100g\n\n### OPÇÃO B — Sanduíche proteico (~320 kcal | P: ~38g | C: ~25g | G: ~7g)\n- Pão de forma integral — 50g (2 fatias)\n- Patê (frango grelhado desfiado + requeijão light) — 110g + 30g'},
+  {id:'janta',emoji:'🌙',name:'Janta',time:'19h00',kcal:'~470 kcal',macro:'P: ~48g | C: ~45g | G: ~9g',note:'Escolher 1 proteína + 1 carboidrato. Adicionar salada, legumes, azeite e maçã.',body:'## PROTEÍNA (porção aumentada) — escolha 1\n- Frango grelhado — 170g\n- Carne vermelha magra grelhada — 140g (patinho, alcatra)\n- Peixe grelhado — 200g (tilápia)\n\n## CARBOIDRATO — escolha 1\n- Arroz branco ou integral cozido — 100g\n- Batata cozida ou assada — 170g\n- Mandioca cozida — 100g\n\n## SEMPRE NO PRATO\n- Legumes à vontade — brócolis, abobrinha, couve-flor, espinafre, berinjela\n- Salada à vontade — folhas, tomate, pepino, cebola, rúcula\n- Azeite de oliva — 5ml\n- Maçã — 160g (1 média)'},
+  {id:'obs',emoji:'📌',name:'Observações gerais',time:'',kcal:'',macro:'',note:'',body:'- Pós-treino apenas em dias de treino.\n- Feijão/lentilha deve entrar na maioria dos dias.\n- Proteína é prioridade — não reduza a porção.\n- Azeite: manter conforme o plano (ajuda a completar as gorduras e melhora a saciedade).\n- Meta diária de proteína: ~220g.\n- Usar os macros como referência aproximada, não como número absoluto.'},
+];
+function getMealPlan(){const raw=localStorage.getItem('mealPlan');if(raw)try{return JSON.parse(raw);}catch(e){}return DEFAULT_MEAL_PLAN.map(m=>({...m}));}
+function saveMealPlan(list){localStorage.setItem('mealPlan',JSON.stringify(list));pushToCloud();}
+let currentMealPlanId=null,editingMealPlanId=null;
+function openMealPlan(){
+  renderMealPlanList();
+  document.getElementById('mealplan-list-view').style.display='';
+  document.getElementById('mealplan-detail-view').style.display='none';
+  document.getElementById('screen-mealplan').classList.add('open');
+}
+function closeMealPlan(){document.getElementById('screen-mealplan').classList.remove('open');}
+function renderMealPlanList(){
+  document.getElementById('mealplan-list').innerHTML=getMealPlan().map(m=>`
+    <div class="mealplan-card" onclick="openMealPlanDetail('${m.id}')">
+      <div class="mealplan-card-icon">${m.emoji||'🍽️'}</div>
+      <div class="mealplan-card-body">
+        <div class="mealplan-card-name">${m.name}</div>
+        <div class="mealplan-card-sub">${m.time||''}</div>
+      </div>
+      <div class="mealplan-card-kcal">${m.kcal||''}</div>
+    </div>`).join('');
+}
+function renderMealPlanBody(body){
+  const lines=(body||'').split('\n');
+  let html='';
+  lines.forEach(line=>{
+    line=line.trim();
+    if(!line)return;
+    if(line.startsWith('### ')){
+      html+=`<div class="mealplan-option-hdr">${line.slice(4)}</div>`;
+    }else if(line.startsWith('##')){
+      const t=line.slice(2).trim();
+      if(t)html+=`<div class="mealplan-group-title">${t}</div>`;
+    }else if(line.startsWith('- ')){
+      const item=line.slice(2),parts=item.split(' — '),name=parts[0],qty=parts.slice(1).join(' — ');
+      html+=`<div class="mealplan-item"><span>${name}</span>${qty?`<span class="mealplan-item-qty">${qty}</span>`:''}</div>`;
+    }else{
+      html+=`<div class="mealplan-item"><span>${line}</span></div>`;
+    }
+  });
+  return html||'<div class="mealplan-item"><span>Sem itens cadastrados.</span></div>';
+}
+function openMealPlanDetail(id){
+  currentMealPlanId=id;
+  const m=getMealPlan().find(x=>x.id===id);
+  if(!m)return;
+  document.getElementById('mealplan-detail-title').textContent=m.name;
+  const headParts=[m.time,m.kcal,m.macro].filter(Boolean);
+  const head=headParts.length?`<div class="mealplan-note" style="background:none;padding:0 0 12px">${headParts.join(' · ')}</div>`:'';
+  const note=m.note?`<div class="mealplan-note">${m.note}</div>`:'';
+  document.getElementById('mealplan-detail-body').innerHTML=head+note+renderMealPlanBody(m.body);
+  document.getElementById('mealplan-list-view').style.display='none';
+  document.getElementById('mealplan-detail-view').style.display='';
+}
+function closeMealPlanDetail(){
+  document.getElementById('mealplan-detail-view').style.display='none';
+  document.getElementById('mealplan-list-view').style.display='';
+  currentMealPlanId=null;
+}
+function openMealPlanEdit(id){
+  editingMealPlanId=id;
+  const m=id?getMealPlan().find(x=>x.id===id):null;
+  document.getElementById('mealplan-edit-title').textContent=id?'Editar refeição':'Nova refeição';
+  document.getElementById('mp-edit-emoji').value=m?m.emoji:'🍽️';
+  document.getElementById('mp-edit-name').value=m?m.name:'';
+  document.getElementById('mp-edit-time').value=m?m.time:'';
+  document.getElementById('mp-edit-kcal').value=m?m.kcal:'';
+  document.getElementById('mp-edit-macro').value=m?m.macro:'';
+  document.getElementById('mp-edit-note').value=m?m.note:'';
+  document.getElementById('mp-edit-body').value=m?m.body:'';
+  document.getElementById('mp-edit-delete-btn').style.display=id?'flex':'none';
+  document.getElementById('screen-mealplan-edit').classList.add('open');
+}
+function closeMealPlanEdit(){document.getElementById('screen-mealplan-edit').classList.remove('open');}
+function saveMealPlanItem(){
+  const name=document.getElementById('mp-edit-name').value.trim();
+  if(!name){alert('Dê um nome pra refeição.');return;}
+  const list=getMealPlan();
+  const data={
+    emoji:document.getElementById('mp-edit-emoji').value.trim()||'🍽️',
+    name,
+    time:document.getElementById('mp-edit-time').value.trim(),
+    kcal:document.getElementById('mp-edit-kcal').value.trim(),
+    macro:document.getElementById('mp-edit-macro').value.trim(),
+    note:document.getElementById('mp-edit-note').value.trim(),
+    body:document.getElementById('mp-edit-body').value,
+  };
+  if(editingMealPlanId){
+    const idx=list.findIndex(x=>x.id===editingMealPlanId);
+    if(idx>-1)list[idx]={...list[idx],...data};
+  }else{
+    list.push({id:'m'+Date.now().toString(36),...data});
+  }
+  saveMealPlan(list);
+  closeMealPlanEdit();
+  renderMealPlanList();
+  if(currentMealPlanId)openMealPlanDetail(currentMealPlanId);
+}
+function deleteMealPlanItem(){
+  if(!editingMealPlanId)return;
+  if(!confirm('Excluir esta refeição do cardápio?'))return;
+  saveMealPlan(getMealPlan().filter(x=>x.id!==editingMealPlanId));
+  closeMealPlanEdit();
+  closeMealPlanDetail();
+  renderMealPlanList();
+}
+
 function getDietDay(dk){
   const d=getDiet();const meals=getDietMeals();
   if(!d[dk])d[dk]={meals:Object.fromEntries(meals.map(m=>[m.id,[]]))};
