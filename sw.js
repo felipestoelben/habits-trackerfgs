@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gymz-cache-v1';
+const CACHE_NAME = 'gymz-cache-v2';
 const PRECACHE_URLS = [
   './',
   './index.html',
